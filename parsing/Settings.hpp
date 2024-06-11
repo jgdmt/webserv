@@ -14,11 +14,14 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
+#include "Server.hpp"
 
 class Settings
 {
     public:
         void parse(std::string const &filePath);
+		void parseServer(std::string& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
     private:
-        
+		std::vector<Server> _servers;
 };

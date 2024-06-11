@@ -34,7 +34,7 @@ class Server
         uint16_t _port;
         uint64_t _max_body_size;
         std::map<std::string, std::string> _error_pages;
-        std::vector<Route> _routes;
+        // std::vector<Route> _routes;
         Server();
 
 };
