@@ -1,24 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   settings.hpp                                       :+:      :+:    :+:   */
+/*   print.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 12:03:28 by vilibert         ###   ########.fr       */
+/*   Created: 2024/06/11 16:20:47 by vilibert          #+#    #+#             */
+/*   Updated: 2024/06/11 17:01:45 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <string>
 #include <iostream>
+#include <ctime>
 
-class Settings
+class Print
 {
     public:
-        void parse(std::string const &filePath);
+        static void print(std::string const &str);
+        static void success_print(std::string const &str);
+        static void error_print(std::string const &str);
     private:
-        
+        Print();
+        ~Print();
 };

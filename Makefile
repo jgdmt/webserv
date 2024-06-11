@@ -1,5 +1,6 @@
-SRCS		:=	
-OBJS		:=	${SRCS:.cpp=.o}
+PARSING_SRCS := Settings.cpp Server.cpp Route.cpp
+SRCS		:=	main.cpp Print.cpp $(addprefix parsing/,$(PARSING_SRCS))
+OBJS		:=	${SRCS:.cpp=.o} 
 
 CC			:= c++
 CXXFLAGS	:= -Werror -Wextra -Wall -I. -std=c++98
