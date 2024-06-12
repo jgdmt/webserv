@@ -21,7 +21,7 @@ class Settings
 {
     public:
         void parse(std::string const &filePath);
-		void parseServer(std::string& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
+		void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
     private:
 		std::vector<Server> _servers;
 };

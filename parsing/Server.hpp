@@ -15,26 +15,33 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
+#include <arpa/inet.h>
 #include "Route.hpp"
+#include "../Utils.hpp"
+#include "../Print.hpp"
 
 class Server
 {
     public:
-        Server(std::string const &name);
+        Server();
         std::string const &getName(void) const;
         std::string const &getHost(void) const;
         uint16_t getPort(void) const;
         uint64_t getMaxBodySize(void) const;
+		int	getID(void) const;
         std::string const &getErrorPage(std::string const &error);
 
-        
+        void	parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);
     private:
-        const std::string _name;
-        std::string _host;
+		int	id;
+        std::vector<std::string> _name;
+        in_addr_t _host;
         uint16_t _port;
         uint64_t _max_body_size;
         std::map<std::string, std::string> _error_pages;
         // std::vector<Route> _routes;
-        Server();
 
+		void listen(std::string const& content, std::string::iterator& start);
+		void servername(std::string const& content, std::string::iterator& start);
 };

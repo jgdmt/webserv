@@ -33,6 +33,7 @@ static std::string createContent(std::string const& fileName)
 		content += line;
 	}
 	ifs.close();
+	std::replace(content.begin(), content.end(), '\t', ' ');
 	return (content);
 }
 
@@ -54,15 +55,43 @@ static it	find_end(std::string content, it i)
 	return (i);
 }
 
-void Settings::parseServer(std::string& content, it& name, it& start, it& end)
+static int	find_len(std::string const& content, it const& name, char endc, bool split)
 {
-	// if (name == start) 
-	// 	Server server;
-	// else	
-		Server server(content.substr(name - content.begin(), start - name)); //Skip space & tab in name
-	std::cout << server.getName() << "\n";
+	int	len = 0;
+
+	while ((name + len) != content.end() && *(name + len) != endc)
+	{
+		if (*(name + len) == ' ')
+		{
+			int	space = 0;
+			while (*(name + len + space) == ' ' && (name + len + space) != content.end())
+				space++;
+			if (*(name + len + space) != endc)
+				len += space;
+			else
+				return (len);
+			if (name + len == content.end())
+				return (-1);
+			if (!split && *(name + len) != endc && *(name + len) != ' ')
+				return (-2);
+		}
+		len++;
+	}
+	return (len);
+}
+
+void Settings::parseServer(std::string const& content, it& name, it& start, it& end)
+{
+	int len = find_len(content, name, '{', true);
+	
+	if (name == start || content.substr(name - content.begin(), len) != "server")
+	{
+		Print::error_print(ERROR, "server");
+		exit (1);
+	}
+	Server server;
+	server.parse(content, start, end);
 	this->_servers.push_back(server);
-	(void) end;
 }
 
 void Settings::parse(std::string const &fileName)
@@ -78,6 +107,8 @@ void Settings::parse(std::string const &fileName)
 		{
 			if (*start == '}')
 				Print::error_print(ERROR, "Bracket error: } has no {");
+			if (*name == ' ')
+				name++;
 			start++;
 		}
 		std::cout << std::distance(name, content.begin()) << "\n";
