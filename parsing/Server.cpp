@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 16:16:09 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/12 17:39:15 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,11 @@ uint64_t Server::getMaxBodySize(void) const
 std::string const &Server::getErrorPage(std::string const &error)
 {
     return _error_pages[error];
+}
+
+int Server::getID(void) const
+{
+    return id;
 }
 
 static int	find_len(std::string const& content, std::string::iterator const& name, char endc, bool split)
