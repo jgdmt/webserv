@@ -44,4 +44,5 @@ class Server
 
 		void listen(std::string const& content, std::string::iterator& start);
 		void servername(std::string const& content, std::string::iterator& start);
+		void maxbodysize(std::string const& content, std::string::iterator& start);
 };

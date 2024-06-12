@@ -111,7 +111,7 @@ void Settings::parse(std::string const &fileName)
 				name++;
 			start++;
 		}
-		std::cout << std::distance(name, content.begin()) << "\n";
+		// std::cout << std::distance(name, content.begin()) << "\n";
 		it end = find_end(content, start + 1);
 		if (end == content.end())
 			return ;

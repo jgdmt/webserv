@@ -18,8 +18,8 @@ int main(int argc, char **argv)
 {
     Settings settings;
 
-    Server a;
-    Socket test(a);
+    // Server a;
+    // Socket test(a);
     switch(argc)
     {
         case 1:

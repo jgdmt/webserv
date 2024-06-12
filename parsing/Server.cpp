@@ -130,7 +130,6 @@ void	Server::servername(std::string const& content, std::string::iterator& start
 	std::string::iterator tmp = start;
 	std::string::iterator it;
 
-	std::cout << "LENGTH "<<len<< "\n "; 
 	if (len == -1)
 	{
 		Print::error_print(ERROR, "Error: missing ';'");
@@ -138,13 +137,29 @@ void	Server::servername(std::string const& content, std::string::iterator& start
 	}
 	while (start != tmp + len)
 	{
-		it = std::find(start, start + len, ' ');
-		std::cout << content.substr(start - content.begin(), it - start) << ".\n";
+		it = std::find(start, tmp + len, ' ');
 		this->_name.push_back(content.substr(start - content.begin(), it - start));
 		start = it;
 		while (*start == ' ')
 			start++;
 	}
+}
+
+void Server::maxbodysize(std::string const& content, std::string::iterator& start)
+{
+	int len = find_len(content, start, ';', false);
+
+	if (len == -1)
+	{
+		Print::error_print(ERROR, "Error: missing ';'");
+		exit (0);
+	}
+	if (len == -2)
+	{
+		Print::error_print(ERROR, "Error: max_body_size doesn't take multiple parameters");
+		exit (0);
+	}
+	this->_max_body_size = convertType<uint64_t>(content.substr(start - content.begin(), (size_t)len));
 }
 
 void	Server::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
@@ -160,16 +175,17 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 		while (*start != ' ' && *start != ';')
 			start++;
 		param = content.substr(it - content.begin(), start - it);
-		// std::cout << "'" << param << "'\n";
+		std::cout << "'" << param << "'\n";
 		while (*start == ' ')
 			start++;
 		if (param == "listen")
 			listen(content, start);
 		else if (param == "server_name")
 			servername(content, start);
+		else if (param == "max_body_size")
+			maxbodysize(content, start);
 		else
 			start++;
-			// exit(0);
 		while (*start == ' ')
 			start++;
 	}
