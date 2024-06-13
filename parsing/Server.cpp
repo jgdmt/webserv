@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 12:55:55 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 13:01:26 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ uint16_t Server::getPort(void) const
 uint64_t Server::getMaxBodySize(void) const
 {
     return _max_body_size;
+}
+
+in_addr_t const &Server::getHost(void) const
+{
+	return _host;
 }
 
 std::string const &Server::getErrorPage(std::string const &error)
