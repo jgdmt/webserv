@@ -6,15 +6,17 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/12 17:39:15 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 10:56:28 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <iostream>
-Server::Server()
+Server::Server(int id)
 {
     _port = 80;
+	_id = id;
+	_log_level= DEBUG;
     _max_body_size = 1000000000;
     _error_pages["400"] = "default/http_error/400.html";
     _error_pages["403"] = "default/http_error/403.html";
@@ -43,7 +45,12 @@ std::string const &Server::getErrorPage(std::string const &error)
 
 int Server::getID(void) const
 {
-    return id;
+    return _id;
+}
+
+std::string Server::getLogLevel(void) const
+{
+	return _log_level;
 }
 
 static int	find_len(std::string const& content, std::string::iterator const& name, char endc, bool split)
@@ -73,7 +80,7 @@ static int	find_len(std::string const& content, std::string::iterator const& nam
 	return (len);
 }
 
-void Server::listen(std::string const& content, std::string::iterator& start)
+void Server::listen2(std::string const& content, std::string::iterator& start)
 {
 	std::string::iterator found;
 	std::string	host;
@@ -179,7 +186,7 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 		while (*start == ' ')
 			start++;
 		if (param == "listen")
-			listen(content, start);
+			listen2(content, start);
 		else if (param == "server_name")
 			servername(content, start);
 		else if (param == "max_body_size")
@@ -190,4 +197,19 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			start++;
 	}
 	
+}
+
+void    Server::setup(void)
+{
+	_fd_listen = socket(AF_INET, SOCK_STREAM, 0);
+    if(_fd_listen == -1)
+		Print::error_print(CRASH, "Socket: " + (std::string)strerror(errno));
+	_server_socket.sin_family = AF_INET;
+    _server_socket.sin_port = htons(_port);
+	_server_socket.sin_addr.s_addr = _host;
+	int option = 1;
+	if (setsockopt(_fd_listen, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option)) == -1)
+		Print::error_print(CRASH, "Socket: " + (std::string)strerror(errno));
+    if(bind(_fd_listen, (struct sockaddr*)&_server_socket, sizeof(_server_socket)) == -1)
+		Print::error_print(CRASH, "Bind: " + (std::string)strerror(errno));
 }

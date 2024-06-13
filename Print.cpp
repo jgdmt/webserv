@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/12 17:37:45 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 10:42:20 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int getLevel(std::string const &level)
 void Print::print(std::string const &status, Server &serv, std::string const &str)
 {
     int level = getLevel(status);
-    if(level >= serv.getID())
+    if(level >= getLevel(serv.getLogLevel()))
     {
         output_time();
         std::cout << "[" << status << "][" << serv.getID() << "]    " << str <<std::endl;
@@ -89,5 +89,6 @@ void Print::error_print(std::string const &status, std::string const &str)
     if (time->tm_sec < 10)
         std::cerr << '0';   
     std::cerr << time->tm_sec << "]    " << status << "    " << str << "\e[97m\n";
-
+    if(status == CRASH)
+        exit(1);
 }

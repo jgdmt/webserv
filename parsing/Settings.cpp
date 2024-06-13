@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 17:02:14 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 10:08:24 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void Settings::parseServer(std::string const& content, it& name, it& start, it& 
 		Print::error_print(ERROR, "server");
 		exit (1);
 	}
-	Server server;
+	Server server(this->_servers.size() + 1);
 	server.parse(content, start, end);
 	this->_servers.push_back(server);
 }
