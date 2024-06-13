@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 10:08:24 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 12:31:09 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,4 +118,24 @@ void Settings::parse(std::string const &fileName)
 		parseServer(content, name, start, end);
 		break;
 	}
+}
+
+std::vector<Server> &Settings::getServers(void)
+{
+	return _servers;
+}
+
+void Settings::setup(void)
+{
+	char buffer[INET_ADDRSTRLEN];
+	FD_ZERO(&_read);
+	FD_ZERO(&_write);
+	for(int i = 0; i < _servers.size(); i++)
+	{
+		_servers[i].setup();
+		
+		Print::print(INFO, _servers[i], "Server started! Listen at " + (std::string)inet_ntop(AF_INET, &_servers[i].getHost(), buffer, INET_ADDRSTRLEN) + ":" + to_string<uint16_t>(_servers[i].getPort()) + ".");
+	}
+	Print::success_print("All servers succesfully started !");
+	
 }

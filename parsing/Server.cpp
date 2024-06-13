@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 10:56:28 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 12:55:55 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,4 +233,8 @@ void    Server::setup(void)
 		Print::error_print(CRASH, "Socket: " + (std::string)strerror(errno));
     if(bind(_fd_listen, (struct sockaddr*)&_server_socket, sizeof(_server_socket)) == -1)
 		Print::error_print(CRASH, "Bind: " + (std::string)strerror(errno));
+	if (listen(_fd_listen, 512) == -1)	
+		Print::error_print(CRASH, "Listen: " + (std::string)strerror(errno));
+	if (fcntl(_fd_listen, F_SETFL, O_NONBLOCK) < 0)
+		Print::error_print(CRASH, "Fcntl: " + (std::string)strerror(errno));
 }
