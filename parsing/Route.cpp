@@ -81,3 +81,8 @@ void Route::setDefaultAutorizedMethod(void)
     _autorizedMethods.push_back("GET");
     _autorizedMethods.push_back("POST");
 }
+
+void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
+{
+	(void) content;(void)start;(void)end;
+}

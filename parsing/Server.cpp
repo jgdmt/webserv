@@ -182,8 +182,9 @@ void	Server::parseRoot(std::string const& content, std::string::iterator& start,
 		Print::error_print(ERROR, "Error: max_body_size doesn't take multiple parameters");
 		exit (0);
 	}
-	// Route route;
-	(void)content;(void)start;(void)end;
+	Route route;
+	route.parse(content, start, end);
+	this->_routes.push_back(route);
 }
 
 void	Server::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)

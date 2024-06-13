@@ -32,6 +32,8 @@ class Route
         void setdefaultFileForDirectory(std::string const &str);
         void addAutorizedMethod(std::string const &str);
         void setDefaultAutorizedMethod(void);
+
+		void parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);
     private:
         // Route(Route const &cpy);
         // Route &operator= (Route const &cpy);
@@ -41,5 +43,4 @@ class Route
         bool _directoryListing;
         std::string _defaultFileForDirectory;
         
-
 };
