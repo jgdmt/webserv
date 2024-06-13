@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 10:41:11 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:29:34 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,6 @@ class Server
 		void listen2(std::string const& content, std::string::iterator& start);
 		void servername(std::string const& content, std::string::iterator& start);
 		void maxbodysize(std::string const& content, std::string::iterator& start);
-
+		void errorpage(std::string const& content, std::string::iterator& start);
 		void parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end);
 };

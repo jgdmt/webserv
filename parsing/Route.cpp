@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 16:08:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:58:25 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,144 @@ void Route::setDefaultAutorizedMethod(void)
     _autorizedMethods.push_back("POST");
 }
 
-void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
+int	Route::find_len(std::string const& content, std::string::iterator const& name, char endc, bool split)
 {
-	(void) content;(void)start;(void)end;
+	int	len = 0;
+
+	while ((name + len) != content.end() && *(name + len) != endc)
+	{
+		if (*(name + len) == ' ')
+		{
+			int	space = 0;
+			while (*(name + len + space) == ' ' && (name + len + space) != content.end())
+				space++;
+			if (*(name + len + space) != endc)
+				len += space;
+			else
+				return (len);
+			if (name + len == content.end())
+				return (-1);
+			if (!split && *(name + len) != endc && *(name + len) != ' ')
+				return (-2);
+		}
+		len++;
+	}
+	if ((name + len) == content.end())
+		return (-1);
+	return (len);
+}
+
+static std::string::iterator	find_end(std::string const& content, std::string::iterator i)
+{
+	int nb = 1;
+	while (i != content.end())
+	{
+		if (*i == '{')
+			nb++;
+		if (*i == '}')
+			nb--;
+		if (nb == 0)
+			break;
+		i++;
+	}
+	if (nb > 0)
+		Print::error_print(CRASH, "Parsing: } not found");
+	return (i);
+}
+
+void Route::path(std::string const& content, std::string::iterator& start)
+{
+	int len = find_len(content, start, ';', false);
+
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing location: root is missing value");
+	if (len == -1)
+		Print::error_print(CRASH, "Parsing location: missing ';'");
+	if (len == -2)
+		Print::error_print(CRASH, "Parsing location: root does not take multiple values");
+	this->_path = content.substr(start - content.begin(), len);
+	start += len;
+}
+
+void Route::route(std::string const& content, std::string::iterator& start, std::string::iterator& end)
+{
+	int len = find_len(content, start, '{', false);
+
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing location: location is missing value");
+	if (len == -2)
+		Print::error_print(CRASH, "Error: location does not take multiple parameters");
+	Route route;
+	parse(content, start, end, len);
+	this->_routes.push_back(route);
+}
+
+void Route::allowmethods(std::string const& content, std::string::iterator& start)
+{
+	int len = find_len(content, start, ';', true);
+	std::string::iterator tmp = start;
+	std::string::iterator it;
+	std::string method;
+
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing location: allow_methods is missing values");
+	if (len == -1)
+		Print::error_print(CRASH, "Parsing location: missing ';'");
+	while (start != tmp + len)
+	{
+		it = std::find(start, tmp + len, ' ');
+		method = content.substr(start - content.begin(), it - start);
+		if (method == "PUT" || method == "POST" || method == "GET")
+			this->_autorizedMethods.push_back(method);
+		else
+			Print::error_print(CRASH, "Parsing location: " + method + " is not a valid method (valid methods: POST, GET, PUT)");
+		start = it;
+		while (*start == ' ')
+			start++;
+	}
+}
+
+void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
+{
+	std::string::iterator it;
+	std::string::iterator root_end;
+	std::string param;
+	bool methods = false;
+
+	this->_redirection = content.substr(start - content.begin(), len);
+	start += len;
+	while (*(++start) == ' ')
+		continue ;
+	root_end = find_end(content, start);
+	while (*(++start) == ' ')
+		continue ;
+	while (start != end && start != root_end)
+	{
+		it = start;
+		while (*start != ' ' && *start != ';' && start != end && start != root_end)
+			start++;
+		if (start == end || start == root_end)
+			return ;
+		param = content.substr(it - content.begin(), start - it);
+		while (*start == ' ')
+			start++;
+
+		std::cout << "PARAM  " << param << "\n";
+
+		if (param == "root")
+			path(content, start);
+		else if (param == "location")
+			route(content, start, root_end);
+		else if (param == "allow_methods")
+		{
+			allowmethods(content, start);
+			methods = true;
+		}
+		else
+			Print::error_print(CRASH, "Parsing location: " + param + " is unknown");
+		while (*start == ' ' || *start == ';' || *start == '}')
+			start++;
+	}
+	if (!methods)
+		setDefaultAutorizedMethod();
 }

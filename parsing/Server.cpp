@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 10:56:28 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:55:36 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,78 +57,35 @@ std::string Server::getLogLevel(void) const
 	return _log_level;
 }
 
-static int	find_len(std::string const& content, std::string::iterator const& name, char endc, bool split)
-{
-	int	len = 0;
-
-	while ((name + len) != content.end() && *(name + len) != endc)
-	{
-		if (*(name + len) == ' ')
-		{
-			int	space = 0;
-			while (*(name + len + space) == ' ' && (name + len + space) != content.end())
-				space++;
-			if (*(name + len + space) != endc)
-				len += space;
-			else
-				return (len);
-			if (name + len == content.end())
-				return (-1);
-			if (!split && *(name + len) != endc && *(name + len) != ' ')
-				return (-2);
-		}
-		len++;
-	}
-	if ((name + len) == content.end())
-		return (-1);
-	return (len);
-}
-
 void Server::listen2(std::string const& content, std::string::iterator& start)
 {
 	std::string::iterator found;
 	std::string	host;
 	std::string port;
-	int l = find_len(content, start, ';', false);
+	int l = Route::find_len(content, start, ';', false);
 	sockaddr_in serverAddress;
 
+	if (l == 0)
+		Print::error_print(CRASH, "Parsing server: listen is missing a value");
 	if (l == -1)
-	{
-		Print::error_print(ERROR, "Error: missing ';'");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: missing ';'");
 	else if (l == -2)
-	{
-		Print::error_print(ERROR, "Error: listen does not take more than one parameter");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: listen does not take multiple values");
 	found = std::find(start, start + l, ':');
 	if (found == start + l)
-	{
-		Print::error_print(ERROR, "Error: listen is missing port parameter");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: listen is missing port parameter");
 	host = content.substr(start - content.begin(), found - start);
 	if (host == "localhost")
 		host = "127.0.0.1";
 	if (inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr.s_addr) == -1)
-	{
-		Print::error_print(ERROR, "Error: host is wrong");
-		exit(0);
-	}
+		Print::error_print(CRASH, "Parsing server: wrong host");
 	port = content.substr(found - content.begin() + 1, std::find(start, start + l, ';') - 1 - found);
 	for (size_t i = 0; i < port.size(); i++)
 	{
 		if (!isdigit(port[i]))
-		{
-			Print::error_print(ERROR, "Error: port is wrong");
-			exit (0);
-		}
+			Print::error_print(CRASH, "Parsing server: wrong port");
 		if (convertType<int>(port) > 65535)
-		{
-			Print::error_print(ERROR, "Error: port overflow");
-			exit(0);
-		}
+			Print::error_print(CRASH, "Parsing server: port overflow");
 	}
 	start += l;
 	this->_host = serverAddress.sin_addr.s_addr;
@@ -137,15 +94,14 @@ void Server::listen2(std::string const& content, std::string::iterator& start)
 
 void	Server::servername(std::string const& content, std::string::iterator& start)
 {
-	int	len = find_len(content, start, ';', true);
+	int	len = Route::find_len(content, start, ';', true);
 	std::string::iterator tmp = start;
 	std::string::iterator it;
 
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing server: server_name is missing a value");
 	if (len == -1)
-	{
-		Print::error_print(ERROR, "Error: missing ';'");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: missing ';'");
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
@@ -158,33 +114,62 @@ void	Server::servername(std::string const& content, std::string::iterator& start
 
 void Server::maxbodysize(std::string const& content, std::string::iterator& start)
 {
-	int len = find_len(content, start, ';', false);
+	int len = Route::find_len(content, start, ';', false);
 
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing server: max_body_size is missing a value");
 	if (len == -1)
-	{
-		Print::error_print(ERROR, "Error: missing ';'");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: missing ';'");
 	if (len == -2)
-	{
-		Print::error_print(ERROR, "Error: max_body_size doesn't take multiple parameters");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: max_body_size does not take multiple values");
 	this->_max_body_size = convertType<uint64_t>(content.substr(start - content.begin(), (size_t)len));
+	start += len;
 }
 
 void	Server::parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end)
 {
-	int l = find_len(content, start, '{', false);
+	int l = Route::find_len(content, start, '{', false);
 
+	if (l == 0)
+		Print::error_print(CRASH, "Parsing server: location is missing a value");
 	if (l == -2)
-	{
-		Print::error_print(ERROR, "Error: max_body_size doesn't take multiple parameters");
-		exit (0);
-	}
+		Print::error_print(CRASH, "Parsing server: location does not take multiple parameters");
 	Route route;
-	route.parse(content, start, end);
+	route.parse(content, start, end, l);
 	this->_routes.push_back(route);
+}
+
+void	Server::errorpage(std::string const& content, std::string::iterator& start)
+{
+	int len = Route::find_len(content, start, ';', true);
+	std::string::iterator tmp = start;
+	std::string::iterator it;
+	std::string key;
+	std::string link;
+
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing server: error_page is missing a value");
+	if (len == -1)
+		Print::error_print(CRASH, "Parsing server: missing ';'");
+	it = std::find(start, tmp + len, ' ');
+	if (it == tmp + len)
+		Print::error_print(CRASH, "Parsing server: error_page is missing a value");
+	key = content.substr(start - content.begin(), it - start);
+	start = it;
+	while (*start == ' ')
+		start++;
+	it = std::find(start, tmp + len, ' ');
+	link = content.substr(start - content.begin(), it - start);
+	start = it;
+	while (*start == ' ')
+		start++;
+	if (*start != ';')
+		Print::error_print(CRASH, "Parsing server: error_page takes two values only");
+	if (this->_error_pages.find(key) == this->_error_pages.end())
+		Print::error_print(CRASH, "Parsing server: " + key + " is an unknown error");
+	if (access(link.c_str(), F_OK | R_OK))
+		Print::error_print(CRASH, "Parsing server: " + link);
+	this->_error_pages[key] = link;
 }
 
 void	Server::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
@@ -202,7 +187,6 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 		if (start == end)
 			return ;
 		param = content.substr(it - content.begin(), start - it);
-		std::cout << "'" << param << "'\n";
 		while (*start == ' ')
 			start++;
 		if (param == "listen")
@@ -213,12 +197,13 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			maxbodysize(content, start);
 		else if (param == "location")
 			parseRoot(content, start, end);
+		else if (param == "error_page")
+			errorpage(content, start);
 		else
-			start++;
-		while (*start == ' ')
+			Print::error_print(CRASH, "Parsing server: " + param + " is unknown");
+		while (*start == ' ' || *start == ';')
 			start++;
 	}
-	
 }
 
 void    Server::setup(void)

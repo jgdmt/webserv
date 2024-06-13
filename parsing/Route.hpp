@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 16:19:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 17:44:24 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include "../Print.hpp"
 
 class Route
 {
@@ -33,14 +34,20 @@ class Route
         void addAutorizedMethod(std::string const &str);
         void setDefaultAutorizedMethod(void);
 
-		void parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);
-    private:
+		void parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len);
+		static int	find_len(std::string const& content, std::string::iterator const& name, char endc, bool split);
+
+	private:
         // Route(Route const &cpy);
         // Route &operator= (Route const &cpy);
         std::vector<std::string> _autorizedMethods;
+		std::vector<Route> _routes;
         std::string _redirection;
         std::string _path;
         bool _directoryListing;
         std::string _defaultFileForDirectory;
         
+		void	path(std::string const& content, std::string::iterator& start);
+		void	route(std::string const& content, std::string::iterator& start, std::string::iterator& end);
+		void	allowmethods(std::string const& content, std::string::iterator& start);
 };
