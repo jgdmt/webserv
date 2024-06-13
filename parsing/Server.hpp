@@ -17,15 +17,18 @@
 #include <map>
 #include <algorithm>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cerrno>
 #include "Route.hpp"
 #include "../Utils.hpp"
 #include "../Print.hpp"
-#include <cerrno>
 
 class Server
 {
     public:
         Server(int id);
+		~Server();
         std::string const &getName(void) const;
         std::string const &getHost(void) const;
         uint16_t getPort(void) const;
@@ -38,18 +41,19 @@ class Server
         void    setup(void);
     private:
 		int	_id;
-        std::string _log_level;
-        std::vector<std::string> _name;
+		std::vector<std::string> _name;
         in_addr_t _host;
         uint16_t _port;
         uint64_t _max_body_size;
+        std::vector<Route> _routes;
         std::map<std::string, std::string> _error_pages;
+        std::string _log_level;
         struct sockaddr_in _server_socket;
         int _fd_listen;
-        
-        // std::vector<Route> _routes;
 
 		void listen2(std::string const& content, std::string::iterator& start);
 		void servername(std::string const& content, std::string::iterator& start);
 		void maxbodysize(std::string const& content, std::string::iterator& start);
+
+		void parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end);
 };

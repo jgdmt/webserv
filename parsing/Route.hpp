@@ -33,8 +33,8 @@ class Route
         void addAutorizedMethod(std::string const &str);
         void setDefaultAutorizedMethod(void);
     private:
-        Route(Route const &cpy);
-        Route &operator= (Route const &cpy);
+        // Route(Route const &cpy);
+        // Route &operator= (Route const &cpy);
         std::vector<std::string> _autorizedMethods;
         std::string _redirection;
         std::string _path;

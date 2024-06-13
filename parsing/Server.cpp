@@ -12,10 +12,9 @@
 
 #include "Server.hpp"
 #include <iostream>
-Server::Server(int id)
+Server::Server(int id) : _id(id)
 {
     _port = 80;
-	_id = id;
 	_log_level= DEBUG;
     _max_body_size = 1000000000;
     _error_pages["400"] = "default/http_error/400.html";
@@ -26,6 +25,11 @@ Server::Server(int id)
     _error_pages["413"] = "default/http_error/413.html";
     _error_pages["500"] = "default/http_error/500.html";
 
+}
+
+Server::~Server()
+{
+	close(this->_fd_listen);
 }
 
 uint16_t Server::getPort(void) const
@@ -169,6 +173,19 @@ void Server::maxbodysize(std::string const& content, std::string::iterator& star
 	this->_max_body_size = convertType<uint64_t>(content.substr(start - content.begin(), (size_t)len));
 }
 
+void	Server::parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end)
+{
+	int l = find_len(content, start, '{', false);
+
+	if (l == -2)
+	{
+		Print::error_print(ERROR, "Error: max_body_size doesn't take multiple parameters");
+		exit (0);
+	}
+	// Route route;
+	(void)content;(void)start;(void)end;
+}
+
 void	Server::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
 {
 	std::string	param;
@@ -179,8 +196,10 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 	while (start != end)
 	{
 		it = start;
-		while (*start != ' ' && *start != ';')
+		while (*start != ' ' && *start != ';' && start != end)
 			start++;
+		if (start == end)
+			return ;
 		param = content.substr(it - content.begin(), start - it);
 		std::cout << "'" << param << "'\n";
 		while (*start == ' ')
@@ -191,6 +210,8 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			servername(content, start);
 		else if (param == "max_body_size")
 			maxbodysize(content, start);
+		else if (param == "location")
+			parseRoot(content, start, end);
 		else
 			start++;
 		while (*start == ' ')
