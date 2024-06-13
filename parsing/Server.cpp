@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:02:02 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:16:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,11 @@ int Server::getID(void) const
 std::string Server::getLogLevel(void) const
 {
 	return _log_level;
+}
+
+int Server::getFdListen(void) const
+{
+	return _fd_listen;
 }
 
 void Server::listen2(std::string const& content, std::string::iterator& start)
@@ -220,7 +225,7 @@ void    Server::setup(void)
     _server_socket.sin_port = htons(_port);
 	_server_socket.sin_addr.s_addr = _host;
 	int option = 1;
-	if (setsockopt(_fd_listen, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option)) == -1)
+	if (setsockopt(_fd_listen, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1)
 		Print::error_print(CRASH, "Socket: " + (std::string)strerror(errno));
     if(bind(_fd_listen, (struct sockaddr*)&_server_socket, sizeof(_server_socket)) == -1)
 		Print::error_print(CRASH, "Bind: " + (std::string)strerror(errno));

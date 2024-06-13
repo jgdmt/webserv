@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:06:50 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:33:53 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,14 +101,46 @@ std::vector<Server> &Settings::getServers(void)
 void Settings::setup(void)
 {
 	char buffer[INET_ADDRSTRLEN];
-	FD_ZERO(&_read);
-	FD_ZERO(&_write);
 	for(int i = 0; i < (int)_servers.size(); i++)
 	{
 		_servers[i].setup();
-		
+		pollfd tmp = {_servers[i].getFdListen(), POLLIN, 0};
+		_fds.push_back(tmp);
 		Print::print(INFO, _servers[i], "Server started! Listen at " + (std::string)inet_ntop(AF_INET, &_servers[i].getHost(), buffer, INET_ADDRSTRLEN) + ":" + to_string<uint16_t>(_servers[i].getPort()) + ".");
 	}
-	Print::success_print("All servers succesfully started !");
+	Print::print(SUCCESS,"All servers succesfully started !");
+}
+
+void Settings::run(void)
+{
+	while(1)
+	{
+		if(poll(_fds.data(), _fds.size(), -1) == -1)
+			Print::error_print(CRASH, "Poll: " + (std::string)strerror(errno));
+		for(unsigned int i = 0; i < _fds.size(); i++)
+		{
+			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
+				Print::error_print(CRASH, "Poll: " + (std::string)strerror(errno));
+			else if(_fds[i].revents == POLLIN && _servers.size() > i && _servers[i].getFdListen() == _fds[i].fd)
+				addClient(i, _servers[i]);
+			else if (_fds[i].revents == POLLIN && _clients.size() > (i - _servers.size()) && _clients[i].getFd() == _fds[i].fd)
+				_clients[i].readRequest();
+		}
+		checkTimeout();
+	}
+}
+
+void Settings::checkTimeout(void)
+{
+	Print::print(INFO, "A checker");
+}
+
+void Settings::addClient(unsigned int i, Server &serv)
+{
+	Client test(serv);
 	
+	pollfd tmp = {test.getFd(), POLLIN, 0};
+	_fds.push_back(tmp);
+	_clients.push_back(test);
+
 }

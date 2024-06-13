@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 11:46:13 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:30:13 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static void output_time(void)
 {
     std::time_t now = std::time(nullptr);
     std::tm *time =  std::localtime(&now);
-    std::cout << "\e[31m[" << time->tm_year + 1900 << '-';
+    std::cout << "[" << time->tm_year + 1900 << '-';
     if (time->tm_mon + 1 < 10)
         std::cout << '0';
     std::cout << time->tm_mon + 1 << '-';
@@ -57,16 +57,22 @@ void Print::print(std::string const &status, Server &serv, std::string const &st
     if(level >= getLevel(serv.getLogLevel()))
     {
         output_time();
-        std::cout << "[" << status << "][" << serv.getID() << "]    " << str <<std::endl;
+        std::cout <<  status << "[" << serv.getID() << "]    " << str <<std::endl;
     }
 }
 
-void Print::success_print(std::string const &str)
+void Print::print(std::string const &status, std::string const &str)
 {
-    std::cout << "\e[1;32m";
-    output_time();
-    std::cout << str << std::endl;
-    std::cout << "\e[97m";
+    if(status == SUCCESS)
+    {
+        std::cout << "\e[1;32m";
+        output_time();
+        std::cout << str << std::endl;
+        std::cout << "\e[97m";
+    }
+    else if(status == CRASH || status == ERROR)
+        error_print(status, str);
+
 }
 
 void Print::error_print(std::string const &status, std::string const &str)

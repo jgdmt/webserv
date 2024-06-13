@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:01:30 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:13:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class Server
 		int	getID(void) const;
         std::string const &getErrorPage(std::string const &error);
         std::string getLogLevel(void) const;
+        int getFdListen(void) const;         
 
         void	parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);
         void    setup(void);
