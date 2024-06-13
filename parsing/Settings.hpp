@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/11 12:03:28 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 12:18:49 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,11 @@ class Settings
 {
     public:
         void parse(std::string const &filePath);
-		void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
+        std::vector<Server> &getServers(void);
+        void setup(void);
     private:
-		std::vector<Server> _servers;
-};
+        fd_set _read;
+        fd_set _write;
+		    void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
+        std::vector<Server> _servers;
+}; 

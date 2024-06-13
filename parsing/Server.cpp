@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 18:55:36 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:02:02 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ uint16_t Server::getPort(void) const
 uint64_t Server::getMaxBodySize(void) const
 {
     return _max_body_size;
+}
+
+in_addr_t const &Server::getHost(void) const
+{
+	return _host;
 }
 
 std::string const &Server::getErrorPage(std::string const &error)
@@ -219,4 +224,8 @@ void    Server::setup(void)
 		Print::error_print(CRASH, "Socket: " + (std::string)strerror(errno));
     if(bind(_fd_listen, (struct sockaddr*)&_server_socket, sizeof(_server_socket)) == -1)
 		Print::error_print(CRASH, "Bind: " + (std::string)strerror(errno));
+	if (listen(_fd_listen, 512) == -1)	
+		Print::error_print(CRASH, "Listen: " + (std::string)strerror(errno));
+	if (fcntl(_fd_listen, F_SETFL, O_NONBLOCK) < 0)
+		Print::error_print(CRASH, "Fcntl: " + (std::string)strerror(errno));
 }

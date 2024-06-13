@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 18:29:34 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:01:30 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class Server
         Server(int id);
 		~Server();
         std::string const &getName(void) const;
-        std::string const &getHost(void) const;
+        in_addr_t const &getHost(void) const;
         uint16_t getPort(void) const;
         uint64_t getMaxBodySize(void) const;
 		int	getID(void) const;

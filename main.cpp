@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:40:09 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/12 17:40:31 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:49:42 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,6 @@ int main(int argc, char **argv)
             std::cerr << "Wrong Numbers of param\n";
             return 1;
     }
+    
     
 }
