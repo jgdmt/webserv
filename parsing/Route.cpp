@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 18:58:25 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:30:01 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,14 +130,20 @@ static std::string::iterator	find_end(std::string const& content, std::string::i
 void Route::path(std::string const& content, std::string::iterator& start)
 {
 	int len = find_len(content, start, ';', false);
+	struct stat	path_stat;
+	std::string path;
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: root is missing value");
+		Print::error_print(CRASH, "Parsing location: root is missing a value");
 	if (len == -1)
 		Print::error_print(CRASH, "Parsing location: missing ';'");
 	if (len == -2)
 		Print::error_print(CRASH, "Parsing location: root does not take multiple values");
-	this->_path = content.substr(start - content.begin(), len);
+	path = content.substr(start - content.begin(), len);
+	stat(path.c_str(), &path_stat);
+	if (!S_ISDIR(path_stat.st_mode))
+		Print::error_print(CRASH, "Parsing location: " + path + " is not a directory");
+	this->_path = path;
 	start += len;
 }
 
@@ -146,7 +152,7 @@ void Route::route(std::string const& content, std::string::iterator& start, std:
 	int len = find_len(content, start, '{', false);
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: location is missing value");
+		Print::error_print(CRASH, "Parsing location: location is missing values");
 	if (len == -2)
 		Print::error_print(CRASH, "Error: location does not take multiple parameters");
 	Route route;
@@ -177,6 +183,27 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 		while (*start == ' ')
 			start++;
 	}
+}
+
+void Route::directorylisting(std::string const& content, std::string::iterator& start)
+{
+	int len = find_len(content, start, ';', false);
+	std::string tf;
+
+	if (len == 0)
+		Print::error_print(CRASH, "Parsing location: directory_listing is missing a value");
+	if (len == -1)
+		Print::error_print(CRASH, "Parsing location: missing ';'");
+	if (len == -2)
+		Print::error_print(CRASH, "Parsing location: directory_listing does not take multiple values");
+	tf = content.substr(start - content.begin(), len);
+	if (tf == "true")
+		this->_directoryListing = true;
+	else if (tf == "false")
+		this->_directoryListing = false;
+	else
+		Print::error_print(CRASH, "Parsing location: " + tf + " is not a bool");
+	start += len;
 }
 
 void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
@@ -215,6 +242,8 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 			allowmethods(content, start);
 			methods = true;
 		}
+		else if (param == "directory_listing")
+			directorylisting(content, start);
 		else
 			Print::error_print(CRASH, "Parsing location: " + param + " is unknown");
 		while (*start == ' ' || *start == ';' || *start == '}')
