@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:23:15 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 11:36:50 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static std::string createContent(std::string const& fileName)
 
 	if (!ifs || !ifs.is_open())
 	{
-		Print::error_print(ERROR, "File error.");
+		Print::print(ERROR, "File error.");
 		ifs.open("default/webserv.conf");
 	}
 	while (ifs.good())
@@ -51,7 +51,7 @@ static it	find_end(std::string const& content, it i)
 		i++;
 	}
 	if (nb > 0)
-		Print::error_print(CRASH, "Bracket error: } not found");
+		Print::print(CRASH, "Bracket error: } not found");
 	return (i);
 }
 
@@ -60,7 +60,7 @@ void Settings::parseServer(std::string const& content, it& name, it& start, it& 
 	int len = Route::find_len(content, name, '{', true);
 	
 	if (name == start || content.substr(name - content.begin(), len) != "server")
-		Print::error_print(CRASH, content.substr(name - content.begin(), len) + " is an unknown key");
+		Print::print(CRASH, content.substr(name - content.begin(), len) + " is an unknown key");
 	Server server(this->_servers.size() + 1);
 	server.parse(content, start, end);
 	this->_servers.push_back(server);
@@ -73,14 +73,14 @@ void Settings::parse(std::string const &fileName)
 	it	name;
 
 	if (start == content.end())
-		Print::error_print(CRASH, "Parsing: file is empty");
+		Print::print(CRASH, "Parsing: file is empty");
 	while (start != content.end())
 	{
 		name = start;
 		while (start != content.end() && *start != '{')
 		{
 			if (*start == '}')
-				Print::error_print(CRASH, "Bracket error: } has no {");
+				Print::print(CRASH, "Bracket error: } has no {");
 			if (*name == ' ')
 				name++;
 			start++;
@@ -91,6 +91,7 @@ void Settings::parse(std::string const &fileName)
 		parseServer(content, name, start, end);
 		start++;
 	}
+	Print::print(SUCCESS, "Parsing finished successfully");
 }
 
 std::vector<Server> &Settings::getServers(void)

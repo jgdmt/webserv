@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:30:01 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/14 11:36:44 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ static std::string::iterator	find_end(std::string const& content, std::string::i
 		i++;
 	}
 	if (nb > 0)
-		Print::error_print(CRASH, "Parsing: } not found");
+		Print::print(CRASH, "Parsing: } not found");
 	return (i);
 }
 
@@ -134,15 +134,15 @@ void Route::path(std::string const& content, std::string::iterator& start)
 	std::string path;
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: root is missing a value");
+		Print::print(CRASH, "Parsing location: root is missing a value");
 	if (len == -1)
-		Print::error_print(CRASH, "Parsing location: missing ';'");
+		Print::print(CRASH, "Parsing location: missing ';'");
 	if (len == -2)
-		Print::error_print(CRASH, "Parsing location: root does not take multiple values");
+		Print::print(CRASH, "Parsing location: root does not take multiple values");
 	path = content.substr(start - content.begin(), len);
 	stat(path.c_str(), &path_stat);
 	if (!S_ISDIR(path_stat.st_mode))
-		Print::error_print(CRASH, "Parsing location: " + path + " is not a directory");
+		Print::print(CRASH, "Parsing location: " + path + " is not a directory");
 	this->_path = path;
 	start += len;
 }
@@ -152,9 +152,9 @@ void Route::route(std::string const& content, std::string::iterator& start, std:
 	int len = find_len(content, start, '{', false);
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: location is missing values");
+		Print::print(CRASH, "Parsing location: location is missing values");
 	if (len == -2)
-		Print::error_print(CRASH, "Error: location does not take multiple parameters");
+		Print::print(CRASH, "Error: location does not take multiple parameters");
 	Route route;
 	parse(content, start, end, len);
 	this->_routes.push_back(route);
@@ -168,9 +168,9 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 	std::string method;
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: allow_methods is missing values");
+		Print::print(CRASH, "Parsing location: allow_methods is missing values");
 	if (len == -1)
-		Print::error_print(CRASH, "Parsing location: missing ';'");
+		Print::print(CRASH, "Parsing location: missing ';'");
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
@@ -178,7 +178,7 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 		if (method == "PUT" || method == "POST" || method == "GET")
 			this->_autorizedMethods.push_back(method);
 		else
-			Print::error_print(CRASH, "Parsing location: " + method + " is not a valid method (valid methods: POST, GET, PUT)");
+			Print::print(CRASH, "Parsing location: " + method + " is not a valid method (valid methods: POST, GET, PUT)");
 		start = it;
 		while (*start == ' ')
 			start++;
@@ -191,18 +191,18 @@ void Route::directorylisting(std::string const& content, std::string::iterator& 
 	std::string tf;
 
 	if (len == 0)
-		Print::error_print(CRASH, "Parsing location: directory_listing is missing a value");
+		Print::print(CRASH, "Parsing location: directory_listing is missing a value");
 	if (len == -1)
-		Print::error_print(CRASH, "Parsing location: missing ';'");
+		Print::print(CRASH, "Parsing location: missing ';'");
 	if (len == -2)
-		Print::error_print(CRASH, "Parsing location: directory_listing does not take multiple values");
+		Print::print(CRASH, "Parsing location: directory_listing does not take multiple values");
 	tf = content.substr(start - content.begin(), len);
 	if (tf == "true")
 		this->_directoryListing = true;
 	else if (tf == "false")
 		this->_directoryListing = false;
 	else
-		Print::error_print(CRASH, "Parsing location: " + tf + " is not a bool");
+		Print::print(CRASH, "Parsing location: " + tf + " is not a bool");
 	start += len;
 }
 
@@ -245,8 +245,8 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 		else if (param == "directory_listing")
 			directorylisting(content, start);
 		else
-			Print::error_print(CRASH, "Parsing location: " + param + " is unknown");
-		while (*start == ' ' || *start == ';' || *start == '}')
+			Print::print(CRASH, "Parsing location: " + param + " is unknown");
+		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)
 			start++;
 	}
 	if (!methods)
