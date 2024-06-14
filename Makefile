@@ -1,5 +1,5 @@
 PARSING_SRCS := Settings.cpp Server.cpp Route.cpp
-SOCKET_SRCS := Socket.cpp
+SOCKET_SRCS := Client.cpp
 SRCS		:=	main.cpp Print.cpp $(addprefix parsing/,$(PARSING_SRCS)) $(addprefix socket/,$(SOCKET_SRCS))
 OBJS		:=	${SRCS:.cpp=.o} 
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   settings.hpp                                       :+:      :+:    :+:   */
+/*   Settings.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:32:25 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 11:23:34 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include "Server.hpp"
 #include <poll.h>
 #include "../socket/Client.hpp"
+
+#define TIMEOUT 60
 
 class Settings
 {

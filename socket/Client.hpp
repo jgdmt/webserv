@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:29:41 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 11:21:24 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,16 @@ class Client
 {
     public:
         Client(Server &serv);
+        ~Client(void);
         int getFd(void) const;
+        time_t getLastCom(void) const;
+        Server &getServer(void);
         void    readRequest(void);
-    private:
-        int _fd;
-        sockaddr_in addr;
         Client(Client const &client);
         Client &operator=(Client const &client);
+    private:
+        int _fd;
+        sockaddr_in _addr;
+        Server _serv;
+        time_t _last_com;
 };

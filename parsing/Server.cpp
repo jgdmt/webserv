@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:16:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 10:59:39 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,26 @@ Server::Server(int id) : _id(id)
 Server::~Server()
 {
 	close(this->_fd_listen);
+}
+
+Server::Server(Server const &cpy)
+{
+	*this = cpy;
+}
+
+Server &Server::operator=(Server const &cpy)
+{
+	this->_id = cpy._id;
+	this->_name = cpy._name;
+	this->_host = cpy._host;
+    this->_port = cpy._port;
+    this->_max_body_size = cpy._max_body_size;
+    this->_routes = cpy._routes;
+    this->_error_pages = cpy._error_pages;
+    this->_log_level = cpy._log_level;
+    this->_server_socket = cpy._server_socket;
+    this->_fd_listen = cpy._fd_listen;
+	return *this;
 }
 
 uint16_t Server::getPort(void) const

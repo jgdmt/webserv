@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 18:30:13 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 10:50:49 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static int getLevel(std::string const &level)
 	return(-1);
 }
 
-void Print::print(std::string const &status, Server &serv, std::string const &str)
+void Print::print(std::string const &status, std::string const &str, Server &serv)
 {
     int level = getLevel(status);
     if(level >= getLevel(serv.getLogLevel()))
