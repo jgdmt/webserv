@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:36:44 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:27:03 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,27 @@ void Route::directorylisting(std::string const& content, std::string::iterator& 
 	start += len;
 }
 
+void Route::defaultfile(std::string const& content, std::string::iterator& start)
+{
+	int len = Route::find_len(content, start, ';', false);
+	std::string::iterator tmp = start;
+	std::string::iterator it;
+	std::string def;
+
+	if (len == 0)
+		Print::print(CRASH, "Parsing location: default_file is missing a value");
+	if (len == -1)
+		Print::print(CRASH, "Parsing location: missing ';'");
+	if (len == -2)
+		Print::print(CRASH, "Parsing location: default_file does not take multiple values");
+	it = std::find(start, tmp + len, ' ');
+	def = content.substr(start - content.begin(), it - start);
+	start = it;
+	if (access(def.c_str(), F_OK | R_OK))
+		Print::print(CRASH, "Parsing server: " + def);
+	this->_defaultFileForDirectory = def;
+}
+
 void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
 {
 	std::string::iterator it;
@@ -244,6 +265,8 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 		}
 		else if (param == "directory_listing")
 			directorylisting(content, start);
+		else if (param == "default_file")
+			defaultfile(content, start);
 		else
 			Print::print(CRASH, "Parsing location: " + param + " is unknown");
 		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)

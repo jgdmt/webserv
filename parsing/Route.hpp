@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/13 19:24:57 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:26:44 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <string>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "../Print.hpp"
 
 class Route
@@ -52,4 +54,5 @@ class Route
 		void	route(std::string const& content, std::string::iterator& start, std::string::iterator& end);
 		void	allowmethods(std::string const& content, std::string::iterator& start);
 		void	directorylisting(std::string const& content, std::string::iterator& start);
+		void	defaultfile(std::string const& content, std::string::iterator& start);
 };
