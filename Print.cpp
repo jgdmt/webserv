@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 10:50:49 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 11:59:51 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void Print::print(std::string const &status, std::string const &str, Server &ser
     if(level >= getLevel(serv.getLogLevel()))
     {
         output_time();
-        std::cout <<  status << "[" << serv.getID() << "]    " << str <<std::endl;
+        std::cout <<  "[" + status + "]" << "[" << serv.getID() << "]    " << str <<std::endl;
     }
 }
 
@@ -94,7 +94,7 @@ void Print::error_print(std::string const &status, std::string const &str)
     std::cerr << time->tm_min << ':';
     if (time->tm_sec < 10)
         std::cerr << '0';   
-    std::cerr << time->tm_sec << "]    " << status << "    " << str << "\e[97m\n";
+    std::cerr << time->tm_sec << "]     [" << status << "]    " << str << "\e[97m\n";
     if(status == CRASH)
         exit(EXIT_FAILURE);
 }

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:47 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 10:50:36 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 12:00:08 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@
 #include <ctime>
 
 
-#define DEBUG "[DEBUG]"
-#define INFO "[INFO]"
-#define ERROR "[ERROR]"
-#define CRASH "[CRASH]"
-#define SUCCESS "[SUCCESS]"
+#define DEBUG "DEBUG"
+#define INFO "INFO"
+#define ERROR "ERROR"
+#define CRASH "CRASH"
+#define SUCCESS "SUCCESS"
 class Server;
 
 class Print

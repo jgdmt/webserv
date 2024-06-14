@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:36:50 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/14 12:18:47 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void Settings::run(void)
 		for(unsigned int i = 0; i < _fds.size(); i++)
 		{
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
-				Print::print(CRASH, "Poll: " + (std::string)strerror(errno));
+				Print::print(CRASH, "Poll: " + to_string(i) + (std::string)strerror(errno));
 			else if(_fds[i].revents == POLLIN && _servers.size() > i && _servers[i].getFdListen() == _fds[i].fd)
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents == POLLIN && _clients.size() > (i - _servers.size()) && _clients[i].getFd() == _fds[i].fd)
@@ -135,9 +135,10 @@ void Settings::checkTimeout(void)
 {
 	for(int i = 0; i < (int)_clients.size(); i++)
 	{
-		if((_clients[i].getLastCom() - time(NULL)) > TIMEOUT)
+		if((time(NULL) - _clients[i].getLastCom()) > TIMEOUT)
 		{
 			Print::print(INFO, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), _clients[i].getServer());
+			_fds.erase(_fds.begin() + _servers.size() + i);
 			_clients.erase(_clients.begin() + i);
 			i--;
 		}
@@ -147,12 +148,13 @@ void Settings::checkTimeout(void)
 void Settings::addClient(unsigned int i, Server &serv)
 {
 	(void)i;
+
 	try
 	{
 		Client test(serv);
-		pollfd tmp = {test.getFd(), POLLIN, 0};
-		_fds.push_back(tmp);
 		_clients.push_back(test);
+		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
+		_fds.push_back(tmp);
 	}
 	catch(const std::exception& e)
 	{

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:21:18 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 12:13:19 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,15 @@ Client::Client(Server &serv): _serv(serv)
 		close(_fd);
 	}
 	_last_com = time(NULL);
-    
 }
 
 Client::~Client(void)
 {
-	close(_fd);
-	char buffer[INET_ADDRSTRLEN];
-	Print::print(INFO, "Connection closed on socket " + to_string(_fd) + " From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), _serv);
+// close(_fd);
+// char buffer[INET_ADDRSTRLEN];
+// Print::print(INFO, "Connection closed on socket " + to_string(_fd) + " From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), _serv);
 }
+
 
 Client::Client(Client const &client): _serv(client._serv)
 {
