@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 12:18:47 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:14:16 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void Settings::run(void)
 			else if(_fds[i].revents == POLLIN && _servers.size() > i && _servers[i].getFdListen() == _fds[i].fd)
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents == POLLIN && _clients.size() > (i - _servers.size()) && _clients[i].getFd() == _fds[i].fd)
-				_clients[i].readRequest();
+				_clients[i].readRequest(*this);
 		}
 		checkTimeout();
 	}
@@ -138,20 +138,26 @@ void Settings::checkTimeout(void)
 		if((time(NULL) - _clients[i].getLastCom()) > TIMEOUT)
 		{
 			Print::print(INFO, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), _clients[i].getServer());
-			_fds.erase(_fds.begin() + _servers.size() + i);
-			_clients.erase(_clients.begin() + i);
+			closeClient(i);
 			i--;
 		}
 	}
 }
 
+void Settings::closeClient(unsigned int i)
+{
+	close(_clients[i].getFd());
+	_fds.erase(_fds.begin() + _servers.size() + i);
+	_clients.erase(_clients.begin() + i);
+	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", _clients[i].getServer());
+}
+
 void Settings::addClient(unsigned int i, Server &serv)
 {
-	(void)i;
 
 	try
 	{
-		Client test(serv);
+		Client test(serv, i);
 		_clients.push_back(test);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.push_back(tmp);

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 12:13:28 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:14:49 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,26 @@
 #include <arpa/inet.h>
 #include <exception>
 #include "parsing/Server.hpp"
+#include "Request.hpp"
+
+#define READSIZE 50000
+
+class Settings;
 
 class Client
 {
     public:
-        Client(Server &serv);
+        Client(Server &serv, int id);
         ~Client(void);
         int getFd(void) const;
         time_t getLastCom(void) const;
         Server &getServer(void);
-        void    readRequest(void);
+        void    readRequest(Settings &set);
         Client(Client const &client);
         Client &operator=(Client const &client);
     private:
+        Request req;
+        const int _id;
         int _fd;
         sockaddr_in _addr;
         Server _serv;

@@ -6,14 +6,14 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 12:13:19 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:15:00 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include <iostream>
+#include "../parsing/Settings.hpp"
 
-Client::Client(Server &serv): _serv(serv)
+Client::Client(Server &serv, int id): _id(id), _serv(serv)
 {
     socklen_t addr_len = sizeof(_addr);
    _fd = accept(serv.getFdListen(), (sockaddr *)&_addr ,&addr_len);
@@ -39,7 +39,7 @@ Client::~Client(void)
 }
 
 
-Client::Client(Client const &client): _serv(client._serv)
+Client::Client(Client const &client): _id(client._id), _serv(client._serv)
 {
 	*this = client;
 }
@@ -68,7 +68,26 @@ Server &Client::getServer(void)
 	return _serv;
 }
 
-void    Client::readRequest(void)
+void    Client::readRequest(Settings &set)
 {
-    Print::print(INFO, "cc");
+	char buffer[READSIZE];
+    switch (recv(_fd, buffer, READSIZE, 0))
+	{
+	case 0:
+		set.closeClient(_id);
+		break;
+	case -1:
+		Print::print(ERROR, "Recv didn't work properly");
+		set.closeClient(_id);
+		break;
+	default:
+		_last_com = time(NULL);
+		req.add(buffer);
+		break;
+	}
+	if(req.parse())
+	{
+		return;
+	}
+	
 }

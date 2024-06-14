@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:23:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:35:55 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Settings
         std::vector<Server> &getServers(void);
         void setup(void);
         void run(void);
+        void closeClient(unsigned int i);
     private:
         void checkTimeout(void);
 		void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
