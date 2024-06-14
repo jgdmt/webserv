@@ -202,6 +202,24 @@ void	Server::errorpage(std::string const& content, std::string::iterator& start)
 	this->_error_pages[key] = link;
 }
 
+void Server::loglevel(std::string const& content, std::string::iterator& start)
+{
+	int len = Route::find_len(content, start, ';', false);
+	std::string level;
+
+	if (len == 0)
+		Print::print(CRASH, "Parsing server: log_level is missing a value");
+	else if (len == -1)
+		Print::print(CRASH, "Parsing server: missing ';'");
+	else if (len == -2)
+		Print::print(CRASH, "Parsing server: log_level does not take multiple values");
+	level = content.substr(start - content.begin(), len);
+	if (level != "DEBUG" && level != "INFO" && level != "ERROR")
+		Print::print(CRASH, "Parsing server: " + level + " is not a valid value (valid value: DEBUG, INFO, ERROR)");
+	this->_log_level = level;
+	start += len;
+}
+
 void	Server::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end)
 {
 	std::string	param;
@@ -229,6 +247,8 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			parseRoot(content, start, end);
 		else if (param == "error_page")
 			errorpage(content, start);
+		else if (param == "log_level")
+			loglevel(content, start);
 		else
 			Print::print(CRASH, "Parsing server: " + param + " is unknown");
 		while (*start == ' ' || *start == ';')

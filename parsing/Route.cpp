@@ -210,7 +210,6 @@ void Route::defaultfile(std::string const& content, std::string::iterator& start
 {
 	int len = Route::find_len(content, start, ';', false);
 	std::string::iterator tmp = start;
-	std::string::iterator it;
 	std::string def;
 
 	if (len == 0)
@@ -219,9 +218,8 @@ void Route::defaultfile(std::string const& content, std::string::iterator& start
 		Print::print(CRASH, "Parsing location: missing ';'");
 	if (len == -2)
 		Print::print(CRASH, "Parsing location: default_file does not take multiple values");
-	it = std::find(start, tmp + len, ' ');
-	def = content.substr(start - content.begin(), it - start);
-	start = it;
+	def = content.substr(start - content.begin(), len);
+	start += len;
 	if (access(def.c_str(), F_OK | R_OK))
 		Print::print(CRASH, "Parsing server: " + def);
 	this->_defaultFileForDirectory = def;

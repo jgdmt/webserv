@@ -59,4 +59,5 @@ class Server
 		void maxbodysize(std::string const& content, std::string::iterator& start);
 		void errorpage(std::string const& content, std::string::iterator& start);
 		void parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end);
+        void loglevel(std::string const& content, std::string::iterator& start);
 };
