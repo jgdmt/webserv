@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 10:59:36 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/17 12:08:54 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,10 +122,10 @@ void Settings::run(void)
 		{
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
 				Print::print(CRASH, "Poll: " + to_string(i) + (std::string)strerror(errno));
-			else if(_fds[i].revents == POLLIN && _servers.size() > i && _servers[i].getFdListen() == _fds[i].fd)
+			else if(_fds[i].revents & POLLIN && _servers.size() > i) //&& _servers[i].getFdListen() == _fds[i].fd
 				addClient(i, _servers[i]);
-			else if (_fds[i].revents == POLLIN && _clients.size() > (i - _servers.size()) && _clients[i].getFd() == _fds[i].fd)
-				_clients[i].readRequest(*this);
+			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
+				_clients[i - _servers.size()].readRequest(*this);
 		}
 		checkTimeout();
 	}
