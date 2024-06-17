@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 11:09:30 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/17 11:55:48 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,8 +247,8 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			parseRoot(content, start, end);
 		else if (param == "error_page")
 			errorpage(content, start);
-		else if (param == "log_level"){std::cout << param << "\n";
-			loglevel(content, start);}
+		else if (param == "log_level")
+			loglevel(content, start);
 		else
 			Print::print(CRASH, "Parsing server: " + param + " is unknown");
 		while (*start == ' ' || *start == ';')
