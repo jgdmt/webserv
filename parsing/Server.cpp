@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 10:21:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/17 11:09:30 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,6 @@ void Server::loglevel(std::string const& content, std::string::iterator& start)
 	level = content.substr(start - content.begin(), len);
 	if (level != "DEBUG" && level != "INFO" && level != "ERROR")
 		Print::print(CRASH, "Parsing server: " + level + " is not a valid value (valid value: DEBUG, INFO, ERROR)");
-	std::cout << "PROBLEM\n";
 	this->_log_level = level;
 	start += len;
 }
@@ -248,8 +247,8 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			parseRoot(content, start, end);
 		else if (param == "error_page")
 			errorpage(content, start);
-		else if (param == "log_level")
-			loglevel(content, start);
+		else if (param == "log_level"){std::cout << param << "\n";
+			loglevel(content, start);}
 		else
 			Print::print(CRASH, "Parsing server: " + param + " is unknown");
 		while (*start == ' ' || *start == ';')
