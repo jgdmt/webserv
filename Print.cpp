@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 11:59:51 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/17 10:23:34 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,30 +35,30 @@ static void output_time(void)
     std::cout << time->tm_sec << "]     ";
 }
 
-static int getLevel(std::string const &level)
-{
-	std::string list[] = {
-		DEBUG,
-		INFO,
-		ERROR,
-		CRASH,
-	};
-	for(int i = 0; i < 4; i++)
-	{
-		if (list[i] == level)
-			return (i);
-	}
-	return(-1);
-}
+// static int getLevel(std::string const &level)
+// {
+// 	std::string list[] = {
+// 		DEBUG,
+// 		INFO,
+// 		ERROR,
+// 		CRASH,
+// 	};
+// 	for(int i = 0; i < 4; i++)
+// 	{
+// 		if (list[i] == level)
+// 			return (i);
+// 	}
+// 	return(-1);
+// }
 
 void Print::print(std::string const &status, std::string const &str, Server &serv)
 {
-    int level = getLevel(status);
-    if(level >= getLevel(serv.getLogLevel()))
-    {
+    // int level = getLevel(status);
+    // if(level >= getLevel(serv.getLogLevel()))
+    // {
         output_time();
         std::cout <<  "[" + status + "]" << "[" << serv.getID() << "]    " << str <<std::endl;
-    }
+    // }
 }
 
 void Print::print(std::string const &status, std::string const &str)

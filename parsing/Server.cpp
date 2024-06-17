@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 12:16:45 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/17 10:21:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,6 +216,7 @@ void Server::loglevel(std::string const& content, std::string::iterator& start)
 	level = content.substr(start - content.begin(), len);
 	if (level != "DEBUG" && level != "INFO" && level != "ERROR")
 		Print::print(CRASH, "Parsing server: " + level + " is not a valid value (valid value: DEBUG, INFO, ERROR)");
+	std::cout << "PROBLEM\n";
 	this->_log_level = level;
 	start += len;
 }

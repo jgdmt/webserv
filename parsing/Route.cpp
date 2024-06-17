@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 15:27:03 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/17 10:12:29 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ void Route::directorylisting(std::string const& content, std::string::iterator& 
 void Route::defaultfile(std::string const& content, std::string::iterator& start)
 {
 	int len = Route::find_len(content, start, ';', false);
-	std::string::iterator tmp = start;
+	// std::string::iterator tmp = start;
 	std::string def;
 
 	if (len == 0)

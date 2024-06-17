@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 15:15:00 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/17 10:45:00 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ Server &Client::getServer(void)
 void    Client::readRequest(Settings &set)
 {
 	char buffer[READSIZE];
+	bzero(buffer, READSIZE); // delete later
+	std::cout << "READ\n";
     switch (recv(_fd, buffer, READSIZE, 0))
 	{
 	case 0:
@@ -85,6 +87,7 @@ void    Client::readRequest(Settings &set)
 		req.add(buffer);
 		break;
 	}
+	std::cout << "Parse\n";
 	if(req.parse())
 	{
 		return;
