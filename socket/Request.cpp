@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 17:38:46 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 19:27:28 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,77 @@ static int getParam(std::string const &param)
         return (OTHER);
 }
 
-void Request::accept(void)
+void Request::accept(std::string const& line)
 {
-    
+    size_t i = line.find(": ") + 2; //eventuellement verif si ':' existe
+	size_t j;
+	size_t k;
+	bool finished = false;
+	std::string tmp;
+	std::vector<float> sort;
+
+	while (1)
+	{
+		j = line.find(",", i);
+		if (j == std::string::npos)
+		{
+			j = line.size() - 1;
+			finished = true;
+		}
+		k = line.find(";q=", i);
+		if (k < j)
+		{
+			_accept.push_back(line.substr(i, k - i));
+			sort.push_back(convertType<float>(line.substr(k + 3, j - k)));
+		}
+		else
+		{
+			_accept.push_back(line.substr(i, j - i));
+			sort.push_back(1);
+		}
+		if (finished)
+			break ;
+		i = j + 1;
+	}
+
+	size_t min = 0;
+	for (size_t j = 0; j < sort.size(); j++)
+	{
+		for (size_t i = j; i < sort.size(); i++)
+		{
+			if (sort[i] < sort[min])
+				min = i;
+		}
+		swap<float>(sort[j], sort[min]);
+		swap<std::string>(_accept[j], _accept[min]);
+	}
+
+	for (size_t i = 0; i < sort.size(); i++)
+	{
+		std::cout << "accept [" << sort[i] << "] -> " << _accept[i] << "\n";
+	}
+}
+
+void Request::acceptEncoding(std::string const& line)
+{
+	size_t i = line.find(": ") + 2; // eventuellement verifier si ':' existe
+	size_t j;
+
+	while (1)
+	{
+		j = line.find(", ", i);
+		if (j == std::string::npos)
+		{
+			j = line.size() - 1;
+			_acceptEncoding.push_back(line.substr(i, j - i));
+			break;
+		}
+		_acceptEncoding.push_back(line.substr(i, j - i));
+		i = j + 2;
+	}
+	
+	for (size_t i = 0; i < _acceptEncoding.size(); i++)
+		std::cout << "acceptEncoding[" << i << "] = " << _acceptEncoding[i] << "\n";
 }
 
 int Request::parseHeader(void)
@@ -64,9 +132,10 @@ int Request::parseHeader(void)
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break;
             case ACCEPT:
-                accept();
+                accept(line);
                 break;
             case ACCEPT_ENCODING:
+				acceptEncoding(line);
                 break;
             case CONTENT_TYPE:
                 if (line.find("; boundary=") != std::string::npos)
