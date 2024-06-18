@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 19:27:28 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/18 19:31:53 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void Request::accept(std::string const& line)
 	size_t j;
 	size_t k;
 	bool finished = false;
-	std::string tmp;
 	std::vector<float> sort;
 
 	while (1)
