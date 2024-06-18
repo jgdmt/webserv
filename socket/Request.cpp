@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 19:31:53 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/18 19:38:40 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,17 +38,13 @@ void Request::accept(std::string const& line)
     size_t i = line.find(": ") + 2; //eventuellement verif si ':' existe
 	size_t j;
 	size_t k;
-	bool finished = false;
 	std::vector<float> sort;
 
 	while (1)
 	{
 		j = line.find(",", i);
 		if (j == std::string::npos)
-		{
 			j = line.size() - 1;
-			finished = true;
-		}
 		k = line.find(";q=", i);
 		if (k < j)
 		{
@@ -60,7 +56,7 @@ void Request::accept(std::string const& line)
 			_accept.push_back(line.substr(i, j - i));
 			sort.push_back(1);
 		}
-		if (finished)
+		if (j == line.size() - 1)
 			break ;
 		i = j + 1;
 	}
