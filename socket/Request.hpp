@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 11:10:33 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 13:23:02 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,6 @@ class Request
       
 	  
        int parseHeader(void);
+       int parseBody(void);
+       void accept(void);
 };

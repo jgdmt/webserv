@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 12:06:15 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 16:22:47 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,11 @@ static int getParam(std::string const &param)
 //     if (std::string(_it, it2) != )
 // }
 
+void Request::accept(void)
+{
+    
+}
+
 int Request::parseHeader(void)
 {
     std::string line;
@@ -72,11 +77,18 @@ int Request::parseHeader(void)
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break;
             case ACCEPT:
+                accept();
                 break;
             case ACCEPT_ENCODING:
                 break;
             case CONTENT_TYPE:
-                _contentType = std::string(line.begin() + line.find(": ") + 2, line.begin() + line.find(';'));
+                if (line.find("; boundary=") != std::string::npos)
+                {
+                    _contentType = std::string(line.begin() + line.find(": ") + 2, line.begin() + line.find(';'));
+                    _contentBoundary = std::string(line.begin() + line.find("; boundary=") + 11, line.end());
+                }
+                else
+                    _contentType = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break; // add
             case CONTENT_LENGTH:
                 _contentLength = convertType<uint32_t>(std::string(line.begin() + line.find(": ") + 2, line.end()));
@@ -84,7 +96,10 @@ int Request::parseHeader(void)
                 break;
         }
         if (_buffer.find("\r\n", _it - _buffer.begin()) == (size_t)(_it - _buffer.begin()))
+        {
+            _it += 2;
             break ;
+        }
         if (_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
             return (1);
         line = std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()));
@@ -101,10 +116,28 @@ int Request::parseHeader(void)
     return (0);
 }
 
+int Request::parseBody(void)
+{
+    std::string tmp(_it, _buffer.end());
+
+    if (tmp.size() + _body.size() >= _contentLength)
+    {
+        _body += tmp.substr(0, _contentLength - _body.size());
+        _state = END;
+        return (0);
+    }
+    else
+    {
+        _body += tmp;
+        _it += tmp.size(); 
+    }
+    return (1);
+}
+
 void Request::add(std::string const &new_buff)
 {
     _buffer += new_buff;
-
+    std::cout << _buffer;
     //parse starting line
     switch (_state)
     {
@@ -129,9 +162,10 @@ void Request::add(std::string const &new_buff)
             _it = _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
             _state = HEADER;
         case HEADER:
-            parseHeader();
+            if (parseHeader())
+                break;
         case BODY:
-            
+            if (parseBody())
             break;
         case END:
             break;

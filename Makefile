@@ -4,7 +4,7 @@ SRCS		:=	main.cpp Print.cpp $(addprefix parsing/,$(PARSING_SRCS)) $(addprefix so
 OBJS		:=	${SRCS:.cpp=.o} 
 
 CC			:= c++
-CXXFLAGS	:= -Werror -Wextra -Wall -I. -std=c++98 #-fsanitize=address -ggdb3
+CXXFLAGS	:= -Werror -Wextra -Wall -I. -std=c++98 -fsanitize=address -ggdb3
 RM			:= rm -f
 
 NAME		:= webserv
