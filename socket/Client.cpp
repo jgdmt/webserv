@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 10:44:56 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 17:22:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,19 @@ void    Client::readRequest(Settings *set)
 		req.add(buffer);
 		break;
 	}
-	// if(req.parse())
-	// {
-	// 	return;
-	// }
-	
+	std::cout << req.IsParsingOk() << "\n";
+	switch(req.IsParsingOk())
+	{
+		case -2:
+			res.error("411");
+			break;
+		case -1:
+			res.error("400");
+			break;
+		case 0:
+			break;
+		case 1:
+			res.init();
+			break;
+	}
 }

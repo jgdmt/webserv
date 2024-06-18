@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 16:22:47 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 17:38:46 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Request::Request()
 {
     _state = METHOD;
     _error = 0;
-    _contentLength = -1;
+    _contentLength = 0;
 }
 
 static int getParam(std::string const &param)
@@ -32,19 +32,6 @@ static int getParam(std::string const &param)
     else
         return (OTHER);
 }
-
-// void Request::startLine()
-// {
-//     std::string::iterator it2 = _buffer.begin() + _buffer.find(' ');
-
-//     _method = std::string(_it, it2);
-//     _it = it2;
-//     it2 = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin());
-//     _uri = std::string(_it, it2);
-//     _it = it2;
-//     it2 = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin());
-//     if (std::string(_it, it2) != )
-// }
 
 void Request::accept(void)
 {
@@ -106,7 +93,6 @@ int Request::parseHeader(void)
         if (line.find(": ") == std::string::npos)
         {
             _error = 1;
-            std::cout << "error\n";
             return (1);
         }
         t = getParam(line.substr(0, line.find(": ")));
@@ -120,6 +106,11 @@ int Request::parseBody(void)
 {
     std::string tmp(_it, _buffer.end());
 
+    if(_contentLength == 0)
+    {
+        _state = END;
+        return 0;
+    }
     if (tmp.size() + _body.size() >= _contentLength)
     {
         _body += tmp.substr(0, _contentLength - _body.size());
@@ -138,7 +129,6 @@ void Request::add(std::string const &new_buff)
 {
     _buffer += new_buff;
     std::cout << _buffer;
-    //parse starting line
     switch (_state)
     {
         case METHOD:
@@ -157,7 +147,7 @@ void Request::add(std::string const &new_buff)
         case PROTOCOL:
             if(_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
                 break;
-            if ("HTTP/1.1" != std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin())))
+            if ("HTTP/1.1" != std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) - 1))
                 _error = true;
             _it = _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
             _state = HEADER;
@@ -174,11 +164,16 @@ void Request::add(std::string const &new_buff)
 }
 
 
-int Request::getState(void)
+int Request::IsParsingOk(void)
 {
-    return _state;
-    // std::cout << _buffer;
-   
-    
-    // return 1;
+    if (_error)
+        return -1;
+    else if (_state != END)
+        return 0;
+    else if ((!_method.size() || !_uri.size() || !_host.size() || !_host.size()))
+        return -1;
+    else if ( _contentLength == 0 && (_method == "POST"))
+        return -2;
+    else
+        return 1;
 }

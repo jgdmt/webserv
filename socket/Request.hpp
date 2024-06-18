@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 13:23:02 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 16:34:09 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class Request
     public:
         Request();
         void add(std::string const &new_buff);
-        int getState(void);
+        int IsParsingOk(void);
     private:
         std::string::iterator _it;
         std::string _buffer;

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 10:36:20 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 16:46:02 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <exception>
 #include "parsing/Server.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 
 #define READSIZE 50000
 
@@ -36,6 +37,7 @@ class Client
         Client &operator=(Client const &client);
     private:
         Request req;
+        Response res;
         const int _id;
         int _fd;
         sockaddr_in _addr;
