@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 12:08:54 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 10:42:56 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void Settings::run(void)
 			else if(_fds[i].revents & POLLIN && _servers.size() > i) //&& _servers[i].getFdListen() == _fds[i].fd
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
-				_clients[i - _servers.size()].readRequest(*this);
+				_clients[i - _servers.size()].readRequest(this);
 		}
 		checkTimeout();
 	}
@@ -148,8 +148,8 @@ void Settings::closeClient(unsigned int i)
 {
 	close(_clients[i].getFd());
 	_fds.erase(_fds.begin() + _servers.size() + i);
-	_clients.erase(_clients.begin() + i);
 	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", _clients[i].getServer());
+	_clients.erase(_clients.begin() + i);
 }
 
 void Settings::addClient(unsigned int i, Server &serv)

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 18:51:16 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 10:44:56 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,27 +68,27 @@ Server &Client::getServer(void)
 	return _serv;
 }
 
-void    Client::readRequest(Settings &set)
+void    Client::readRequest(Settings *set)
 {
 	char buffer[READSIZE];
-	bzero(buffer, READSIZE); // delete later
+	// bzero(buffer, READSIZE); // delete later
     switch (recv(_fd, buffer, READSIZE, 0))
 	{
 	case 0:
-		set.closeClient(_id);
+		set->closeClient(_id);
 		break;
 	case -1:
 		Print::print(ERROR, "Recv didn't work properly");
-		set.closeClient(_id);
+		set->closeClient(_id);
 		break;
 	default:
 		_last_com = time(NULL);
 		req.add(buffer);
 		break;
 	}
-	if(req.parse())
-	{
-		return;
-	}
+	// if(req.parse())
+	// {
+	// 	return;
+	// }
 	
 }

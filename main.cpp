@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:40:09 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 11:08:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 11:36:56 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     switch(argc)
     {
         case 1:
-            settings.parse("webserv.conf");
+            settings.parse("default/webserv.conf");
             break;
         case 2:
         	settings.parse(argv[1]);

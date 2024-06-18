@@ -6,32 +6,24 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 19:24:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/18 12:06:15 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-enum Paramater 
-{
-    EMPTY = -1,
-    HOST = 0,
-    CONNECTION,
-    ACCEPT,
-    ACCEPT_ENCODING,
-    OTHER,
-};
+
 
 Request::Request()
 {
     _state = METHOD;
     _error = 0;
+    _contentLength = -1;
 }
 
 static int getParam(std::string const &param)
 {
-    std::cout << "PARAM" << param << "\n";
-    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "end"};
+    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "end"};
     for(int i = 0; params[i] != "end"; i++)
         if (params[i] == param)
             return (i);
@@ -67,33 +59,43 @@ int Request::parseHeader(void)
         return (1);
     }
     int t = getParam(line.substr(0, line.find(':')));
-    _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin());
+    _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
     while(t != EMPTY)
     {
         switch (t)
         {
             case HOST:
-                // this->_host
+                _host = std::string(line.begin() + line.find(": ") + 2, line.end());
+                std::cout << "host:" << _host << "\n";
                 break;
             case CONNECTION:
+                _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break;
             case ACCEPT:
                 break;
             case ACCEPT_ENCODING:
                 break;
+            case CONTENT_TYPE:
+                _contentType = std::string(line.begin() + line.find(": ") + 2, line.begin() + line.find(';'));
+                break; // add
+            case CONTENT_LENGTH:
+                _contentLength = convertType<uint32_t>(std::string(line.begin() + line.find(": ") + 2, line.end()));
             default:
                 break;
         }
+        if (_buffer.find("\r\n", _it - _buffer.begin()) == (size_t)(_it - _buffer.begin()))
+            break ;
         if (_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
             return (1);
         line = std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()));
         if (line.find(": ") == std::string::npos)
         {
             _error = 1;
+            std::cout << "error\n";
             return (1);
         }
-        t = getParam(line.substr(0, line.find(':')));
-        _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin());
+        t = getParam(line.substr(0, line.find(": ")));
+        _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
     }
     _state = BODY;
     return (0);
@@ -129,16 +131,20 @@ void Request::add(std::string const &new_buff)
         case HEADER:
             parseHeader();
         case BODY:
+            
+            break;
+        case END:
             break;
     }
     //else body
 }
 
 
-bool Request::parse(void)
+int Request::getState(void)
 {
-    std::cout << _buffer;
+    return _state;
+    // std::cout << _buffer;
    
     
-    return 1;
+    // return 1;
 }
