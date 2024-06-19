@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 16:14:57 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:45:20 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <string>
 #include <ctime>
 #include <fstream>
+#include <map>
 // #include <Windows.h>
 #include "../Print.hpp"
 #include "Request.hpp"
@@ -30,9 +31,10 @@ class Response
         Request* _req;
         Server* _serv;
         std::string _buffer;
+		std::map<std::string, std::string> _cgiEnv;
         
         void genHeader(std::string type);
         void genBody(std::string path);
 
-        void rec();
+        void createEnv(void);
 };

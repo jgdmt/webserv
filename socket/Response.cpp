@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 18:09:48 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 19:03:06 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,4 +132,25 @@ void Response::init(void)
     std::cout << "coucou\n";
     genHeader("200 ok");
     return ;
+}
+
+void	Response::createEnv(void)
+{
+	_cgiEnv["SERVER_SOFTWARE"] = "?";
+	_cgiEnv["SERVER_NAME"] = "?";
+	_cgiEnv["GATEWAY_INTERFACE"] = "?";
+	_cgiEnv["SERVER_PROTOCOL"] = "?";
+	_cgiEnv["SERVER_PORT"] = "?";
+	_cgiEnv["REQUEST_METHOD"] = "?";
+	_cgiEnv["PATH_INFO"] = "?";
+	_cgiEnv["PATH_TRANSLATED"] = "?";
+	_cgiEnv["SCRIPT_NAME"] = "?";
+	_cgiEnv["QUERY_STRING"] = "?";
+	_cgiEnv["REMOTE_HOST"] = "?";
+	_cgiEnv["REMOTE_ADDR"] = "?";
+	_cgiEnv["AUTH_TYPE"] = "?";
+	_cgiEnv["REMOTE_USER"] = "?";
+	_cgiEnv["REMOTE_IDENT"] = "?";
+	_cgiEnv["CONTENT_TYPE"] = "?";
+	_cgiEnv["CONTENT_LENGTH"] = "?";
 }
