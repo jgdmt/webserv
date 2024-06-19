@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 16:13:02 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:02:03 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Route
 
 		void parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len);
 		static int	find_len(std::string const& content, std::string::iterator const& name, char endc, bool split);
+		static std::string::iterator	find_end(std::string const& content, std::string::iterator i);
 
 	private:
         // Route(Route const &cpy);
@@ -61,4 +62,6 @@ class Route
 		void	defaultfile(std::string const& content, std::string::iterator& start);
 		void	cgipath(std::string const& content, std::string::iterator& start);
 		void	cgiextension(std::string const& content, std::string::iterator& start);
+		void	check_name(void);
+		void	check_duplicates(void);
 };

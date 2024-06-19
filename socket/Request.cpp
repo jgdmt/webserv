@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 15:14:08 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:39:42 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,10 @@ void Request::accept(std::string const& line)
 		swap<std::string>(_accept[j], _accept[min]);
 	}
 
-	for (size_t i = 0; i < sort.size(); i++)
-	{
-		std::cout << "accept [" << sort[i] << "] -> " << _accept[i] << "\n";
-	}
+	// for (size_t i = 0; i < sort.size(); i++)
+	// {
+	// 	std::cout << "accept [" << sort[i] << "] -> " << _accept[i] << "\n";
+	// }
 }
 
 void Request::acceptEncoding(std::string const& line)
@@ -108,8 +108,8 @@ void Request::acceptEncoding(std::string const& line)
 		i = j + 2;
 	}
 	
-	for (size_t i = 0; i < _acceptEncoding.size(); i++)
-		std::cout << "acceptEncoding[" << i << "] = " << _acceptEncoding[i] << "\n";
+	// for (size_t i = 0; i < _acceptEncoding.size(); i++)
+	// 	std::cout << "acceptEncoding[" << i << "] = " << _acceptEncoding[i] << "\n";
 }
 
 int Request::parseHeader(void)
@@ -132,7 +132,6 @@ int Request::parseHeader(void)
         {
             case HOST:
                 _host = std::string(line.begin() + line.find(": ") + 2, line.end());
-                std::cout << "host:" << _host << "\n";
                 break;
             case CONNECTION:
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());

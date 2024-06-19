@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 16:12:41 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:05:52 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ int	Route::find_len(std::string const& content, std::string::iterator const& nam
 	return (len);
 }
 
-static std::string::iterator	find_end(std::string const& content, std::string::iterator i)
+std::string::iterator	Route::find_end(std::string const& content, std::string::iterator i)
 {
 	int nb = 1;
 	while (i != content.end())
@@ -166,7 +166,7 @@ void Route::route(std::string const& content, std::string::iterator& start, std:
 	if (len == -2)
 		Print::print(CRASH, "Error: location does not take multiple parameters");
 	Route route;
-	parse(content, start, end, len);
+	route.parse(content, start, end, len);
 	this->_routes.push_back(route);
 }
 
@@ -219,7 +219,6 @@ void Route::directorylisting(std::string const& content, std::string::iterator& 
 void Route::defaultfile(std::string const& content, std::string::iterator& start)
 {
 	int len = Route::find_len(content, start, ';', false);
-	// std::string::iterator tmp = start;
 	std::string def;
 
 	if (len == 0)
@@ -252,7 +251,6 @@ void Route::cgipath(std::string const& content, std::string::iterator& start)
 		Print::print(CRASH, "Parsing location: " + path + " does not exist or is not executable");
 	_cgiPath = path;
 	start += len;
-	std::cout << "cgi path: " << _cgiPath << "\n";
 }
 
 void Route::cgiextension(std::string const& content, std::string::iterator& start)
@@ -278,8 +276,24 @@ void Route::cgiextension(std::string const& content, std::string::iterator& star
 		while (*start == ' ')
 			start++;
 	}
-	for (size_t i = 0; i < _cgiExtensions.size(); i++)
-		std::cout << _cgiExtensions[i] << "\n";
+}
+
+void Route::check_name(void)
+{
+	if (_redirection.find('\\') != std::string::npos)
+		Print::print(CRASH, "Parsing location: location can not have '\\' in the name");
+	if (_redirection.find('/') != _redirection.rfind('/'))
+		Print::print(CRASH, "Parsing location: location does not take multiple '/'");
+}
+
+void Route::check_duplicates(void)
+{
+	for (size_t i = 0; i < _routes.size(); i++)
+	{
+		for (size_t j = i + 1; j < _routes.size(); j++)
+			if (_routes[j]._redirection == _routes[i]._redirection)
+				Print::print(CRASH, "Parsing location: location can not have duplicate locations (" + _routes[j]._redirection + ")");
+	}
 }
 
 void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
@@ -290,9 +304,12 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 	bool methods = false;
 
 	this->_redirection = content.substr(start - content.begin(), len);
+	check_name();
 	start += len;
 	while (*(++start) == ' ')
 		continue ;
+	if (*start == '{')
+		start++;
 	root_end = find_end(content, start);
 	while (*(++start) == ' ')
 		continue ;
@@ -306,9 +323,6 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 		param = content.substr(it - content.begin(), start - it);
 		while (*start == ' ')
 			start++;
-
-		std::cout << "PARAM  " << param << "\n";
-
 		if (param == "root")
 			path(content, start);
 		else if (param == "location")
@@ -331,6 +345,10 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)
 			start++;
 	}
+	start++;
 	if (!methods)
 		setDefaultAutorizedMethod();
+	check_duplicates();
+	for (size_t i = 0; i < _routes.size(); i++)
+		std::cout << "route " << _redirection << " (" << i << ") : " << _routes[i]._redirection << "\n";
 }

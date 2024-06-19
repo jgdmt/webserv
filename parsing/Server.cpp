@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 16:13:10 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:01:08 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,13 +169,18 @@ void Server::maxbodysize(std::string const& content, std::string::iterator& star
 void	Server::parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end)
 {
 	int l = Route::find_len(content, start, '{', false);
+	// std::string::iterator end_root = Route::find_end(content, start + l + 1);(void)end;
 
 	if (l == 0)
 		Print::print(CRASH, "Parsing server: location is missing a value");
 	if (l == -2)
 		Print::print(CRASH, "Parsing server: location does not take multiple parameters");
 	Route route;
+
+	// std::string::iterator it = start;
+	// std::cout << "BEFORE " << content.substr((start + l + 2) - content.begin(), end_root - content.begin()) << "\n";
 	route.parse(content, start, end, l);
+	// std::cout << "parsing server " << route.getRedirection() << " end root: " << content.substr(it - content.begin(), end_root - content.begin()) << " and length: " << l << "\n"; 
 	this->_routes.push_back(route);
 }
 

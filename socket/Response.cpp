@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 16:28:39 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:09:48 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,17 +89,6 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     return;
 }
 
-// void Response::rec(int pos, Route * route)
-// {
-//     std::string chunkUri = req->getUri().substr(req->getUri().find('/', pos));
-
-//     for (unsigned int i = 0; i < route->getRoutesNumber(); i++)
-//     {
-//         if (route->getRoute(i)->getRedirection() == chunkUri)
-//             rec(req->getUri().find('/', pos) + 1, );
-//     }
-// }
-
 void Response::init(void)
 {
     size_t pos = 0;
@@ -109,24 +98,22 @@ void Response::init(void)
     std::string chunkUri = _req->getUri().substr(pos, next - pos);
     Route *route = NULL;
 
-        std::cout << "serv '" << chunkUri << "'\n";
     for(unsigned int i = 0; i < _serv->getRoutesNumber(); i++)
     {
-        std::cout << "serv2 '" << _serv->getRoute(i)->getRedirection() << "'\n";
         if(_serv->getRoute(i)->getRedirection() == chunkUri)
         {
             route = _serv->getRoute(i);
             break ;
         }
     }
-    if (route == NULL)
-        std::cout << "default case\n";
+    // if (route == NULL)
+    //     std::cout << "default case\n";
     while (route != NULL)
     {
         pos = next;
         next = _req->getUri().find('/', pos + 1);
         if (next == std::string::npos)
-            break;
+            next = _req->getUri().size();
         chunkUri = _req->getUri().substr(pos, next - pos);
         int nbRoute = route->getRoutesNumber();
         int i = 0;
@@ -135,15 +122,13 @@ void Response::init(void)
             if (route->getRoute(i)->getRedirection() == chunkUri)
             {
                 route = route->getRoute(i);
-                std::cout << route->getRedirection();
                 break ;
             }
+			i++;
         }
         if (i == nbRoute)
             break ;
     }
-    std::cout << _req->getUri() << "\n";
-    // std::cout << route->getRedirection();
     std::cout << "coucou\n";
     genHeader("200 ok");
     return ;
