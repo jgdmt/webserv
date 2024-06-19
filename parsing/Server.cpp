@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 11:55:48 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:13:10 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,16 @@ std::string Server::getLogLevel(void) const
 int Server::getFdListen(void) const
 {
 	return _fd_listen;
+}
+
+Route* Server::getRoute(uint32_t i)
+{
+	return &_routes[i];
+}
+
+unsigned int Server::getRoutesNumber(void) const
+{
+	return _routes.size();
 }
 
 void Server::listen2(std::string const& content, std::string::iterator& start)

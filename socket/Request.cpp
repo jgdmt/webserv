@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 19:38:40 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 15:14:08 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,17 @@ Request::Request()
     _error = 0;
     _contentLength = 0;
 }
+
+std::string const &Request::getConnection(void)
+{
+    return _connection;
+}
+
+std::string const &Request::getUri() const
+{
+    return _uri;
+}
+
 
 static int getParam(std::string const &param)
 {
@@ -234,7 +245,7 @@ int Request::IsParsingOk(void)
         return -1;
     else if (_state != END)
         return 0;
-    else if ((!_method.size() || !_uri.size() || !_host.size() || !_host.size()))
+    else if (!_method.size() || !_uri.size() || !_host.size())
         return -1;
     else if ( _contentLength == 0 && (_method == "POST"))
         return -2;

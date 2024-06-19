@@ -6,14 +6,14 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 17:22:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 12:25:40 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include "../parsing/Settings.hpp"
 
-Client::Client(Server &serv, int id): _id(id), _serv(serv)
+Client::Client(Server &serv, int id): _serv(serv), res(&req, &_serv), _id(id)
 {
     socklen_t addr_len = sizeof(_addr);
    _fd = accept(serv.getFdListen(), (sockaddr *)&_addr ,&addr_len);
@@ -39,7 +39,7 @@ Client::~Client(void)
 }
 
 
-Client::Client(Client const &client): _id(client._id), _serv(client._serv)
+Client::Client(Client const &client): _serv(client._serv), res(&req, &_serv), _id(client._id)
 {
 	*this = client;
 }
@@ -90,10 +90,10 @@ void    Client::readRequest(Settings *set)
 	switch(req.IsParsingOk())
 	{
 		case -2:
-			res.error("411");
+			res.error("411", "Length Required");
 			break;
 		case -1:
-			res.error("400");
+			res.error("400", "Bad Request");
 			break;
 		case 0:
 			break;

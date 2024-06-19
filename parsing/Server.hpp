@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 10:45:39 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:13:14 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,9 @@ class Server
 		int	getID(void) const;
         std::string const &getErrorPage(std::string const &error);
         std::string getLogLevel(void) const;
-        int getFdListen(void) const;         
+        int getFdListen(void) const;
+        Route* getRoute(uint32_t i);
+        unsigned int getRoutesNumber(void) const;
 
         void	parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);
         void    setup(void);

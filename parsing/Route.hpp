@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 13:28:23 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:13:02 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ class Route
         std::string const &getPath(void) const;
         bool IsListing(void);
         std::string getdefaultFileForDirectory(void) const;
+        Route* getRoute(uint32_t i);
+        unsigned int getRoutesNumber(void) const;
         void setDefaultFileForDirectory(std::string const &str);
         void setRedirection(std::string const &str);
         void setPath(std::string const &str);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 19:29:15 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 15:13:34 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ class Request
     public:
         Request();
         void add(std::string const &new_buff);
+        std::string const &getConnection(void);
+        std::string const &getUri() const;
         int IsParsingOk(void);
     private:
         std::string::iterator _it;

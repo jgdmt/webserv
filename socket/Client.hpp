@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 16:46:02 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 12:19:51 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ class Client
         Client &operator=(Client const &client);
     private:
         Request req;
+        Server _serv;
         Response res;
         const int _id;
         int _fd;
         sockaddr_in _addr;
-        Server _serv;
         time_t _last_com;
 };

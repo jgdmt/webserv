@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 13:56:42 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:12:41 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,16 @@ bool Route::IsListing(void)
 std::string Route::getdefaultFileForDirectory(void) const
 {
     return _defaultFileForDirectory;
+}
+
+Route* Route::getRoute(uint32_t i)
+{
+	return &_routes[i];
+}
+
+unsigned int Route::getRoutesNumber(void) const
+{
+	return _routes.size();
 }
 
 void Route::setDefaultFileForDirectory(std::string const &str)
