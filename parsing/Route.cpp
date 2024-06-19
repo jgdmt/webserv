@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 13:09:16 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:56:42 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,8 +221,55 @@ void Route::defaultfile(std::string const& content, std::string::iterator& start
 	def = content.substr(start - content.begin(), len);
 	start += len;
 	if (access(def.c_str(), F_OK | R_OK))
-		Print::print(CRASH, "Parsing server: " + def);
+		Print::print(CRASH, "Parsing location: " + def + " does not exist or is not executable");
 	this->_defaultFileForDirectory = def;
+}
+
+void Route::cgipath(std::string const& content, std::string::iterator& start)
+{
+	int len = Route::find_len(content, start, ';', false);
+	std::string path;
+	//check if executable
+	if (len == 0)
+		Print::print(CRASH, "Parsing location: cgi_path is missing a value");
+	if (len == -1)
+		Print::print(CRASH, "Parsing location: missing ';'");
+	if (len == -2)
+		Print::print(CRASH, "Parsing location: cgi_path does not take multiple values");
+	
+	path = content.substr(start - content.begin(), len);
+	if (access(path.c_str(), F_OK | X_OK))
+		Print::print(CRASH, "Parsing location: " + path + " does not exist or is not executable");
+	_cgiPath = path;
+	start += len;
+	std::cout << "cgi path: " << _cgiPath << "\n";
+}
+
+void Route::cgiextension(std::string const& content, std::string::iterator& start)
+{
+	//.php
+	int len = Route::find_len(content, start, ';', true);
+	std::string::iterator tmp = start;
+	std::string::iterator it;
+	std::string extension;
+
+	if (len == 0)
+		Print::print(CRASH, "Parsing location: cgi_extension is missing values");
+	if (len == -1)
+		Print::print(CRASH, "Parsing location: missing ';");
+		while (start != tmp + len)
+	{
+		it = std::find(start, tmp + len, ' ');
+		extension = content.substr(start - content.begin(), it - start);
+		if (extension.size() == 0 || extension[0] != '.')
+			Print::print(CRASH, "Parsing location: " + extension + " is not a valid extension");
+		_cgiExtensions.push_back(extension);
+		start = it;
+		while (*start == ' ')
+			start++;
+	}
+	for (size_t i = 0; i < _cgiExtensions.size(); i++)
+		std::cout << _cgiExtensions[i] << "\n";
 }
 
 void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
@@ -265,6 +312,10 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 			directorylisting(content, start);
 		else if (param == "default_file")
 			defaultfile(content, start);
+		else if (param == "cgi_path")
+			cgipath(content, start);
+		else if (param == "cgi_extension")
+			cgiextension(content, start);
 		else
 			Print::print(CRASH, "Parsing location: " + param + " is unknown");
 		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)

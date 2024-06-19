@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/14 15:26:44 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:28:23 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,14 @@ class Route
         std::string _path;
         bool _directoryListing;
         std::string _defaultFileForDirectory;
+		std::string _cgiPath;
+		std::vector<std::string> _cgiExtensions;
         
 		void	path(std::string const& content, std::string::iterator& start);
 		void	route(std::string const& content, std::string::iterator& start, std::string::iterator& end);
 		void	allowmethods(std::string const& content, std::string::iterator& start);
 		void	directorylisting(std::string const& content, std::string::iterator& start);
 		void	defaultfile(std::string const& content, std::string::iterator& start);
+		void	cgipath(std::string const& content, std::string::iterator& start);
+		void	cgiextension(std::string const& content, std::string::iterator& start);
 };
