@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/18 10:42:56 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/20 15:38:51 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 #include <iterator>
 
 typedef std::string::iterator it;
+
+std::vector<pollfd> *Settings::getFds()
+{
+	return &_fds;
+}
 
 static std::string createContent(std::string const& fileName)
 {
@@ -126,6 +131,8 @@ void Settings::run(void)
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
 				_clients[i - _servers.size()].readRequest(this);
+			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd)
+				_clients[i - _servers.size()].sendResponse();
 		}
 		checkTimeout();
 	}

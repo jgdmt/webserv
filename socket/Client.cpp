@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 11:08:41 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/20 15:49:01 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,14 +91,31 @@ void    Client::readRequest(Settings *set)
 	{
 		case -2:
 			res.error("411", "Length Required");
+			set->getFds()->at(_id).events = POLLOUT;
 			break;
 		case -1:
 			res.error("400", "Bad Request");
+			set->getFds()->at(_id).events = POLLOUT;
 			break;
 		case 0:
 			break;
 		case 1:
 			res.init();
+			set->getFds()->at(_id).events = POLLOUT;
 			break;
 	}
+
+}
+
+void    Client::sendResponse(void)
+{
+
+	std::cout << " will Send\n";
+	switch (send(_fd, res.getRes().c_str(), res.getRes().size(), 0))
+	{
+		default:
+			break;
+
+	}
+	std::cout << "Send\n";
 }

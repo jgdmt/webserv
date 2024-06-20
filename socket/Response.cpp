@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 11:48:53 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:58:35 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@ Response::Response(Request* req, Server* serv)
 {
     _req = req;
     _serv = serv;
+}
+
+std::string const &Response::getRes(void)
+{
+    return _buffer;
 }
 
 void Response::genHeader(std::string type)
@@ -31,7 +36,6 @@ void Response::genHeader(std::string type)
     _buffer += "Date: " + (std::string)buff + "\r\n";
     _buffer += "Keep-Alive: timeout=60\r\n";
     _buffer += "Server: IsWatchingYou\r\n";
-    std::cout << _buffer << "\n";
 }
 // static std::string getMimeType(const string &szExtension)
 // {
@@ -96,11 +100,13 @@ void Response::check_path(std::string path)
 	stat(path.c_str(), &path_stat);
 	if (!S_ISDIR(path_stat.st_mode))
     {
-        if (access(path.c_str(), F_OK | R_OK))
+        if (access(path.c_str(), F_OK))
+            error("404", "Not Found");
+        else if (access(path.c_str(),  R_OK))
             error("403", "Forbidden");
         else
         {
-            //get minmetype
+            // for(int i = 0; i < )
         }
     }
 }
@@ -155,7 +161,7 @@ void Response::init(void)
         path = route->getPath() + _req->getUri().substr(pos, _req->getUri().size() - pos);
     }
     check_path(path);
-    genHeader("200 ok");
+    // genHeader("200 ok");
     return ;
 }
 

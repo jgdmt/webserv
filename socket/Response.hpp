@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 12:03:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/20 15:40:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Response
         Response(Request* req, Server* serv);
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);
+        std::string const &getRes(void);
     private:
         Request* _req;
         Server* _serv;
