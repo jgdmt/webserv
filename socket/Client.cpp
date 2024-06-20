@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 12:25:40 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/20 11:08:41 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void    Client::readRequest(Settings *set)
 	{
 	case 0:
 		set->closeClient(_id);
-		break;
+		return ;
 	case -1:
 		Print::print(ERROR, "Recv didn't work properly");
 		set->closeClient(_id);
@@ -86,7 +86,7 @@ void    Client::readRequest(Settings *set)
 		req.add(buffer);
 		break;
 	}
-	std::cout << req.IsParsingOk() << "\n";
+	// std::cout << req.IsParsingOk() << "\n";
 	switch(req.IsParsingOk())
 	{
 		case -2:

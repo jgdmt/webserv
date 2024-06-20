@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 19:03:06 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/20 11:48:53 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,22 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     return;
 }
 
+void Response::check_path(std::string path)
+{
+    struct stat	path_stat;
+
+	stat(path.c_str(), &path_stat);
+	if (!S_ISDIR(path_stat.st_mode))
+    {
+        if (access(path.c_str(), F_OK | R_OK))
+            error("403", "Forbidden");
+        else
+        {
+            //get minmetype
+        }
+    }
+}
+
 void Response::init(void)
 {
     size_t pos = 0;
@@ -129,7 +145,16 @@ void Response::init(void)
         if (i == nbRoute)
             break ;
     }
-    std::cout << "coucou\n";
+    std::string path;
+    if(route == NULL)
+        path = _req->getUri();
+    else
+    {
+        if(route->getPath().back() == '/')
+            pos++;
+        path = route->getPath() + _req->getUri().substr(pos, _req->getUri().size() - pos);
+    }
+    check_path(path);
     genHeader("200 ok");
     return ;
 }
