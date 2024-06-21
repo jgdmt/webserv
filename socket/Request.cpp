@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 15:52:55 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:49:51 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,55 @@ std::string const &Request::getUri() const
     return _uri;
 }
 
+std::string const &Request::getMethod(void) const
+{
+	return _method;
+}
+
+std::string const &Request::getHost(void) const
+{
+	return _host;
+}
+
+std::string const &Request::getContentType(void) const
+{
+	return _contentType;
+}
+
+std::string const &Request::getContentBoundary(void) const
+{
+	return _contentBoundary;
+}
+
+std::string const &Request::getBody(void) const
+{
+	return _body;
+}
+
+std::string const &Request::getAccept(int i) const
+{
+	return _accept[i];
+}
+
+std::string const &Request::getAcceptEncoding(int i) const
+{
+	return _acceptEncoding[i];
+}
+
+uint32_t const &Request::getContentLength(void) const
+{
+	return _contentLength;
+}
+
+size_t Request::getAcceptSize(void)
+{
+	return _accept.size();
+}
+
+size_t Request::getAcceptEncodingSize(void)
+{
+	return _acceptEncoding.size();
+}
 
 static int getParam(std::string const &param)
 {

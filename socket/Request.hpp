@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 15:13:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:49:53 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,19 @@ class Request
         Request();
         void add(std::string const &new_buff);
         std::string const &getConnection(void);
-        std::string const &getUri() const;
+        std::string const &getUri(void) const;
+		std::string const &getMethod(void) const;
+		std::string const &getHost(void) const;
+		std::string const &getContentType(void) const;
+		std::string const &getContentBoundary(void) const;
+		std::string const &getBody(void) const;
+		std::string const &getAccept(int i) const;
+		std::string const &getAcceptEncoding(int i) const;
+		uint32_t const& getContentLength(void) const;
+		size_t getAcceptSize(void);
+		size_t getAcceptEncodingSize(void);
+
+
         int IsParsingOk(void);
     private:
         std::string::iterator _it;
