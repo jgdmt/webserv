@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 11:49:51 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/21 15:44:29 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,6 +246,11 @@ int Request::parseBody(void)
         _it += tmp.size(); 
     }
     return (1);
+}
+
+void Request::clear(void)
+{
+    _buffer.clear();
 }
 
 void Request::add(std::string const &new_buff)

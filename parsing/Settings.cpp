@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 11:10:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 16:17:51 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,8 @@ void Settings::checkTimeout(void)
 
 void Settings::closeClient(unsigned int i)
 {
+	for(unsigned int j = i + 1; j < _clients.size(); j++)
+			_clients[j].setId(j - 1);
 	close(_clients[i].getFd());
 	_fds.erase(_fds.begin() + _servers.size() + i);
 	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", _clients[i].getServer());
@@ -161,10 +163,10 @@ void Settings::closeClient(unsigned int i)
 
 void Settings::addClient(unsigned int i, Server &serv)
 {
-
+	(void)i;
 	try
 	{
-		Client test(serv, i);
+		Client test(serv,  _clients.size());
 		_clients.push_back(test);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.push_back(tmp);

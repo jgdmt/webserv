@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 15:40:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 15:48:26 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,12 @@
 #include <ctime>
 #include <fstream>
 #include <map>
-// #include <Windows.h>
+#include <dirent.h>
 #include "../Print.hpp"
 #include "Request.hpp"
 #include "../parsing/Server.hpp"
+
+#define WRITESIZE 50000
 
 #define MIME_TYPE(extension) \
     (std::string(extension) == "html" ? "text/html" : \
@@ -42,7 +44,7 @@
     std::string(extension) == "php" ? "application/x-httpd-php" : \
     std::string(extension) == "svg" ? "image/svg+xml" : \
     std::string(extension) == "ico" ? "image/vnd.microsoft.icon" : \
-    "application/octet-stream" :)
+    "application/octet-stream" )
 
 class Response
 {
@@ -50,6 +52,7 @@ class Response
         Response(Request* req, Server* serv);
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);
+        void cut(int pos);
         std::string const &getRes(void);
     private:
         Request* _req;

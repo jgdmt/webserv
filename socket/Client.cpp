@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 11:25:24 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 16:36:20 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ Client::Client(Server &serv, int id): _serv(serv), res(&req, &_serv), _id(id)
 	}
 	char buffer[INET_ADDRSTRLEN];
 	Print::print(INFO, "New Connection on socket " + to_string(_fd) + " From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), serv);
-	if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
-	{
-		throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
-		close(_fd);
-	}
+	// if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
+	// {
+	// 	throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
+	// 	close(_fd);
+	// }
 	_last_com = time(NULL);
 }
 
@@ -47,6 +47,7 @@ Client::Client(Client const &client): _serv(client._serv), res(&req, &_serv), _i
 Client &Client::operator=(Client const &client)
 {
 	this->_addr = client._addr;
+	this->_id = client._id;
 	this->_fd = client._fd;
 	this->_serv = client._serv;
 	this->_last_com = client._last_com;
@@ -68,20 +69,25 @@ Server &Client::getServer(void)
 	return _serv;
 }
 
+void    Client::setId(int id)
+{
+	_id = id;
+}
+
 void    Client::readRequest(Settings *set)
 {
 	char buffer[READSIZE];
 	int i = _id + set->getServers()->size();
 	// bzero(buffer, READSIZE); // delete later
-    switch (recv(_fd, buffer, READSIZE, 0))
+    switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
 	{
 	case 0:
 		set->closeClient(_id);
 		return ;
 	case -1:
-		Print::print(ERROR, "Recv didn't work properly");
+		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id));
 		set->closeClient(_id);
-		break;
+		return ;
 	default:
 		_last_com = time(NULL);
 		req.add(buffer);
@@ -111,16 +117,28 @@ void    Client::readRequest(Settings *set)
 
 void    Client::sendResponse(Settings *set)
 {
+	// Print::print(INFO, "ready", _serv);
+	int result;
 
-	std::cout << _id << " will Send\n";
-	std::cout << res.getRes();
-	switch (send(_fd, res.getRes().c_str(), res.getRes().size(), 0))
+	if(res.getRes().size() >= WRITESIZE)
+		result = send(_fd, res.getRes().c_str(), WRITESIZE, MSG_DONTWAIT);
+	else
+		result = send(_fd, res.getRes().c_str(), res.getRes().size(), MSG_DONTWAIT);
+
+	if(result < 0)
+			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
+	else if(result == 0 || (unsigned int)result == res.getRes().size())
 	{
-		default:
-			break;
-
+			Print::print(DEBUG, "Response send to Client " + to_string<int>(_id) + ".", _serv);
+			set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
+			_last_com = time(NULL);
 	}
+	else
+	{
+		_last_com = time(NULL);
+		res.cut(result);
+	}
+	
 
-	set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};
-	std::cout << "Send\n";
+
 }

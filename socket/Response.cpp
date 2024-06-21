@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 11:28:00 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 16:26:22 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ std::string const &Response::getRes(void)
     return _buffer;
 }
 
+void Response::cut(int pos)
+{
+    _buffer = _buffer.substr(pos);
+}
+
 void Response::genHeader(std::string type)
 {
     std::time_t now = std::time(nullptr);
@@ -37,35 +42,7 @@ void Response::genHeader(std::string type)
     _buffer += "Keep-Alive: timeout=60\r\n";
     _buffer += "Server: IsWatchingYou\r\n";
 }
-// static std::string getMimeType(const string &szExtension)
-// {
-//     // return mime type for extension
-//     HKEY hKey = NULL;
-//     string szResult = "application/unknown";
 
-//     // open registry key
-//     if (RegOpenKeyEx(HKEY_CLASSES_ROOT, szExtension.c_str(), 
-//                        0, KEY_READ, &hKey) == ERROR_SUCCESS)
-//     {
-//         // define buffer
-//         char szBuffer[256] = {0};
-//         DWORD dwBuffSize = sizeof(szBuffer);
-
-//         // get content type
-//         if (RegQueryValueEx(hKey, "Content Type", NULL, NULL, 
-//                        (LPBYTE)szBuffer, &dwBuffSize) == ERROR_SUCCESS)
-//         {
-//             // success
-//             szResult = szBuffer;
-//         }
-
-//         // close key
-//         RegCloseKey(hKey);
-//     }
-
-//     // return result
-//     return szResult;
-// }
 
 void Response::genBody(std::string path)
 {
@@ -78,8 +55,8 @@ void Response::genBody(std::string path)
     std::stringstream FileStream;
     FileStream << FileDescriptor.rdbuf();
     std::string buff = FileStream.str();
+    _buffer += "Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find('.', path.find_last_of('/')) + 1)) + "\r\n";
     _buffer += "Content-Length: " + to_string(buff.size()) + "\r\n\r\n";
-    // _buffer += "Content-Type: " + getMimType(path.substr(path.find('.', path.find_last_of('/'))) + "\r\n\r\n");
     _buffer += buff;
     _buffer += "\r\n";
 }
@@ -89,7 +66,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
     std::string path = _serv->getErrorPage(httpErrorCode);
     genBody(path);
-    std::cout << "ERROOR\n";
+    std::cout << "ERROOR "<< httpErrorCode << "\n";
     return;
 }
 
@@ -106,9 +83,26 @@ void Response::check_path(std::string path)
             error("403", "Forbidden");
         else
         {
-            // for(int i = 0; i < )
+            uint32_t i = 0;
+            std::string myme = MIME_TYPE(path.substr(path.find('.', path.find_last_of('/')) + 1));
+            
+            while(i < _req->getAcceptSize())
+            {
+                if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
+                    break;
+                i++;
+            }
+            if(_req->getAcceptSize() != 0 && i == _req->getAcceptSize())
+                error("406", "Not Acceptable");
+            else
+            {
+                genHeader("200 OK");
+                genBody(path);
+            }
         }
     }
+            // DIR *dir = opendirr()
+            // for(int i = 0; i < )
 }
 
 void Response::init(void)

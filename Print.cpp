@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/17 11:47:12 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 14:28:50 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void output_time(void)
     std::cout << time->tm_min << ':';
     if (time->tm_sec < 10)
         std::cout << '0';   
-    std::cout << time->tm_sec << "]     ";
+    std::cout << time->tm_sec << "]";
 }
 
 static int getLevel(std::string const &level)
@@ -67,7 +67,7 @@ void Print::print(std::string const &status, std::string const &str)
     {
         std::cout << "\e[1;32m";
         output_time();
-        std::cout << str << std::endl;
+        std::cout << "              " << str << std::endl;
         std::cout << "\e[97m";
     }
     else if(status == CRASH || status == ERROR)
@@ -94,7 +94,7 @@ void Print::error_print(std::string const &status, std::string const &str)
     std::cerr << time->tm_min << ':';
     if (time->tm_sec < 10)
         std::cerr << '0';   
-    std::cerr << time->tm_sec << "]     [" << status << "]    " << str << "\e[97m\n";
+    std::cerr << time->tm_sec << "]     [" << status << "]        " << str << "\e[97m\n";
     if(status == CRASH)
         exit(EXIT_FAILURE);
 }
