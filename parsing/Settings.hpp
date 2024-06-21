@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 15:37:05 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:10:32 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class Settings
 {
     public:
         void parse(std::string const &filePath);
-        std::vector<Server> &getServers(void);
+        std::vector<Server> *getServers(void);
         std::vector<pollfd> *getFds();
         void setup(void);
         void run(void);

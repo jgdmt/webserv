@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 15:10:14 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:14:23 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Client
         time_t getLastCom(void) const;
         Server &getServer(void);
         void    readRequest(Settings *set);
-        void    sendResponse(void);
+        void    sendResponse(Settings *set);
         Client(Client const &client);
         Client &operator=(Client const &client);
     private:

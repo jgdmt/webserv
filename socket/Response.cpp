@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 18:58:35 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:28:00 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void Response::genHeader(std::string type)
     std::tm *time =  std::localtime(&now);
     char buff[80];
 
-    _buffer += "HTTP/1.1 " + type + "\r\n";
+    _buffer = "HTTP/1.1 " + type + "\r\n";
     if (_req->getConnection() == "keep-alive\r")
         _buffer += "Connection: Keep-Alive\r\n";
     strftime(buff, 80, "%c", time);
@@ -78,7 +78,7 @@ void Response::genBody(std::string path)
     std::stringstream FileStream;
     FileStream << FileDescriptor.rdbuf();
     std::string buff = FileStream.str();
-    _buffer += "Content-Length: " + to_string(buff.size()) + "\r\n";
+    _buffer += "Content-Length: " + to_string(buff.size()) + "\r\n\r\n";
     // _buffer += "Content-Type: " + getMimType(path.substr(path.find('.', path.find_last_of('/'))) + "\r\n\r\n");
     _buffer += buff;
     _buffer += "\r\n";
@@ -89,7 +89,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
     std::string path = _serv->getErrorPage(httpErrorCode);
     genBody(path);
-    
+    std::cout << "ERROOR\n";
     return;
 }
 

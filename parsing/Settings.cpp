@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/20 15:38:51 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:10:52 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,9 +99,9 @@ void Settings::parse(std::string const &fileName)
 	Print::print(SUCCESS, "Parsing finished successfully");
 }
 
-std::vector<Server> &Settings::getServers(void)
+std::vector<Server> *Settings::getServers(void)
 {
-	return _servers;
+	return &_servers;
 }
 
 void Settings::setup(void)
@@ -132,7 +132,7 @@ void Settings::run(void)
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
 				_clients[i - _servers.size()].readRequest(this);
 			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd)
-				_clients[i - _servers.size()].sendResponse();
+				_clients[i - _servers.size()].sendResponse(this);
 		}
 		checkTimeout();
 	}
