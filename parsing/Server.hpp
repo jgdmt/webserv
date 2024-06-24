@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 18:01:17 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:31:12 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
+#include <cstring>
 #include "Route.hpp"
 #include "../Utils.hpp"
 #include "../Print.hpp"
@@ -39,7 +40,7 @@ class Server
         std::string const &getErrorPage(std::string const &error);
         std::string getLogLevel(void) const;
         int getFdListen(void) const;
-        Route* getRoute(uint32_t i);
+        Route* getRoute(unsigned int i);
         unsigned int getRoutesNumber(void) const;
 
         void	parse(std::string const& content, std::string::iterator& start, std::string::iterator& end);

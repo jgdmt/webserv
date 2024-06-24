@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 16:10:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:44:32 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void Response::cut(int pos)
 
 void Response::genHeader(std::string type)
 {
-    std::time_t now = std::time(nullptr);
+    std::time_t now = std::time(NULL);
     std::tm *time =  std::localtime(&now);
     char buff[80];
 
@@ -46,7 +46,7 @@ void Response::genHeader(std::string type)
 
 void Response::genBody(std::string path)
 {
-    std::ifstream FileDescriptor(path);
+    std::ifstream FileDescriptor(path.c_str());
     if(FileDescriptor.fail())
     {
         Print::print(ERROR, "Couldn't open body file");
@@ -87,7 +87,7 @@ void Response::check_path(std::string path)
             error("403", "Forbidden");
         else
         {
-            uint32_t i = 0;
+            unsigned int i = 0;
             std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
             while(i < _req->getAcceptSize())
             {
@@ -151,7 +151,7 @@ void Response::init(void)
         path = _req->getUri();
     else
     {
-        if(route->getPath().back() == '/')
+        if(route->getPath()[route->getPath().size() - 1] == '/')
             pos++;
         path = route->getPath() + _req->getUri().substr(pos, _req->getUri().size() - pos);
     }

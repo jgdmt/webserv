@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/19 18:05:52 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:31:05 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ std::string Route::getdefaultFileForDirectory(void) const
     return _defaultFileForDirectory;
 }
 
-Route* Route::getRoute(uint32_t i)
+Route* Route::getRoute(unsigned int i)
 {
 	return &_routes[i];
 }
@@ -265,7 +265,7 @@ void Route::cgiextension(std::string const& content, std::string::iterator& star
 		Print::print(CRASH, "Parsing location: cgi_extension is missing values");
 	if (len == -1)
 		Print::print(CRASH, "Parsing location: missing ';");
-		while (start != tmp + len)
+	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
 		extension = content.substr(start - content.begin(), it - start);

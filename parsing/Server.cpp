@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 12:22:19 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:31:12 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int Server::getFdListen(void) const
 	return _fd_listen;
 }
 
-Route* Server::getRoute(uint32_t i)
+Route* Server::getRoute(unsigned int i)
 {
 	return &_routes[i];
 }

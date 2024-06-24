@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 15:44:29 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:39:55 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ std::string const &Request::getAcceptEncoding(int i) const
 	return _acceptEncoding[i];
 }
 
-uint32_t const &Request::getContentLength(void) const
+unsigned int const &Request::getContentLength(void) const
 {
 	return _contentLength;
 }
@@ -201,7 +201,7 @@ int Request::parseHeader(void)
                     _contentType = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break; // add
             case CONTENT_LENGTH:
-                _contentLength = convertType<uint32_t>(std::string(line.begin() + line.find(": ") + 2, line.end()));
+                _contentLength = convertType<unsigned int>(std::string(line.begin() + line.find(": ") + 2, line.end()));
             default:
                 break;
         }
@@ -283,7 +283,7 @@ void Request::add(std::string const &new_buff)
                 break;
         case BODY:
             if (parseBody())
-            break;
+           		break;
         case END:
             break;
     }
@@ -301,6 +301,5 @@ int Request::IsParsingOk(void)
         return -1;
     else if ( _contentLength == 0 && (_method == "POST"))
         return -2;
-    else
-        return 1;
+return 1;
 }

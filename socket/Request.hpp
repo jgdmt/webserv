@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 15:43:31 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:31:05 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class Request
 		std::string const &getBody(void) const;
 		std::string const &getAccept(int i) const;
 		std::string const &getAcceptEncoding(int i) const;
-		uint32_t const& getContentLength(void) const;
+		unsigned int const& getContentLength(void) const;
 		size_t getAcceptSize(void);
 		size_t getAcceptEncodingSize(void);
 
@@ -70,7 +70,7 @@ class Request
         std::string _contentType;
         std::string _contentBoundary;
         std::string _body;
-        uint32_t _contentLength;
+        unsigned int _contentLength;
         std::vector<std::string> _accept;
 		std::vector<std::string> _acceptEncoding;
         enum State _state;

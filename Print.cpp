@@ -15,7 +15,7 @@
 
 static void output_time(void)
 {
-    std::time_t now = std::time(nullptr);
+    std::time_t now = std::time(NULL);
     std::tm *time =  std::localtime(&now);
     std::cout << "[" << time->tm_year + 1900 << '-';
     if (time->tm_mon + 1 < 10)
@@ -77,7 +77,7 @@ void Print::print(std::string const &status, std::string const &str)
 
 void Print::error_print(std::string const &status, std::string const &str)
 {
-    std::time_t now = std::time(nullptr);
+    std::time_t now = std::time(NULL);
     std::tm *time =  std::localtime(&now);
     std::cerr << "\e[31m[" << time->tm_year + 1900 << '-';
     if (time->tm_mon + 1 < 10)

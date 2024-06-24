@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 12:03:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:17:49 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ std::vector<pollfd> *Settings::getFds()
 
 static std::string createContent(std::string const& fileName)
 {
-	std::ifstream ifs(fileName);
+	std::ifstream ifs(fileName.c_str());
 	std::string	line;
 	std::string content;
 

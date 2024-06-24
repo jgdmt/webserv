@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 16:10:04 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:20:58 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ void    Client::readRequest(Settings *set)
 {
 	char buffer[READSIZE];
 	int i = _id + set->getServers()->size();
-	static int a = 0;
 	// bzero(buffer, READSIZE); // delete later
 	
     switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
