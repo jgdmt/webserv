@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:20:58 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 18:19:08 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,14 +129,15 @@ void    Client::sendResponse(Settings *set)
 	else if(result == 0 || (unsigned int)result == res.getRes()->size())
 	{
 			Print::print(DEBUG, "Response send to Client " + to_string<int>(_id) + ".", _serv);
-			// set->closeClient(_id);
 			req.clear();
+			res.getRes()->clear();
 			set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
 			_last_com = time(NULL);
 	}
 	else
 	{
 		_last_com = time(NULL);
+		std::cout << "CUT\n";
 		res.cut(result);
 	}
 	

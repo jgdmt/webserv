@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:44:32 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 18:20:42 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ std::string *Response::getRes(void)
 
 void Response::cut(int pos)
 {
-    _buffer = _buffer.substr(pos);
+    _buffer = _buffer.substr(pos, _buffer.size() - pos);
+    _buffer.shrink_to_fit();
 }
 
 void Response::genHeader(std::string type)
