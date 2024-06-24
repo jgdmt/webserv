@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 16:26:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 16:10:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ Response::Response(Request* req, Server* serv)
     _serv = serv;
 }
 
-std::string const &Response::getRes(void)
+std::string *Response::getRes(void)
 {
-    return _buffer;
+    return &_buffer;
 }
 
 void Response::cut(int pos)
@@ -55,10 +55,14 @@ void Response::genBody(std::string path)
     std::stringstream FileStream;
     FileStream << FileDescriptor.rdbuf();
     std::string buff = FileStream.str();
-    _buffer += "Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find('.', path.find_last_of('/')) + 1)) + "\r\n";
+    _buffer += "Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n";
     _buffer += "Content-Length: " + to_string(buff.size()) + "\r\n\r\n";
+
     _buffer += buff;
     _buffer += "\r\n";
+    // std::ofstream test(path + ".req");
+    // test <<_buffer;
+
 }
 
 void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
@@ -84,8 +88,7 @@ void Response::check_path(std::string path)
         else
         {
             uint32_t i = 0;
-            std::string myme = MIME_TYPE(path.substr(path.find('.', path.find_last_of('/')) + 1));
-            
+            std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
             while(i < _req->getAcceptSize())
             {
                 if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
@@ -122,8 +125,6 @@ void Response::init(void)
             break ;
         }
     }
-    // if (route == NULL)
-    //     std::cout << "default case\n";
     while (route != NULL)
     {
         pos = next;

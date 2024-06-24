@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 16:36:20 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 16:10:04 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Client::Client(Server &serv, int id): _serv(serv), res(&req, &_serv), _id(id)
 		throw std::runtime_error("Fail to accept new client: " + (std::string)strerror(errno));
 	}
 	char buffer[INET_ADDRSTRLEN];
-	Print::print(INFO, "New Connection on socket " + to_string(_fd) + " From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), serv);
+	Print::print(INFO, "New Connection with id " + to_string(_id) + "(socket " + to_string(_fd) + ") From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), serv);
 	// if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
 	// {
 	// 	throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
@@ -78,14 +78,16 @@ void    Client::readRequest(Settings *set)
 {
 	char buffer[READSIZE];
 	int i = _id + set->getServers()->size();
+	static int a = 0;
 	// bzero(buffer, READSIZE); // delete later
+	
     switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
 	{
 	case 0:
 		set->closeClient(_id);
 		return ;
 	case -1:
-		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id));
+		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + strerror(errno));
 		set->closeClient(_id);
 		return ;
 	default:
@@ -93,7 +95,6 @@ void    Client::readRequest(Settings *set)
 		req.add(buffer);
 		break;
 	}
-	// std::cout << req.IsParsingOk() << "\n";
 	switch(req.IsParsingOk())
 	{
 		case -2:
@@ -120,16 +121,17 @@ void    Client::sendResponse(Settings *set)
 	// Print::print(INFO, "ready", _serv);
 	int result;
 
-	if(res.getRes().size() >= WRITESIZE)
-		result = send(_fd, res.getRes().c_str(), WRITESIZE, MSG_DONTWAIT);
+	if(res.getRes()->size() >= WRITESIZE)
+		result = send(_fd, res.getRes()->c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
-		result = send(_fd, res.getRes().c_str(), res.getRes().size(), MSG_DONTWAIT);
-
+		result = send(_fd, res.getRes()->c_str(), res.getRes()->size(), MSG_DONTWAIT);
 	if(result < 0)
 			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
-	else if(result == 0 || (unsigned int)result == res.getRes().size())
+	else if(result == 0 || (unsigned int)result == res.getRes()->size())
 	{
 			Print::print(DEBUG, "Response send to Client " + to_string<int>(_id) + ".", _serv);
+			// set->closeClient(_id);
+			req.clear();
 			set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
 			_last_com = time(NULL);
 	}

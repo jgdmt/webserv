@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 16:17:51 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/24 12:03:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ void Settings::run(void)
 		for(unsigned int i = 0; i < _fds.size(); i++)
 		{
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
-				Print::print(CRASH, "Poll: " + to_string(i) + (std::string)strerror(errno));
+				Print::print(CRASH, "Poll: at client id " + to_string<int>(i - 1) + ": " +  (std::string)strerror(errno));
 			else if(_fds[i].revents & POLLIN && _servers.size() > i) //&& _servers[i].getFdListen() == _fds[i].fd
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
