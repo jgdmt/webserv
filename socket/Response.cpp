@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 18:20:42 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:15:01 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,20 @@ Response::Response(Request* req, Server* serv)
 {
     _req = req;
     _serv = serv;
+}
+
+Response::Response(Response const &res)
+{
+    this->_req = res._req;
+    this->_serv = res._serv;
+    *this = res;
+}
+
+Response &Response::operator=(Response const &res)
+{
+    this->_buffer = res._buffer;
+    this->_cgiEnv = res._cgiEnv;
+    return *this;
 }
 
 std::string *Response::getRes(void)
@@ -37,11 +51,11 @@ void Response::genHeader(std::string type)
 
     _buffer = "HTTP/1.1 " + type + "\r\n";
     if (_req->getConnection() == "keep-alive\r")
-        _buffer += "Connection: Keep-Alive\r\n";
+        _buffer.append("Connection: Keep-Alive\r\n");
     strftime(buff, 80, "%c", time);
-    _buffer += "Date: " + (std::string)buff + "\r\n";
-    _buffer += "Keep-Alive: timeout=60\r\n";
-    _buffer += "Server: IsWatchingYou\r\n";
+    _buffer.append("Date: " + (std::string)buff + "\r\n");
+    _buffer.append("Keep-Alive: timeout=60\r\n");
+    _buffer.append("Server: IsWatchingYou\r\n");
 }
 
 
@@ -56,11 +70,11 @@ void Response::genBody(std::string path)
     std::stringstream FileStream;
     FileStream << FileDescriptor.rdbuf();
     std::string buff = FileStream.str();
-    _buffer += "Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n";
-    _buffer += "Content-Length: " + to_string(buff.size()) + "\r\n\r\n";
+    _buffer.append("Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n");
+    _buffer.append("Content-Length: " + to_string(buff.size()) + "\r\n\r\n");
 
-    _buffer += buff;
-    _buffer += "\r\n";
+    _buffer.append(buff);
+    _buffer.append("\r\n");
     // std::ofstream test(path + ".req");
     // test <<_buffer;
 

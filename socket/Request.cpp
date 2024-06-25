@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 18:22:06 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 10:53:31 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,13 +236,13 @@ int Request::parseBody(void)
     }
     if (tmp.size() + _body.size() >= _contentLength)
     {
-        _body += tmp.substr(0, _contentLength - _body.size());
+        _body.append(tmp.substr(0, _contentLength - _body.size()));
         _state = END;
         return (0);
     }
     else
     {
-        _body += tmp;
+        _body.append(tmp);
         _it += tmp.size(); 
     }
     return (1);

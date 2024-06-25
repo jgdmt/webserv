@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 18:19:08 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 10:56:35 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ Client &Client::operator=(Client const &client)
 	this->_fd = client._fd;
 	this->_serv = client._serv;
 	this->_last_com = client._last_com;
+	this->req = client.req;
+	this->res = client.res;
 	return *this;
 }
 
