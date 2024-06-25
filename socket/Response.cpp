@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 11:15:01 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 18:28:03 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "CGI.hpp"
 
 Response::Response(Request* req, Server* serv)
 {
@@ -89,10 +90,10 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     return;
 }
 
-void Response::check_path(std::string path)
+void Response::check_path(std::string path, Route *route)
 {
     struct stat	path_stat;
-
+(void)route;
 	stat(path.c_str(), &path_stat);
 	if (!S_ISDIR(path_stat.st_mode))
     {
@@ -104,6 +105,20 @@ void Response::check_path(std::string path)
         {
             unsigned int i = 0;
             std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
+			if (!route->getCgiPath().empty() && route->getCgiLength() > 0)
+			{
+				std::string ext = path.substr(path.find_last_of('.'));
+
+				for (size_t i = 0; i < route->getCgiLength(); i++)
+				{
+					if (ext == route->getCgiExtension(i))
+					{
+						CGI cgi(*_req, *_serv, path);
+						cgi.handler();
+						break ;
+					}
+				}
+			}
             while(i < _req->getAcceptSize())
             {
                 if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
@@ -170,28 +185,7 @@ void Response::init(void)
             pos++;
         path = route->getPath() + _req->getUri().substr(pos, _req->getUri().size() - pos);
     }
-    check_path(path);
+    check_path(path, route);
     // genHeader("200 ok");
     return ;
-}
-
-void	Response::createEnv(void)
-{
-	_cgiEnv["SERVER_SOFTWARE"] = "?";
-	_cgiEnv["SERVER_NAME"] = "?";
-	_cgiEnv["GATEWAY_INTERFACE"] = "?";
-	_cgiEnv["SERVER_PROTOCOL"] = "?";
-	_cgiEnv["SERVER_PORT"] = "?";
-	_cgiEnv["REQUEST_METHOD"] = "?";
-	_cgiEnv["PATH_INFO"] = "?";
-	_cgiEnv["PATH_TRANSLATED"] = "?";
-	_cgiEnv["SCRIPT_NAME"] = "?";
-	_cgiEnv["QUERY_STRING"] = "?";
-	_cgiEnv["REMOTE_HOST"] = "?";
-	_cgiEnv["REMOTE_ADDR"] = "?";
-	_cgiEnv["AUTH_TYPE"] = "?";
-	_cgiEnv["REMOTE_USER"] = "?";
-	_cgiEnv["REMOTE_IDENT"] = "?";
-	_cgiEnv["CONTENT_TYPE"] = "?";
-	_cgiEnv["CONTENT_LENGTH"] = "?";
 }

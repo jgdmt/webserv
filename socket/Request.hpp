@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:31:05 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:27:53 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class Request
 		std::string const &getBody(void) const;
 		std::string const &getAccept(int i) const;
 		std::string const &getAcceptEncoding(int i) const;
+		std::string const &getQuery(void) const;
 		unsigned int const& getContentLength(void) const;
 		size_t getAcceptSize(void);
 		size_t getAcceptEncodingSize(void);
@@ -65,6 +66,7 @@ class Request
         std::string _buffer;
         std::string _method;
         std::string _uri;
+		std::string _query;
         std::string _host;
         std::string _connection;
         std::string _contentType;

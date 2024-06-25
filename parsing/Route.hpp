@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:31:05 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:52:32 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ class Route
         std::string const &getPath(void) const;
         bool IsListing(void);
         std::string getdefaultFileForDirectory(void) const;
+		std::string const &getCgiPath(void) const;
+		std::string const &getCgiExtension(int i) const;
+		size_t getCgiLength(void);
         Route *getRoute(unsigned int i);
         unsigned int getRoutesNumber(void) const;
         void setDefaultFileForDirectory(std::string const &str);

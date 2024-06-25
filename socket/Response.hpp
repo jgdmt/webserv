@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 10:57:41 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:50:46 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,5 +66,5 @@ class Response
         void genBody(std::string path);
 
         void createEnv(void);
-        void check_path(std::string path);
+        void check_path(std::string path, Route *route);
 };

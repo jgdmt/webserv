@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:31:05 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:53:16 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,21 @@ std::string const &Route::getRedirection(void) const
 std::string const &Route::getPath(void) const
 {
     return _path;
+}
+
+std::string const &Route::getCgiPath(void) const
+{
+	return _cgiPath;
+}
+
+std::string const &Route::getCgiExtension(int i) const
+{
+	return _cgiExtensions[i];
+}
+
+size_t Route::getCgiLength(void)
+{
+	return _cgiExtensions.size();
 }
 
 bool Route::IsListing(void)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 18:31:13 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:18:31 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static std::string createContent(std::string const& fileName)
 	while (ifs.good())
 	{
 		std::getline(ifs, line);
-		content += line;
+		content.append(line);
 	}
 	ifs.close();
 	std::replace(content.begin(), content.end(), '\t', ' ');

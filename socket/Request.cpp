@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 10:53:31 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/25 15:48:31 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,11 @@ std::string const &Request::getAccept(int i) const
 std::string const &Request::getAcceptEncoding(int i) const
 {
 	return _acceptEncoding[i];
+}
+
+std::string const &Request::getQuery(void) const
+{
+	return _query;
 }
 
 unsigned int const &Request::getContentLength(void) const
@@ -268,8 +273,15 @@ void Request::add(std::string const &new_buff)
         case URI:
             if(_buffer.find(' ', _it - _buffer.begin()) == std::string::npos)
                 break;
-            _uri = std::string(_it, _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()));
-            _it = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()) + 1;
+			if (_buffer.find('?', _it - _buffer.begin()) > _buffer.find(' ', _it - _buffer.begin()))
+	            _uri = std::string(_it, _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()));
+			else
+			{
+				_uri = std::string(_it, _buffer.begin() + _buffer.find('?', _it - _buffer.begin()));
+				_it = _buffer.begin() + _buffer.find('?', _it - _buffer.begin()) + 1;
+				_query = std::string(_it, _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()));
+			}
+			_it = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()) + 1;
             _state = PROTOCOL;
         case PROTOCOL:
             if(_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)

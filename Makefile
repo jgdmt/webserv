@@ -1,10 +1,10 @@
 PARSING_SRCS := Settings.cpp Server.cpp Route.cpp
-SOCKET_SRCS := Client.cpp Request.cpp Response.cpp
+SOCKET_SRCS := Client.cpp Request.cpp Response.cpp CGI.cpp
 SRCS		:=	main.cpp Print.cpp $(addprefix parsing/,$(PARSING_SRCS)) $(addprefix socket/,$(SOCKET_SRCS))
 OBJS		:=	${SRCS:.cpp=.o} 
 
 CC			:= c++
-CXXFLAGS	:= -Werror -Wextra -Wall -I. #-std=c++98 -fsanitize=address -ggdb3
+CXXFLAGS	:= -Werror -Wextra -Wall -I. -std=c++98 -fsanitize=address -ggdb3
 RM			:= rm -f
 
 NAME		:= webserv
