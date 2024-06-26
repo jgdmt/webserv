@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 18:28:03 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:32:33 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 void Response::check_path(std::string path, Route *route)
 {
     struct stat	path_stat;
-(void)route;
+    (void)route;
 	stat(path.c_str(), &path_stat);
 	if (!S_ISDIR(path_stat.st_mode))
     {
@@ -115,7 +115,7 @@ void Response::check_path(std::string path, Route *route)
 					{
 						CGI cgi(*_req, *_serv, path);
 						cgi.handler();
-						break ;
+						return ;
 					}
 				}
 			}
@@ -134,6 +134,54 @@ void Response::check_path(std::string path, Route *route)
             }
         }
     }
+    else
+    {
+    if(path[path.size() - 1] != '/')
+    {
+        genHeader("301 Moved Permanently");
+        _buffer.append("Location: " + path + "/\r\n\r\n");
+        return;
+    }
+    unsigned int bestMatchKey = _req->getAcceptSize();
+    std::string bestMatchValue;
+    DIR *dir = opendir(path.c_str());
+    if(!dir)
+    {
+        Print::print(ERROR, "Couldn't open directory");
+        error("500", "Internal Server Error");
+        return ;
+    }
+    struct dirent* file;
+    while((file = readdir(dir)) != NULL)
+    {
+        if (((std::string)file->d_name).find("index.") == 0)
+        {
+            std::string tmp = file->d_name;
+            std::string myme = MIME_TYPE(tmp.substr(tmp.find_last_of('.') + 1));
+            unsigned int i = 0;
+            while(i < _req->getAcceptSize())
+            {
+                if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
+                    break;
+                i++;
+            }
+            if (i != _req->getAcceptSize() && i < bestMatchKey)
+            {
+                bestMatchKey = i;
+                bestMatchValue = tmp;
+            }
+
+        }
+        if(bestMatchValue.size())
+        {
+            if (path[path.size() -1] != '/')
+                path.append("/");
+            genHeader("200 OK");
+            genBody(path + bestMatchValue); 
+        }
+    }
+    }
+    
             // DIR *dir = opendirr()
             // for(int i = 0; i < )
 }
@@ -182,10 +230,11 @@ void Response::init(void)
     else
     {
         if(route->getPath()[route->getPath().size() - 1] == '/')
-            pos++;
-        path = route->getPath() + _req->getUri().substr(pos, _req->getUri().size() - pos);
+            route->setPath(route->getPath().substr(0, route->getPath().size() - 1)); 
+        path = route->getPath();
+        if(pos < _req->getUri().size())
+            path.append(_req->getUri().substr(pos, _req->getUri().size() - pos));
     }
     check_path(path, route);
-    // genHeader("200 ok");
     return ;
 }
