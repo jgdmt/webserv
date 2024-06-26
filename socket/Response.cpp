@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 16:09:29 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:53:17 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void Response::genHeader(std::string type)
     std::tm *time =  std::localtime(&now);
     char buff[80];
 
+    _buffer.clear();
     _buffer = "HTTP/1.1 " + type + "\r\n";
     if (_req->getConnection() == "keep-alive\r")
     {
@@ -68,24 +69,28 @@ void Response::genBody(std::string path)
     if(FileDescriptor.fail())
     {
         Print::print(ERROR, "Couldn't open body file");
+        error("500", "Internal Server Error");
         return ;
     }
-    std::stringstream FileStream;
+    std::ostringstream FileStream;
     FileStream << FileDescriptor.rdbuf();
     std::string buff = FileStream.str();
     _buffer.append("Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n");
-    _buffer.append("Content-Length: " + to_string(buff.size()) + "\r\n\r\n");
+    _buffer.append("Content-Length: " + to_string(buff.length()) + "\r\n\r\n");
+    // std::cout << _buffer;
+    // std::cout << path << '\n';
+    if(_req->getMethod() == "HEAD")
+        return;
     _buffer.append(buff);
-    _buffer.append("\r\n");
+    // _buffer.append("\r\n");
 }
 
 void Response::genDirListing(std::string path)
 {
     _buffer.append("Content-Type: text/html\r\n");
-    _buffer.append("\r\n");
-    _buffer.append("<html><head><title>Index of " + path + "</title></head>");
-    _buffer.append("<body><h1>Index of " + path + "</h1><hr><pre>");
-    // _buffer.append("<a href=\"../\">../</a>");
+    std::string body;
+    body.append("<html><head><title>Index of " + path + "</title></head>");
+    body.append("<body><h1>Index of " + path + "</h1><hr><pre>");
     DIR *dir = opendir(path.c_str());
     struct stat	path_stat;
     std::string relativeUrl;
@@ -104,10 +109,12 @@ void Response::genDirListing(std::string path)
             relativeUrl = file->d_name;
         if(S_ISDIR(path_stat.st_mode))
             relativeUrl.append("/");
-        _buffer.append("<a href=\"" + relativeUrl + "\">" + relativeUrl + "</a>\n");
+        body.append("<a href=\"" + relativeUrl + "\">" + relativeUrl + "</a>\n");
     }
-    _buffer.append("</pre><hr></body></html>");
-
+    body.append("</pre><hr></body></html>");
+    _buffer.append("Content-Length" + to_string(body.size()) + "\r\n");
+    _buffer.append("\r\n");
+    _buffer.append(body);
 }
 
 
@@ -135,7 +142,7 @@ void Response::check_path(std::string path, Route *route)
         {
             unsigned int i = 0;
             std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
-			if (!route->getCgiPath().empty() && route->getCgiLength() > 0)
+			if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_req->getMethod() == "POST" || _req->getMethod() == "GET"))
 			{
 				std::string ext = path.substr(path.find_last_of('.'));
 
@@ -149,6 +156,7 @@ void Response::check_path(std::string path, Route *route)
 					}
 				}
 			}
+    
             while(i < _req->getAcceptSize())
             {
                 if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))

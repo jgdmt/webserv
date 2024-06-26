@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 15:48:31 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:59:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,6 +256,19 @@ int Request::parseBody(void)
 void Request::clear(void)
 {
     _buffer.clear();
+    _state = METHOD;
+    _method.clear();
+    _uri.clear();
+	 _query.clear();
+    _host.clear();
+    _connection.clear();
+    _contentType.clear();
+    _contentBoundary.clear();
+    _body.clear();
+    _contentLength = 0;
+    _error = 0;
+    _accept.clear();
+	_acceptEncoding.clear();
 }
 
 void Request::add(std::string const &new_buff)
