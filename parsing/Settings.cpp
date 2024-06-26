@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 11:18:31 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:10:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void Settings::run(void)
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
 			{
 				Print::print(ERROR, "Poll: at client id " + to_string<int>(i - 1) + ": " +  (std::string)strerror(errno));
-				if(i > _servers.size())
+				if(i >= _servers.size())
 					closeClient(i - _servers.size());
 				else
 				exit(1);
