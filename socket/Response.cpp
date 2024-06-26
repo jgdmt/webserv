@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 12:38:25 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:09:29 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,12 @@ void Response::genHeader(std::string type)
 
     _buffer = "HTTP/1.1 " + type + "\r\n";
     if (_req->getConnection() == "keep-alive\r")
+    {
         _buffer.append("Connection: Keep-Alive\r\n");
+        _buffer.append("Keep-Alive: timeout=60\r\n");
+    }
     strftime(buff, 80, "%c", time);
     _buffer.append("Date: " + (std::string)buff + "\r\n");
-    _buffer.append("Keep-Alive: timeout=60\r\n");
     _buffer.append("Server: IsWatchingYou\r\n");
 }
 
@@ -73,13 +75,41 @@ void Response::genBody(std::string path)
     std::string buff = FileStream.str();
     _buffer.append("Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n");
     _buffer.append("Content-Length: " + to_string(buff.size()) + "\r\n\r\n");
-
     _buffer.append(buff);
     _buffer.append("\r\n");
-    // std::ofstream test(path + ".req");
-    // test <<_buffer;
+}
+
+void Response::genDirListing(std::string path)
+{
+    _buffer.append("Content-Type: text/html\r\n");
+    _buffer.append("\r\n");
+    _buffer.append("<html><head><title>Index of " + path + "</title></head>");
+    _buffer.append("<body><h1>Index of " + path + "</h1><hr><pre>");
+    // _buffer.append("<a href=\"../\">../</a>");
+    DIR *dir = opendir(path.c_str());
+    struct stat	path_stat;
+    std::string relativeUrl;
+    if(!dir)
+    {
+        Print::print(ERROR, "Couldn't open directory");
+        error("500", "Internal Server Error");
+        return ;
+    }
+    struct dirent* file;
+    while((file = readdir(dir)) != NULL)
+    {
+        if ((std::string)file->d_name == ".")
+            continue;
+        stat((path + file->d_name).c_str(), &path_stat);
+            relativeUrl = file->d_name;
+        if(S_ISDIR(path_stat.st_mode))
+            relativeUrl.append("/");
+        _buffer.append("<a href=\"" + relativeUrl + "\">" + relativeUrl + "</a>\n");
+    }
+    _buffer.append("</pre><hr></body></html>");
 
 }
+
 
 void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 {
@@ -156,6 +186,9 @@ void Response::check_path(std::string path, Route *route)
     {
         if (((std::string)file->d_name).find("index.") == 0)
         {
+            stat((path + file->d_name).c_str(), &path_stat);
+            if(S_ISDIR(path_stat.st_mode))
+                continue;
             std::string tmp = file->d_name;
             std::string myme = MIME_TYPE(tmp.substr(tmp.find_last_of('.') + 1));
             unsigned int i = 0;
@@ -172,18 +205,24 @@ void Response::check_path(std::string path, Route *route)
             }
 
         }
-        if(bestMatchValue.size())
-        {
-            if (path[path.size() -1] != '/')
-                path.append("/");
-            genHeader("200 OK");
-            genBody(path + bestMatchValue); 
-        }
+    }
+    if(bestMatchValue.size())
+    {
+        if (path[path.size() -1] != '/')
+            path.append("/");
+        genHeader("200 OK");
+        genBody(path + bestMatchValue); 
+    }
+    else if ((route && route->IsListing()))
+    {
+        genHeader("200 OK");
+        genDirListing(path);
+    }
+    else
+    {
+        error("403", "Forbidden");
     }
     }
-    
-            // DIR *dir = opendirr()
-            // for(int i = 0; i < )
 }
 
 void Response::init(void)
@@ -229,6 +268,11 @@ void Response::init(void)
         path = _req->getUri();
     else
     {
+        if (route && !route->isAutorizedMethod(_req->getMethod()))
+        {
+            error("405", "Method Not Allowed");
+            return;
+        }
         if(route->getPath()[route->getPath().size() - 1] == '/')
             route->setPath(route->getPath().substr(0, route->getPath().size() - 1)); 
         path = route->getPath();

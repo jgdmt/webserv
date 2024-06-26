@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 15:53:16 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 14:59:31 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Route::Route()
     _defaultFileForDirectory = "default/directory.html";
 }
 
-bool Route::_isAutorizedMethod(std::string const &method)
+bool Route::isAutorizedMethod(std::string const &method)
 {
     if(find(_autorizedMethods.begin(), _autorizedMethods.end(), method) != _autorizedMethods.end())
         return true;

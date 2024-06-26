@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 15:52:32 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 14:59:33 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class Route
 {
     public:
         Route();
-        bool _isAutorizedMethod(std::string const &method);
+        bool isAutorizedMethod(std::string const &method);
         std::string const &getRedirection(void) const;
         std::string const &getPath(void) const;
         bool IsListing(void);
