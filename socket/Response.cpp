@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 12:32:33 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:38:25 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 void Response::check_path(std::string path, Route *route)
 {
     struct stat	path_stat;
-    (void)route;
+
 	stat(path.c_str(), &path_stat);
 	if (!S_ISDIR(path_stat.st_mode))
     {
