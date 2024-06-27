@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 17:53:17 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 13:22:21 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
     std::string path = _serv->getErrorPage(httpErrorCode);
     genBody(path);
-    std::cout << "ERROOR "<< httpErrorCode << "\n";
+    Print::print(DEBUG, "Error " + to_string(httpErrorCode) + " sent.", *_serv);
     return;
 }
 
@@ -178,6 +178,11 @@ void Response::check_path(std::string path, Route *route)
     {
         genHeader("301 Moved Permanently");
         _buffer.append("Location: " + path + "/\r\n\r\n");
+        return;
+    }
+    if (route->getdefaultFileForDirectory().size() != 0)
+    {
+        check_path(path + route->getdefaultFileForDirectory(), route);
         return;
     }
     unsigned int bestMatchKey = _req->getAcceptSize();

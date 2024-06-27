@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 10:56:35 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 13:17:28 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,6 @@ void    Client::sendResponse(Settings *set)
 	else
 	{
 		_last_com = time(NULL);
-		std::cout << "CUT\n";
 		res.cut(result);
 	}
 	

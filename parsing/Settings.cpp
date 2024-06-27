@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 18:10:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 13:18:26 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,11 +133,11 @@ void Settings::run(void)
 				else
 				exit(1);
 			}
-			else if(_fds[i].revents & POLLIN && _servers.size() > i) //&& _servers[i].getFdListen() == _fds[i].fd
+			else if(_fds[i].revents & POLLIN && _servers.size() > i)
 				addClient(i, _servers[i]);
-			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd) // 
+			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
 				_clients[i - _servers.size()].readRequest(this);
-			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size()) && _clients[i - _servers.size()].getFd() == _fds[i].fd)
+			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
 				_clients[i - _servers.size()].sendResponse(this);
 		}
 		checkTimeout();
@@ -150,7 +150,7 @@ void Settings::checkTimeout(void)
 	{
 		if((time(NULL) - _clients[i].getLastCom()) > TIMEOUT)
 		{
-			Print::print(INFO, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), _clients[i].getServer());
+			Print::print(DEBUG, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), _clients[i].getServer());
 			closeClient(i);
 			i--;
 		}
@@ -175,7 +175,7 @@ void Settings::addClient(unsigned int i, Server &serv)
 		Client test(serv,  _clients.size());
 		_clients.push_back(test);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
-		_fds.push_back(tmp);
+		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
 	}
 	catch(const std::exception& e)
 	{
