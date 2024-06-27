@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 15:32:46 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 15:39:31 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,8 @@ void Response::check_path(std::string path, Route *route)
             error("403", "Forbidden");
         else
         {
-			checkCGI(path, route);
+			if (checkCGI(path, route))
+				return ;
             unsigned int i = 0;
             std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
             while(i < _req->getAcceptSize())

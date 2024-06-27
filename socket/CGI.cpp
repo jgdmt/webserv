@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/26 20:21:28 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/27 15:35:24 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,22 @@ char ** CGI::stringToChar(void)
 	return (cenv);
 }
 
+void	CGI::body(void)
+{
+	char buff[READSIZE];
+
+	while (read(_end[0], buff, READSIZE) != 0)
+	{
+		std::cout << buff << "\n";
+	}
+}
+
 void	CGI::exec(void)
 {
 	pid_t pid;
-	int end[2];
 	char **cenv = stringToChar();
 
-	if (pipe(end) == -1)
+	if (pipe(_end) == -1)
 	{
 		std::cout << "Pipe error\n";
 		return ;
@@ -76,13 +85,12 @@ void	CGI::exec(void)
 	}
 	if (!pid)
 	{
-		dup2(end[1], STDOUT_FILENO);
-		dup2(end[0], STDIN_FILENO);
-		close(end[0]);
-		close(end[1]);
+		// dup2(_end[1], STDOUT_FILENO);
+		// dup2(_end[0], STDIN_FILENO);
+		// close(_end[0]);
+		// close(_end[1]);
 		execve(_script[0], _script, cenv);
 	}
-	
 }
 
 void	CGI::handler(void)
