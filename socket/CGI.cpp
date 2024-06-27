@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/27 15:35:24 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:46:25 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,37 @@ char ** CGI::stringToChar(void)
 void	CGI::body(void)
 {
 	char buff[READSIZE];
+    // std::tm *time = std::localtime(&now);
+    // char buff[80];
 
-	while (read(_end[0], buff, READSIZE) != 0)
+    // _buffer.clear();
+    // _buffer = "HTTP/1.1 " + type + "\r\n";
+    // if (_req->getConnection() == "keep-alive\r")
+    // {
+    //     _buffer.append("Connection: Keep-Alive\r\n");
+    //     _buffer.append("Keep-Alive: timeout=60\r\n");
+    // }
+    // strftime(buff, 80, "%c", time);
+    // _buffer.append("Date: " + (std::string)buff + "\r\n");
+    // _buffer.append("Server: IsWatchingYou\r\n");
+	int sum = read(_end[0], buff, READSIZE);
+	// std::cout << sum <<"\n";
+	while (sum != 0)
 	{
-		std::cout << buff << "\n";
+		_answer.append(buff);
+		// int i = 0;
+		// while(buff[i]) i++;
+		// std::cout << i << "\n";
+		// i =-1;
+		// while (buff[++i])// && buff[i] != '\n')
+		// 	std::cout << i << " " << buff[i];
+	// 	std::cout << i << " | "  << buff[i - 2]<< "\n";
+	// }
+		// sum = read(_end[0], buff, READSIZE);
+		// std::cout << sum << "\n";
+		break ;
 	}
+		// std::cout << "ANSWER" << _answer << "\n";
 }
 
 void	CGI::exec(void)
@@ -85,15 +111,15 @@ void	CGI::exec(void)
 	}
 	if (!pid)
 	{
-		// dup2(_end[1], STDOUT_FILENO);
+		dup2(_end[1], STDOUT_FILENO);
 		// dup2(_end[0], STDIN_FILENO);
-		// close(_end[0]);
-		// close(_end[1]);
+		close(_end[0]);
+		close(_end[1]);
 		execve(_script[0], _script, cenv);
 	}
 }
 
-void	CGI::handler(void)
+std::string	CGI::handler(void)
 {
 	std::string s;
 	if (_path.substr(_path.find_last_of('.')) == ".php")
@@ -105,6 +131,8 @@ void	CGI::handler(void)
 	_script[2] = NULL;
 	createEnv();
 	exec();
+	body();
+	return (_answer);
 	// 	pid_t pid;
 	// char **cenv = stringToChar();
 

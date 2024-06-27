@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 18:36:47 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:41:41 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,8 @@ bool Response::checkCGI(std::string path, Route *route)
             if (ext == route->getCgiExtension(i))
             {
                 CGI cgi(*_req, *_serv, *route, path);
-                cgi.handler();
+				genHeader("200 OK");
+                _buffer.append(cgi.handler());
                 return true;
             }
         }
@@ -303,7 +304,7 @@ void Response::init(void)
         if (pos < _req->getUri().size())
             path.append(_req->getUri().substr(pos, _req->getUri().size() - pos));
     }
-    std::cout << path << std::endl;
+    // std::cout << path << std::endl;
     check_path(path, route);
     return;
 }

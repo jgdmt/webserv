@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 13:17:28 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:41:51 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void    Client::sendResponse(Settings *set)
 {
 	// Print::print(INFO, "ready", _serv);
 	int result;
-
+std::cout<< *(res.getRes()) << "\n";
 	if(res.getRes()->size() >= WRITESIZE)
 		result = send(_fd, res.getRes()->c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
@@ -130,7 +130,7 @@ void    Client::sendResponse(Settings *set)
 			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
 	else if(result == 0 || (unsigned int)result == res.getRes()->size())
 	{
-			Print::print(DEBUG, "Response send to Client " + to_string<int>(_id) + ".", _serv);
+			Print::print(DEBUG, "Response sent to Client " + to_string<int>(_id) + ".", _serv);
 			req.clear();
 			res.getRes()->clear();
 			set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
