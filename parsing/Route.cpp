@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 14:02:31 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/27 15:12:00 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,8 +315,10 @@ void Route::check_defaultfile(void)
 	def.append(_defaultFileForDirectory);
 	std::cout << def << "\n";
 	if (access(def.c_str(), F_OK | R_OK))
+	{
 		Print::print(ERROR, "Parsing location " + _redirection + ": " + def + " does not exist or is not executable");
-	_defaultFileForDirectory.clear();
+		_defaultFileForDirectory.clear();
+	}
 }
 
 void Route::parse(std::string const& content, std::string::iterator& start, std::string::iterator& end, int len)
