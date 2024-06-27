@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 13:27:23 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/27 15:32:46 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void Response::genDirListing(std::string path)
         body.append("<a href=\"" + relativeUrl + "\">" + relativeUrl + "</a>\n");
     }
     body.append("</pre><hr></body></html>");
-    _buffer.append("Content-Length" + to_string(body.size()) + "\r\n");
+    _buffer.append("Content-Length: " + to_string(body.size()) + "\r\n");
     _buffer.append("\r\n");
     _buffer.append(body);
 }
@@ -127,6 +127,28 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
     return;
 }
 
+bool Response::checkCGI(std::string path, Route *route)
+{
+    if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_req->getMethod() == "POST" || _req->getMethod() == "GET"))
+    {
+        std::string ext = path.substr(path.find_last_of('.'));
+
+        for (size_t i = 0; i < route->getCgiLength(); i++)
+        {
+            if (ext == route->getCgiExtension(i))
+            {
+                CGI cgi(*_req, *_serv, *route, path);
+                cgi.handler();
+                return true;
+            }
+        }
+        return false;
+    }
+    else
+    return false;
+}
+
+
 void Response::check_path(std::string path, Route *route)
 {
     struct stat	path_stat;
@@ -140,23 +162,9 @@ void Response::check_path(std::string path, Route *route)
             error("403", "Forbidden");
         else
         {
+			checkCGI(path, route);
             unsigned int i = 0;
             std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
-			if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_req->getMethod() == "POST" || _req->getMethod() == "GET"))
-			{
-				std::string ext = path.substr(path.find_last_of('.'));
-
-				for (size_t i = 0; i < route->getCgiLength(); i++)
-				{
-					if (ext == route->getCgiExtension(i))
-					{
-						CGI cgi(*_req, *_serv, *route, path);
-						cgi.handler();
-						return ;
-					}
-				}
-			}
-    
             while(i < _req->getAcceptSize())
             {
                 if(myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
@@ -180,8 +188,11 @@ void Response::check_path(std::string path, Route *route)
         _buffer.append("Location: " + path + "/\r\n\r\n");
         return;
     }
-    if (route->getdefaultFileForDirectory().size() != 0)
+    std::cout << path << '\n';
+    if (route->getdefaultFileForDirectory().size() != 0 && route->getPath() + "/" == path)
     {
+        if(route->getdefaultFileForDirectory()[0] == '/')
+            route->setdefaultFileForDirectory(route->getdefaultFileForDirectory().substr(1));
         check_path(path + route->getdefaultFileForDirectory(), route);
         return;
     }
