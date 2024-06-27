@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/25 16:05:21 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:19:51 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,16 @@
 #include "../Print.hpp"
 class CGI {
 	public:
-		CGI(Request &req, Server &serv, std::string path);
+		CGI(Request &req, Server &serv, Route& route, std::string path);
 		CGI(CGI const& cpy);
 		void handler(void);
 	private:
 		std::map<std::string, std::string> _env;
 		Request& _req;
 		Server& _serv;
+		Route& _route;
 		std::string _path;
-		std::string _script;
+		char *_script[3];
 
 		char** stringToChar();
 		void createEnv(void);

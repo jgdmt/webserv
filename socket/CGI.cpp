@@ -6,56 +6,68 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/25 18:26:43 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/26 20:21:28 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 
-CGI::CGI(Request& req, Server& serv, std::string path) : _req(req), _serv(serv), _path(path)
+CGI::CGI(Request& req, Server& serv, Route& route, std::string path) : _req(req), _serv(serv), _route(route), _path(path)
 {
-	
+	_script[1] = NULL;
 }
 
 void	CGI::createEnv(void)
 {
-	_env["SERVER_SOFTWARE"] = "Webserv/1.0";
-	_env["SERVER_NAME"] = _serv.getID();
-	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	_env["SERVER_PORT"] = _serv.getPort();
-	_env["REQUEST_METHOD"] = _req.getMethod();
-	_env["PATH_INFO"] = _req.getUri();
-	_env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
-	_env["SCRIPT_NAME"] = _path;
+	// _env["DOCUMENT_ROOT"] = _route.getPath();
+	// _env["SERVER_SOFTWARE"] = "Webserv";
+	// _env["SERVER_NAME"] = "127.0.0.1";
+	// _env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	// _env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	// _env["SERVER_PORT"] = to_string(_serv.getPort());
+	// _env["REQUEST_METHOD"] = _req.getMethod();
+	// _env["PATH_INFO"] = _path;
+	// _env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
+	// _env["SCRIPT_NAME"] = _path.substr(_path.find(_route.getPath()) + _route.getPath().size() + 1);
+	// _env["SCRIPT_FILENAME"] = _path;
 	_env["QUERY_STRING"] = _req.getQuery();
-	_env["REMOTE_HOST"] = _req.getHost();
-	_env["REMOTE_ADDR"] = "";
-	_env["AUTH_TYPE"] = "";
-	_env["REMOTE_USER"] = "";
-	_env["REMOTE_IDENT"] = "";
-	_env["CONTENT_TYPE"] = _req.getContentType();
-	_env["CONTENT_LENGTH"] = _req.getContentLength();
+	// _env["REMOTE_ADDR"] = _req.getHost();
+	// _env["AUTH_TYPE"] = "Basic";
+	// _env["CONTENT_TYPE"] = _req.getContentType();
+	// _env["CONTENT_LENGTH"] = _req.getContentLength();
+	//_env["HTTP_COOKIE"] = ;
+
 }
 
 char ** CGI::stringToChar(void)
 {
-	char** cenv = (char**)malloc((sizeof(char*) * _env.size()) + 1);
+	char** cenv = (char**)malloc(sizeof(char*) * (_env.size() + 1));
 	int i = 0;
-
+	std::string s;
 	if (cenv == NULL)
 		Print::print(ERROR, "Error malloc in cgi");
 	for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-		cenv[i++] = (char*)(it->first + "=" + it->second).c_str();
+	{
+		s = it->first;
+		s.append("=");
+		s.append(it->second);
+		cenv[i++] = strdup((char*) s.c_str());
+	}
+	cenv[i] = NULL;
 	return (cenv);
 }
 
 void	CGI::exec(void)
 {
 	pid_t pid;
+	int end[2];
 	char **cenv = stringToChar();
-	char *script = (char*) _path.c_str();
 
+	if (pipe(end) == -1)
+	{
+		std::cout << "Pipe error\n";
+		return ;
+	}
 	pid = fork();
 	if (pid < 0)
 	{
@@ -64,21 +76,76 @@ void	CGI::exec(void)
 	}
 	if (!pid)
 	{
-		execve(script, NULL, cenv);
-		free(cenv);
-		std::cout << "child\n";
+		dup2(end[1], STDOUT_FILENO);
+		dup2(end[0], STDIN_FILENO);
+		close(end[0]);
+		close(end[1]);
+		execve(_script[0], _script, cenv);
 	}
-	else
-	{
-		free(cenv);
-		std::cout << "parent\n";
-	}
+	
 }
 
 void	CGI::handler(void)
 {
+	std::string s;
 	if (_path.substr(_path.find_last_of('.')) == ".php")
-		_script = "/usr/bin/php";
+		s = "/usr/bin/php";
 	else if (!_path.substr(_path.find_last_of('.')).compare(".py"))
-		_script = "/usr/bin/python3";
+		s = "/usr/bin/python3";
+	_script[0] = (char*) s.c_str();
+	_script[1] = (char*) _path.c_str();
+	_script[2] = NULL;
+	createEnv();
+	exec();
+	// 	pid_t pid;
+	// char **cenv = stringToChar();
+
+	// pid = fork();
+	// if (pid < 0)
+	// {
+	// 	std::cout << "fork error\n";
+	// 	return ;
+	// }
+	// if (!pid)
+	// {
+	// 	std::cout << _script[0] << "\n" << _script[1] << "\n";
+	// 	for (size_t i = 0; cenv[i]; i++)
+	// 		std::cout << cenv[i] << "\n";
+	// 	execve(_script[0], _script, cenv);
+	// }
+
+
+/*	char *argv[3];
+	char *env[20];
+
+	argv[0] = strdup("/usr/bin/python3");
+argv[1] = strdup("cgi-bin/get_hello.py");
+argv[2] = NULL;
+// env[0] = strdup("AUTH_TYPE=Basic");
+// env[1] = strdup("CONTENT_LENGTH=");
+// env[2] = strdup("CONTENT_TYPE=");
+// env[1] = strdup("DOCUMENT_ROOT=./");
+// env[0] = strdup("GATEWAY_INTERFACE=CGI/1.1");
+// env[5] = strdup("HTTP_COOKIE=");
+// env[6] = strdup("PATH_INFO=");
+// env[7] = strdup("PATH_TRANSLATED=.//");
+env[0] = strdup("QUERY_STRING=first_name=&last_name=");
+// env[9] = strdup("REDIRECT_STATUS=200");
+// env[8] = strdup("REMOTE_ADDR=127.0.0.1:8002");
+// env[8] = strdup("REQUEST_METHOD=GET");
+// env[9] = strdup("REQUEST_URI=/cgi-bin/get_hello.pyfirst_name=&last_name=");
+// env[10] = strdup("SCRIPT_FILENAME=get_hello.py");
+// env[11] = strdup("SCRIPT_NAME=cgi-bin/get_hello.py");
+// env[12] = strdup("SERVER_NAME=127.0.0.1");
+// env[13] = strdup("SERVER_PORT=8002");
+// env[14] = strdup("SERVER_PROTOCOL=HTTP/1.1");
+// env[15] = strdup("SERVER_SOFTWARE=AMANIX");
+env[1] = NULL;
+	int pid = fork();
+
+	if (!pid)
+	{
+		execve(argv[0], argv, env);
+	}
+*/
 }
