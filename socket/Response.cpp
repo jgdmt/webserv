@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response.cpp                                       :+:      :+:    :+:   */
+/*   Response2.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 20:41:41 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 12:25:19 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ bool Response::checkCGI(std::string path, Route *route)
             if (ext == route->getCgiExtension(i))
             {
                 CGI cgi(*_req, *_serv, *route, path);
-				genHeader("200 OK");
+                genHeader("200 OK");
                 _buffer.append(cgi.handler());
                 return true;
             }
@@ -146,6 +146,33 @@ bool Response::checkCGI(std::string path, Route *route)
     else
         return false;
 }
+void Response::genRes(std::string path, Route* route)
+{
+    if (access(path.c_str(), F_OK))
+        error("404", "Not Found");
+    else if (access(path.c_str(), R_OK))
+        error("403", "Forbidden");
+    else
+    {
+        if (checkCGI(path, route))
+            return;
+        unsigned int i = 0;
+        std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
+        while (i < _req->getAcceptSize())
+        {
+            if (myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
+                break;
+            i++;
+        }
+        if (_req->getAcceptSize() != 0 && i == _req->getAcceptSize())
+            error("406", "Not Acceptable");
+        else
+        {
+            genHeader("200 OK");
+            genBody(path);
+        }
+    }
+}
 
 void Response::check_path(std::string path, Route *route)
 {
@@ -153,46 +180,20 @@ void Response::check_path(std::string path, Route *route)
 
     stat(path.c_str(), &path_stat);
     if (!S_ISDIR(path_stat.st_mode))
-    {
-        if (access(path.c_str(), F_OK))
-            error("404", "Not Found");
-        else if (access(path.c_str(), R_OK))
-            error("403", "Forbidden");
-        else
-        {
-            if (checkCGI(path, route))
-                return;
-            unsigned int i = 0;
-            std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
-            while (i < _req->getAcceptSize())
-            {
-                if (myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
-                    break;
-                i++;
-            }
-            if (_req->getAcceptSize() != 0 && i == _req->getAcceptSize())
-                error("406", "Not Acceptable");
-            else
-            {
-                genHeader("200 OK");
-                genBody(path);
-            }
-        }
-    }
+       genRes(path, route);
     else
     {
         if (path[path.size() - 1] != '/')
         {
-            std::cout << path << std::endl;
             genHeader("301 Moved Permanently");
-            _buffer.append("Location: " + path + "/\r\n\r\n");
+            _buffer.append("Location: " + _req->getUri() + "/\r\n\r\n");
             return;
         }
         if (route->getdefaultFileForDirectory().size() != 0 && route->getPath() + "/" == path)
         {
             if (route->getdefaultFileForDirectory()[0] == '/')
                 route->setdefaultFileForDirectory(route->getdefaultFileForDirectory().substr(1));
-            check_path(path + route->getdefaultFileForDirectory(), route);
+            genRes(path + route->getdefaultFileForDirectory(), route);
             return;
         }
         unsigned int bestMatchKey = _req->getAcceptSize();
@@ -232,6 +233,7 @@ void Response::check_path(std::string path, Route *route)
         {
             if (path[path.size() - 1] != '/')
                 path.append("/");
+            checkCGI(path, route);
             genHeader("200 OK");
             genBody(path + bestMatchValue);
         }
@@ -304,7 +306,6 @@ void Response::init(void)
         if (pos < _req->getUri().size())
             path.append(_req->getUri().substr(pos, _req->getUri().size() - pos));
     }
-    // std::cout << path << std::endl;
     check_path(path, route);
     return;
 }
