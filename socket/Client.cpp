@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 20:41:51 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 14:44:27 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void    Client::sendResponse(Settings *set)
 {
 	// Print::print(INFO, "ready", _serv);
 	int result;
-std::cout<< *(res.getRes()) << "\n";
+// std::cout<< *(res.getRes()) << "\n";
 	if(res.getRes()->size() >= WRITESIZE)
 		result = send(_fd, res.getRes()->c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
@@ -138,8 +138,8 @@ std::cout<< *(res.getRes()) << "\n";
 	}
 	else
 	{
-		_last_com = time(NULL);
 		res.cut(result);
+		_last_com = time(NULL);
 	}
 	
 
