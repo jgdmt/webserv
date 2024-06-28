@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 15:13:12 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:58:37 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,12 @@
     std::string(extension) == "ico" ? "image/vnd.microsoft.icon" : \
     "application/octet-stream" )
 
+class Settings;
+
 class Response
 {
     public:
-        Response(Request* req, Server* serv, CGI *cgi);
+        Response(Request* req, Server* serv, Settings *settings);
         Response(Response const &res);
         Response &operator=(Response const &res);
         void init(void);
@@ -60,7 +62,7 @@ class Response
     private:
         Request* _req;
         Server* _serv;
-		CGI* _cgi;
+		Settings* _settings;
         std::string _buffer;
 		std::map<std::string, std::string> _cgiEnv;
         

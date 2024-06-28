@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/28 16:22:01 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 20:01:32 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 CGI::CGI(Request* req, Server* serv, Settings* settings) : _req(req), _serv(serv), _settings(settings)
 {
-	
+	_id = _settings->getFds()->size() - 1;
 }
 
 CGI::CGI(CGI const& cpy)
@@ -78,39 +78,31 @@ char ** CGI::stringToChar(void)
 void	CGI::body(void)
 {
 	char buff[READSIZE];
-    // std::tm *time = std::localtime(&now);
-    // char buff[80];
-
-    // _buffer.clear();
-    // _buffer = "HTTP/1.1 " + type + "\r\n";
-    // if (_req->getConnection() == "keep-alive\r")
-    // {
-    //     _buffer.append("Connection: Keep-Alive\r\n");
-    //     _buffer.append("Keep-Alive: timeout=60\r\n");
-    // }
-    // strftime(buff, 80, "%c", time);
-    // _buffer.append("Date: " + (std::string)buff + "\r\n");
-    // _buffer.append("Server: IsWatchingYou\r\n");
-	_answer.append("Content-length: 104\r\n"); // check if content-length exist if not count 
-
+	
+	// switch (read(_end, buff, READSIZE))
+	// {
+	// 	case 0:
+	// 		if (_answer.find("Content-length") == std::string::npos)
+	// 		{
+	// 			size_t i = _answer.substr(_answer.find("\r\n\r\n") + 4).size();
+	// 			_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+	// 		}
+	// 		return ;
+	// 	default:
+	// 		_answer.append(buff);
+	// }
 	int sum = read(_end, buff, READSIZE);
-	// std::cout << sum <<"\n";
+		std::cout << buff << "\n";
 	while (sum != 0)
 	{
 		_answer.append(buff);
-		// int i = 0;
-		// while(buff[i]) i++;
-		// std::cout << i << "\n";
-		// i =-1;
-		// while (buff[++i])// && buff[i] != '\n')
-		// 	std::cout << i << " " << buff[i];
-	// 	std::cout << i << " | "  << buff[i - 2]<< "\n";
-	// }
-		// sum = read(_end[0], buff, READSIZE);
-		// std::cout << sum << "\n";
 		break ;
 	}
-		// std::cout << "ANSWER" << _answer << "\n";
+	if (_answer.find("Content-length") == std::string::npos)
+	{
+		size_t i = (_answer.substr(_answer.find("\r\n\r\n") + 4)).size();
+		_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+	}
 }
 
 void	CGI::exec(char **script)
@@ -125,7 +117,7 @@ void	CGI::exec(char **script)
 		return ;
 	}
 	_end = end[0];
-	_settings->getFds()->push_back((pollfd){end[0], POLLIN, 0});
+	_settings->getFds()->push_back((pollfd){_end, POLLIN, 0});
 	pid = fork();
 	if (pid < 0)
 	{
@@ -137,7 +129,7 @@ void	CGI::exec(char **script)
 	else if (!pid)
 	{
 		dup2(end[1], STDOUT_FILENO);
-		// dup2(_end[0], STDIN_FILENO);
+		// // dup2(_end[0], STDIN_FILENO);
 		close(end[0]);
 		close(end[1]);
 		execve(script[0], script, cenv);
@@ -152,6 +144,8 @@ std::string	CGI::handler(Route* route, std::string path)
 {
 	std::string s;
 	char *script[3];
+
+	_answer.clear();
 	if (path.substr(path.find_last_of('.')) == ".php")
 		s = "/usr/bin/php";
 	else if (!path.substr(path.find_last_of('.')).compare(".py"))
@@ -163,39 +157,4 @@ std::string	CGI::handler(Route* route, std::string path)
 	exec(script);
 	body();
 	return (_answer);
-
-
-/*	char *argv[3];
-	char *env[20];
-
-	argv[0] = strdup("/usr/bin/python3");
-argv[1] = strdup("cgi-bin/get_hello.py");
-argv[2] = NULL;
-// env[0] = strdup("AUTH_TYPE=Basic");
-// env[1] = strdup("CONTENT_LENGTH=");
-// env[2] = strdup("CONTENT_TYPE=");
-// env[1] = strdup("DOCUMENT_ROOT=./");
-// env[0] = strdup("GATEWAY_INTERFACE=CGI/1.1");
-// env[5] = strdup("HTTP_COOKIE=");
-// env[6] = strdup("PATH_INFO=");
-// env[7] = strdup("PATH_TRANSLATED=.//");
-env[0] = strdup("QUERY_STRING=first_name=&last_name=");
-// env[9] = strdup("REDIRECT_STATUS=200");
-// env[8] = strdup("REMOTE_ADDR=127.0.0.1:8002");
-// env[8] = strdup("REQUEST_METHOD=GET");
-// env[9] = strdup("REQUEST_URI=/cgi-bin/get_hello.pyfirst_name=&last_name=");
-// env[10] = strdup("SCRIPT_FILENAME=get_hello.py");
-// env[11] = strdup("SCRIPT_NAME=cgi-bin/get_hello.py");
-// env[12] = strdup("SERVER_NAME=127.0.0.1");
-// env[13] = strdup("SERVER_PORT=8002");
-// env[14] = strdup("SERVER_PROTOCOL=HTTP/1.1");
-// env[15] = strdup("SERVER_SOFTWARE=AMANIX");
-env[1] = NULL;
-	int pid = fork();
-
-	if (!pid)
-	{
-		execve(argv[0], argv, env);
-	}
-*/
 }

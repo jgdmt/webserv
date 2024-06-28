@@ -6,14 +6,14 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:32:58 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:56:21 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include "../parsing/Settings.hpp"
 
-Client::Client(Server &serv, int id, Settings* settings): _settings(settings), _serv(serv), _cgi(&req, &_serv, settings), res(&req, &_serv, &_cgi), _id(id)
+Client::Client(Server &serv, int id, Settings* settings): _settings(settings), _serv(serv), res(&req, &_serv, _settings), _id(id)
 {
     socklen_t addr_len = sizeof(_addr);
    _fd = accept(serv.getFdListen(), (sockaddr *)&_addr ,&addr_len);
@@ -39,7 +39,7 @@ Client::~Client(void)
 }
 
 
-Client::Client(Client const &client): _serv(client._serv), _cgi(&req, &_serv, client._settings), res(&req, &_serv, &_cgi), _id(client._id)
+Client::Client(Client const &client): _serv(client._serv), res(&req, &_serv, client._settings), _id(client._id)
 {
 	*this = client;
 }

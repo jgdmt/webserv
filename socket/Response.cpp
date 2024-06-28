@@ -6,19 +6,20 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/06/28 16:33:49 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 19:20:38 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Response.hpp"
 #include "CGI.hpp"
+#include "../parsing/Settings.hpp"
 
-Response::Response(Request *req, Server *serv, CGI *cgi)
+Response::Response(Request *req, Server *serv, Settings *settings)
 {
     _req = req;
     _serv = serv;
-	_cgi = cgi;
+	_settings = settings;
 }
 
 Response::Response(Response const &res)
@@ -134,8 +135,10 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
+				CGI cgi(_req, _serv, _settings);
                 genHeader("200 OK");
-                _buffer.append(_cgi->handler(route, path));
+                _buffer.append(cgi.handler(route, path));
+				std::cout << _buffer << "\n";
                 return true;
             }
         }

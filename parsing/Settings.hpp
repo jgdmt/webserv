@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:28:34 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:36:51 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Settings
         void parse(std::string const &filePath);
         std::vector<Server> *getServers(void);
         std::vector<pollfd> *getFds();
+		std::vector<CGI> *getCgi();
         void setup(void);
         void run(void);
         void closeClient(unsigned int i);

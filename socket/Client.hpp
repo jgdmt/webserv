@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:09:46 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:49:10 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ class Client
 		Settings *_settings;
         Request req;
         Server _serv;
-		CGI _cgi;
         Response res;
         int _id;
         int _fd;
