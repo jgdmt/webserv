@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:12:22 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:32:58 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ void    Client::sendResponse(void)
 {
 	// Print::print(INFO, "ready", _serv);
 	int result;
-// std::cout<< *(res.getRes()) << "\n";
+// // std::cout<< *(res.getRes()) << "\n";
 	if(res.getRes()->size() >= WRITESIZE)
 		result = send(_fd, res.getRes()->c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
@@ -139,8 +139,8 @@ void    Client::sendResponse(void)
 	}
 	else
 	{
-		_last_com = time(NULL);
 		res.cut(result);
+		_last_com = time(NULL);
 	}
 	
 

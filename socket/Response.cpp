@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 15:13:01 by jgoudema         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2024/06/28 16:33:49 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Response.hpp"
 #include "CGI.hpp"
@@ -77,12 +78,9 @@ void Response::genBody(std::string path)
     std::string buff = FileStream.str();
     _buffer.append("Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n");
     _buffer.append("Content-Length: " + to_string(buff.length()) + "\r\n\r\n");
-    // std::cout << _buffer;
-    // std::cout << path << '\n';
     if (_req->getMethod() == "HEAD")
         return;
     _buffer.append(buff);
-    // _buffer.append("\r\n");
 }
 
 void Response::genDirListing(std::string path)
@@ -208,7 +206,8 @@ void Response::check_path(std::string path, Route *route)
         struct dirent *file;
         while ((file = readdir(dir)) != NULL)
         {
-            if (((std::string)file->d_name).find("index.") == 0)
+            std::string fileName = file->d_name;
+            if (fileName.find("index.") == 0)
             {
                 stat((path + file->d_name).c_str(), &path_stat);
                 if (S_ISDIR(path_stat.st_mode))
@@ -233,9 +232,7 @@ void Response::check_path(std::string path, Route *route)
         {
             if (path[path.size() - 1] != '/')
                 path.append("/");
-            checkCGI(path, route);
-            genHeader("200 OK");
-            genBody(path + bestMatchValue);
+            genRes(path + bestMatchValue, route);
         }
         else if ((route && route->IsListing()))
         {
@@ -252,12 +249,11 @@ void Response::check_path(std::string path, Route *route)
 void Response::init(void)
 {
     size_t pos = 0;
+    Route *route = NULL;
     size_t next = _req->getUri().find('/', pos + 1);
     if (next == std::string::npos)
         next = _req->getUri().size();
     std::string chunkUri = _req->getUri().substr(pos, next - pos);
-    Route *route = NULL;
-
     for (unsigned int i = 0; i < _serv->getRoutesNumber(); i++)
     {
         if (_serv->getRoute(i)->getRedirection() == chunkUri)
@@ -273,8 +269,8 @@ void Response::init(void)
         if (next == std::string::npos)
             next = _req->getUri().size();
         chunkUri = _req->getUri().substr(pos, next - pos);
-        int nbRoute = route->getRoutesNumber();
-        int i = 0;
+        unsigned int nbRoute = route->getRoutesNumber();
+        unsigned int i = 0;
         while (i < nbRoute)
         {
             if (route->getRoute(i)->getRedirection() == chunkUri)
@@ -288,12 +284,7 @@ void Response::init(void)
             break;
     }
     std::string path;
-    if (route == NULL)
-    {
-        error("404", "Not Found");
-        return;
-    }
-    else
+    if (route != NULL)
     {
         if (route && !route->isAutorizedMethod(_req->getMethod()))
         {
@@ -305,7 +296,6 @@ void Response::init(void)
         path = route->getPath();
         if (pos < _req->getUri().size())
             path.append(_req->getUri().substr(pos, _req->getUri().size() - pos));
+        check_path(path, route);
     }
-    check_path(path, route);
-    return;
 }
