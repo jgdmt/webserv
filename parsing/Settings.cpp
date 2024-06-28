@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 13:18:26 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:30:30 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,9 +136,11 @@ void Settings::run(void)
 			else if(_fds[i].revents & POLLIN && _servers.size() > i)
 				addClient(i, _servers[i]);
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
-				_clients[i - _servers.size()].readRequest(this);
+				_clients[i - _servers.size()].readRequest();
 			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
-				_clients[i - _servers.size()].sendResponse(this);
+				_clients[i - _servers.size()].sendResponse();
+			// else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() < i)
+			// 	_clients
 		}
 		checkTimeout();
 	}
@@ -172,7 +174,7 @@ void Settings::addClient(unsigned int i, Server &serv)
 	(void)i;
 	try
 	{
-		Client test(serv,  _clients.size());
+		Client test(serv,  _clients.size(), this);
 		_clients.push_back(test);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);

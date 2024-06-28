@@ -6,14 +6,14 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 20:41:51 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:12:22 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include "../parsing/Settings.hpp"
 
-Client::Client(Server &serv, int id): _serv(serv), res(&req, &_serv), _id(id)
+Client::Client(Server &serv, int id, Settings* settings): _settings(settings), _serv(serv), _cgi(&req, &_serv, settings), res(&req, &_serv, &_cgi), _id(id)
 {
     socklen_t addr_len = sizeof(_addr);
    _fd = accept(serv.getFdListen(), (sockaddr *)&_addr ,&addr_len);
@@ -39,7 +39,7 @@ Client::~Client(void)
 }
 
 
-Client::Client(Client const &client): _serv(client._serv), res(&req, &_serv), _id(client._id)
+Client::Client(Client const &client): _serv(client._serv), _cgi(&req, &_serv, client._settings), res(&req, &_serv, &_cgi), _id(client._id)
 {
 	*this = client;
 }
@@ -53,6 +53,7 @@ Client &Client::operator=(Client const &client)
 	this->_last_com = client._last_com;
 	this->req = client.req;
 	this->res = client.res;
+	this->_settings = client._settings;
 	return *this;
 }
 
@@ -76,20 +77,20 @@ void    Client::setId(int id)
 	_id = id;
 }
 
-void    Client::readRequest(Settings *set)
+void    Client::readRequest(void)
 {
 	char buffer[READSIZE];
-	int i = _id + set->getServers()->size();
+	int i = _id + _settings->getServers()->size();
 	// bzero(buffer, READSIZE); // delete later
 	
     switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
 	{
 	case 0:
-		set->closeClient(_id);
+		_settings->closeClient(_id);
 		return ;
 	case -1:
 		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + strerror(errno));
-		set->closeClient(_id);
+		_settings->closeClient(_id);
 		return ;
 	default:
 		_last_com = time(NULL);
@@ -100,28 +101,28 @@ void    Client::readRequest(Settings *set)
 	{
 		case -2:
 			res.error("411", "Length Required");
-			set->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+			_settings->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
 
 			break;
 		case -1:
 			res.error("400", "Bad Request");
-			set->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+			_settings->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
 			break;
 		case 0:
 			break;
 		case 1:
 			res.init();
-			set->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+			_settings->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
 			break;
 	}
 
 }
 
-void    Client::sendResponse(Settings *set)
+void    Client::sendResponse(void)
 {
 	// Print::print(INFO, "ready", _serv);
 	int result;
-std::cout<< *(res.getRes()) << "\n";
+// std::cout<< *(res.getRes()) << "\n";
 	if(res.getRes()->size() >= WRITESIZE)
 		result = send(_fd, res.getRes()->c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
@@ -133,7 +134,7 @@ std::cout<< *(res.getRes()) << "\n";
 			Print::print(DEBUG, "Response sent to Client " + to_string<int>(_id) + ".", _serv);
 			req.clear();
 			res.getRes()->clear();
-			set->getFds()->at(_id + set->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
+			_settings->getFds()->at(_id + _settings->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
 			_last_com = time(NULL);
 	}
 	else

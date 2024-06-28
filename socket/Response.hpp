@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 12:05:26 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:13:12 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "../Print.hpp"
 #include "Request.hpp"
 #include "../parsing/Server.hpp"
+#include "CGI.hpp"
 
 #define WRITESIZE 50000
 
@@ -49,7 +50,7 @@
 class Response
 {
     public:
-        Response(Request* req, Server* serv);
+        Response(Request* req, Server* serv, CGI *cgi);
         Response(Response const &res);
         Response &operator=(Response const &res);
         void init(void);
@@ -59,6 +60,7 @@ class Response
     private:
         Request* _req;
         Server* _serv;
+		CGI* _cgi;
         std::string _buffer;
 		std::map<std::string, std::string> _cgiEnv;
         

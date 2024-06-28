@@ -6,20 +6,38 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/27 20:46:25 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:22:01 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
+#include "../parsing/Settings.hpp"
 
-CGI::CGI(Request& req, Server& serv, Route& route, std::string path) : _req(req), _serv(serv), _route(route), _path(path)
+CGI::CGI(Request* req, Server* serv, Settings* settings) : _req(req), _serv(serv), _settings(settings)
 {
-	_script[1] = NULL;
+	
 }
 
-void	CGI::createEnv(void)
+CGI::CGI(CGI const& cpy)
 {
-	// _env["DOCUMENT_ROOT"] = _route.getPath();
+	*this = cpy;
+}
+
+CGI& CGI::operator=(CGI const& other)
+{
+		this->_env = other._env;
+		this->_req = other._req;
+		this->_serv = other._serv;
+		this->_settings = other._settings;
+		this->_answer = other._answer;
+		this->_end = other._end;
+		return *this;
+}
+
+void	CGI::createEnv(Route* route, std::string path)
+{
+	std::cout << _req << "\n";
+	_env["DOCUMENT_ROOT"] = route->getPath();
 	// _env["SERVER_SOFTWARE"] = "Webserv";
 	// _env["SERVER_NAME"] = "127.0.0.1";
 	// _env["GATEWAY_INTERFACE"] = "CGI/1.1";
@@ -29,8 +47,8 @@ void	CGI::createEnv(void)
 	// _env["PATH_INFO"] = _path;
 	// _env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
 	// _env["SCRIPT_NAME"] = _path.substr(_path.find(_route.getPath()) + _route.getPath().size() + 1);
-	// _env["SCRIPT_FILENAME"] = _path;
-	_env["QUERY_STRING"] = _req.getQuery();
+	_env["SCRIPT_FILENAME"] = path;
+	_env["QUERY_STRING"] = _req->getQuery();
 	// _env["REMOTE_ADDR"] = _req.getHost();
 	// _env["AUTH_TYPE"] = "Basic";
 	// _env["CONTENT_TYPE"] = _req.getContentType();
@@ -73,7 +91,9 @@ void	CGI::body(void)
     // strftime(buff, 80, "%c", time);
     // _buffer.append("Date: " + (std::string)buff + "\r\n");
     // _buffer.append("Server: IsWatchingYou\r\n");
-	int sum = read(_end[0], buff, READSIZE);
+	_answer.append("Content-length: 104\r\n"); // check if content-length exist if not count 
+
+	int sum = read(_end, buff, READSIZE);
 	// std::cout << sum <<"\n";
 	while (sum != 0)
 	{
@@ -93,62 +113,56 @@ void	CGI::body(void)
 		// std::cout << "ANSWER" << _answer << "\n";
 }
 
-void	CGI::exec(void)
+void	CGI::exec(char **script)
 {
 	pid_t pid;
 	char **cenv = stringToChar();
-
-	if (pipe(_end) == -1)
+	int end[2];
+	
+	if (pipe(end) == -1)
 	{
 		std::cout << "Pipe error\n";
 		return ;
 	}
+	_end = end[0];
+	_settings->getFds()->push_back((pollfd){end[0], POLLIN, 0});
 	pid = fork();
 	if (pid < 0)
 	{
 		std::cout << "fork error\n";
+		close(end[0]);
+		_settings->getFds()->pop_back();
 		return ;
 	}
-	if (!pid)
+	else if (!pid)
 	{
-		dup2(_end[1], STDOUT_FILENO);
+		dup2(end[1], STDOUT_FILENO);
 		// dup2(_end[0], STDIN_FILENO);
-		close(_end[0]);
-		close(_end[1]);
-		execve(_script[0], _script, cenv);
+		close(end[0]);
+		close(end[1]);
+		execve(script[0], script, cenv);
+	}
+	else
+	{
+		close(end[1]);
 	}
 }
 
-std::string	CGI::handler(void)
+std::string	CGI::handler(Route* route, std::string path)
 {
 	std::string s;
-	if (_path.substr(_path.find_last_of('.')) == ".php")
+	char *script[3];
+	if (path.substr(path.find_last_of('.')) == ".php")
 		s = "/usr/bin/php";
-	else if (!_path.substr(_path.find_last_of('.')).compare(".py"))
+	else if (!path.substr(path.find_last_of('.')).compare(".py"))
 		s = "/usr/bin/python3";
-	_script[0] = (char*) s.c_str();
-	_script[1] = (char*) _path.c_str();
-	_script[2] = NULL;
-	createEnv();
-	exec();
+	script[0] = (char*) s.c_str();
+	script[1] = (char*) path.c_str();
+	script[2] = NULL;
+	createEnv(route, path);
+	exec(script);
 	body();
 	return (_answer);
-	// 	pid_t pid;
-	// char **cenv = stringToChar();
-
-	// pid = fork();
-	// if (pid < 0)
-	// {
-	// 	std::cout << "fork error\n";
-	// 	return ;
-	// }
-	// if (!pid)
-	// {
-	// 	std::cout << _script[0] << "\n" << _script[1] << "\n";
-	// 	for (size_t i = 0; cenv[i]; i++)
-	// 		std::cout << cenv[i] << "\n";
-	// 	execve(_script[0], _script, cenv);
-	// }
 
 
 /*	char *argv[3];

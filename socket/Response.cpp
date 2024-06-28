@@ -1,22 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response2.cpp                                      :+:      :+:    :+:   */
+/*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 12:25:19 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:13:01 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 #include "CGI.hpp"
 
-Response::Response(Request *req, Server *serv)
+Response::Response(Request *req, Server *serv, CGI *cgi)
 {
     _req = req;
     _serv = serv;
+	_cgi = cgi;
 }
 
 Response::Response(Response const &res)
@@ -135,9 +136,8 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
-                CGI cgi(*_req, *_serv, *route, path);
                 genHeader("200 OK");
-                _buffer.append(cgi.handler());
+                _buffer.append(_cgi->handler(route, path));
                 return true;
             }
         }

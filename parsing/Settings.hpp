@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 11:10:32 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:28:34 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,5 @@ class Settings
         std::vector<pollfd> _fds;
         std::vector<Server> _servers;
         std::vector<Client> _clients;
+		std::vector<CGI> _cgis;
 }; 
