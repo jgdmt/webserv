@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/26 17:59:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:49:42 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ Request::Request()
     _error = 0;
     _contentLength = 0;
 }
+
+Request::~Request()
+{}
 
 std::string const &Request::getConnection(void)
 {
@@ -98,7 +101,7 @@ static int getParam(std::string const &param)
         return (OTHER);
 }
 
-void Request::accept(std::string const& line)
+void Request::setAccept(std::string const& line)
 {
     size_t i = line.find(": ") + 2; //eventuellement verif si ':' existe
 	size_t j;
@@ -137,11 +140,6 @@ void Request::accept(std::string const& line)
 		swap<float>(sort[j], sort[min]);
 		swap<std::string>(_accept[j], _accept[min]);
 	}
-
-	// for (size_t i = 0; i < sort.size(); i++)
-	// {
-	// 	std::cout << "accept [" << sort[i] << "] -> " << _accept[i] << "\n";
-	// }
 }
 
 void Request::acceptEncoding(std::string const& line)
@@ -161,9 +159,6 @@ void Request::acceptEncoding(std::string const& line)
 		_acceptEncoding.push_back(line.substr(i, j - i));
 		i = j + 2;
 	}
-	
-	// for (size_t i = 0; i < _acceptEncoding.size(); i++)
-	// 	std::cout << "acceptEncoding[" << i << "] = " << _acceptEncoding[i] << "\n";
 }
 
 int Request::parseHeader(void)
@@ -191,7 +186,7 @@ int Request::parseHeader(void)
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
                 break;
             case ACCEPT:
-                accept(line);
+                setAccept(line);
                 break;
             case ACCEPT_ENCODING:
 				acceptEncoding(line);

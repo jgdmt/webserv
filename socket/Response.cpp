@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/01 12:08:54 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:49:58 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,22 @@
 #include "../parsing/Settings.hpp"
 #include "Client.hpp"
 
-Response::Response(Request *req, Server *serv, Settings *settings, Client *client)
+
+
+Response::Response()
 {
-    _req = req;
-    _serv = serv;
-	_settings = settings;
-	_client = client;
 	_cgiStatus = false;
 }
+void Response::setClient(Client* cli)
+{
+    _client = cli;
+}
+
+Response::~Response()
+{};
 
 Response::Response(Response const &res)
 {
-    this->_req = res._req;
-    this->_serv = res._serv;
     *this = res;
 }
 
@@ -38,16 +41,6 @@ Response &Response::operator=(Response const &res)
     // this->_cgiEnv = res._cgiEnv;
 	this->_cgiStatus = res._cgiStatus;
     return *this;
-}
-
-std::string *Response::getRes(void)
-{
-    return &_buffer;
-}
-
-bool Response::getCgiStatus(void) const
-{
-	return _cgiStatus;
 }
 
 void Response::cut(int pos)
@@ -65,7 +58,7 @@ void Response::genHeader(std::string type)
     _buffer.clear();
 	_cgiStatus = false;
     _buffer = "HTTP/1.1 " + type + "\r\n";
-    if (_req->getConnection() == "keep-alive\r")
+    if (_client->getConnection() == "keep-alive\r")
     {
         _buffer.append("Connection: Keep-Alive\r\n");
         _buffer.append("Keep-Alive: timeout=60\r\n");
@@ -89,7 +82,7 @@ void Response::genBody(std::string path)
     std::string buff = FileStream.str();
     _buffer.append("Content-Type: " + (std::string)MIME_TYPE(path.substr(path.find_last_of('.') + 1)) + "\r\n");
     _buffer.append("Content-Length: " + to_string(buff.length()) + "\r\n\r\n");
-    if (_req->getMethod() == "HEAD")
+    if (_client->getMethod() == "HEAD")
         return;
     _buffer.append(buff);
 }
@@ -129,15 +122,15 @@ void Response::genDirListing(std::string path)
 void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 {
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
-    std::string path = _serv->getErrorPage(httpErrorCode);
+    std::string path = _client->_serverPtr->getErrorPage(httpErrorCode);
     genBody(path);
-    Print::print(DEBUG, "Error " + to_string(httpErrorCode) + " sent.", *_serv);
+    Print::print(DEBUG, "Error " + to_string(httpErrorCode) + " sent.", *_client->_serverPtr);
     return;
 }
 
 bool Response::checkCGI(std::string path, Route *route)
 {
-    if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_req->getMethod() == "POST" || _req->getMethod() == "GET"))
+    if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_client->getMethod() == "POST" || _client->getMethod() == "GET"))
     {
         std::string ext = path.substr(path.find_last_of('.'));
 
@@ -145,9 +138,9 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
-				_settings->getCgi()->push_back(CGI(_req, _serv, _settings));
+				_client->_settingsPtr->getCgi()->push_back(CGI(_client, _client->_serverPtr, _client->_settingsPtr));
                 genHeader("200 OK");
-                _settings->getCgi()->back().handler(route, path);
+                _client->_settingsPtr->getCgi()->back().handler(route, path);
                 return true;
             }
         }
@@ -171,13 +164,13 @@ void Response::genRes(std::string path, Route* route)
 		}
         unsigned int i = 0;
         std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
-        while (i < _req->getAcceptSize())
+        while (i < _client->getAcceptSize())
         {
-            if (myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
+            if (myme == _client->getAccept(i) || "*/*" == _client->getAccept(i))
                 break;
             i++;
         }
-        if (_req->getAcceptSize() != 0 && i == _req->getAcceptSize())
+        if (_client->getAcceptSize() != 0 && i == _client->getAcceptSize())
             error("406", "Not Acceptable");
         else
         {
@@ -199,7 +192,7 @@ void Response::check_path(std::string path, Route *route)
         if (path[path.size() - 1] != '/')
         {
             genHeader("301 Moved Permanently");
-            _buffer.append("Location: " + _req->getUri() + "/\r\n\r\n");
+            _buffer.append("Location: " + _client->getUri() + "/\r\n\r\n");
             return;
         }
         if (route->getdefaultFileForDirectory().size() != 0 && route->getPath() + "/" == path)
@@ -209,7 +202,7 @@ void Response::check_path(std::string path, Route *route)
             genRes(path + route->getdefaultFileForDirectory(), route);
             return;
         }
-        unsigned int bestMatchKey = _req->getAcceptSize();
+        unsigned int bestMatchKey = _client->getAcceptSize();
         std::string bestMatchValue;
         DIR *dir = opendir(path.c_str());
         if (!dir)
@@ -230,13 +223,13 @@ void Response::check_path(std::string path, Route *route)
                 std::string tmp = file->d_name;
                 std::string myme = MIME_TYPE(tmp.substr(tmp.find_last_of('.') + 1));
                 unsigned int i = 0;
-                while (i < _req->getAcceptSize())
+                while (i < _client->getAcceptSize())
                 {
-                    if (myme == _req->getAccept(i) || "*/*" == _req->getAccept(i))
+                    if (myme == _client->getAccept(i) || "*/*" == _client->getAccept(i))
                         break;
                     i++;
                 }
-                if (i != _req->getAcceptSize() && i < bestMatchKey)
+                if (i != _client->getAcceptSize() && i < bestMatchKey)
                 {
                     bestMatchKey = i;
                     bestMatchValue = tmp;
@@ -258,6 +251,7 @@ void Response::check_path(std::string path, Route *route)
         {
             error("403", "Forbidden");
         }
+        
     }
 }
 
@@ -265,25 +259,25 @@ void Response::init(void)
 {
     size_t pos = 0;
     Route *route = NULL;
-    size_t next = _req->getUri().find('/', pos + 1);
+    size_t next = _client->getUri().find('/', pos + 1);
     if (next == std::string::npos)
-        next = _req->getUri().size();
-    std::string chunkUri = _req->getUri().substr(pos, next - pos);
-    for (unsigned int i = 0; i < _serv->getRoutesNumber(); i++)
+        next = _client->getUri().size();
+    std::string chunkUri = _client->getUri().substr(pos, next - pos);
+    for (unsigned int i = 0; i < _client->_serverPtr->getRoutesNumber(); i++)
     {
-        if (_serv->getRoute(i)->getRedirection() == chunkUri)
+        if (_client->_serverPtr->getRoute(i)->getRedirection() == chunkUri)
         {
-            route = _serv->getRoute(i);
+            route = _client->_serverPtr->getRoute(i);
             break;
         }
     }
     while (route != NULL)
     {
         pos = next;
-        next = _req->getUri().find('/', pos + 1);
+        next = _client->getUri().find('/', pos + 1);
         if (next == std::string::npos)
-            next = _req->getUri().size();
-        chunkUri = _req->getUri().substr(pos, next - pos);
+            next = _client->getUri().size();
+        chunkUri = _client->getUri().substr(pos, next - pos);
         unsigned int nbRoute = route->getRoutesNumber();
         unsigned int i = 0;
         while (i < nbRoute)
@@ -301,7 +295,7 @@ void Response::init(void)
     std::string path;
     if (route != NULL)
     {
-        if (route && !route->isAutorizedMethod(_req->getMethod()))
+        if (route && !route->isAutorizedMethod(_client->getMethod()))
         {
             error("405", "Method Not Allowed");
             return;
@@ -309,8 +303,8 @@ void Response::init(void)
         if (route->getPath()[route->getPath().size() - 1] == '/')
             route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
         path = route->getPath();
-        if (pos < _req->getUri().size())
-            path.append(_req->getUri().substr(pos, _req->getUri().size() - pos));
+        if (pos < _client->getUri().size())
+            path.append(_client->getUri().substr(pos, _client->getUri().size() - pos));
         check_path(path, route);
     }
 }

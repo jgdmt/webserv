@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 12:07:29 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 14:21:16 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,13 @@ class Settings;
 
 class CGI {
 	public:
-		CGI(Request *req, Server *serv, Settings *settings);
+		CGI(Client *cli, Server *serv, Settings *settings);
 		CGI(CGI const& cpy);
 		CGI& operator=(CGI const& other);
 		void handler(Route* route, std::string path);
 		void body(int id);
 	private:
 		std::map<std::string, std::string> _env;
-		Request* _req;
 		Server* _serv;
 		Settings* _settings;
 		Client* _client;

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 12:03:52 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 14:22:39 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "../parsing/Settings.hpp"
 
-CGI::CGI(Request* req, Server* serv, Settings* settings) : _req(req), _serv(serv), _settings(settings)
+CGI::CGI(Client* cli, Server* serv, Settings* settings) :  _serv(serv), _settings(settings), _client(cli)
 {
 	_id = _settings->getFds()->size() - 1;
 }
@@ -26,7 +26,7 @@ CGI::CGI(CGI const& cpy)
 CGI& CGI::operator=(CGI const& other)
 {
 		this->_env = other._env;
-		this->_req = other._req;
+		this->_client = other._client;
 		this->_serv = other._serv;
 		this->_settings = other._settings;
 		this->_answer = other._answer;
@@ -37,7 +37,7 @@ CGI& CGI::operator=(CGI const& other)
 
 void	CGI::createEnv(Route* route, std::string path)
 {
-	std::cout << _req << "\n";
+	std::cout << _client << "\n";
 	_env["DOCUMENT_ROOT"] = route->getPath();
 	// _env["SERVER_SOFTWARE"] = "Webserv";
 	// _env["SERVER_NAME"] = "127.0.0.1";
@@ -49,7 +49,7 @@ void	CGI::createEnv(Route* route, std::string path)
 	// _env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
 	// _env["SCRIPT_NAME"] = _path.substr(_path.find(_route.getPath()) + _route.getPath().size() + 1);
 	_env["SCRIPT_FILENAME"] = path;
-	_env["QUERY_STRING"] = _req->getQuery();
+	_env["QUERY_STRING"] = _client->getQuery();
 	// _env["REMOTE_ADDR"] = _req.getHost();
 	// _env["AUTH_TYPE"] = "Basic";
 	// _env["CONTENT_TYPE"] = _req.getContentType();

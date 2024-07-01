@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 12:08:23 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:25:40 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,28 +53,23 @@ class Client;
 class Response
 {
     public:
-        Response(Request* req, Server* serv, Settings *settings, Client *client);
+        Response();
         Response(Response const &res);
         Response &operator=(Response const &res);
+        ~Response();
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);
         void cut(int pos);
-        std::string *getRes(void);
-		bool getCgiStatus(void) const;
-    private:
-        Request* _req;
-        Server* _serv;
-		Settings* _settings;
-		Client* _client;
+    protected:
         std::string _buffer;
-		// std::map<std::string, std::string> _cgiEnv;
 		bool _cgiStatus;
-        
+        void setClient(Client* cli);
+    private:
+        Client *_client;
         bool checkCGI(std::string path, Route *route);
         void genHeader(std::string type);
         void genBody(std::string path);
         void genDirListing(std::string path);
         void genRes(std::string path, Route* route);
-        // void createEnv(void);
         void check_path(std::string path, Route *route);
 };

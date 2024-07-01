@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:49:10 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:47:36 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <arpa/inet.h>
 #include <exception>
 #include "parsing/Server.hpp"
+#include "../Print.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 #include "CGI.hpp"
@@ -25,24 +26,21 @@
 
 class Settings;
 
-class Client
+class Client: public Request, public Response
 {
     public:
-        Client(Server &serv, int id, Settings* settings);
+        Client(Server *serv, int id, Settings* settings);
         ~Client(void);
         int getFd(void) const;
         time_t getLastCom(void) const;
-        Server &getServer(void);
         void    setId(int id);
         void    readRequest(void);
         void    sendResponse(void);
         Client(Client const &client);
         Client &operator=(Client const &client);
+		Settings *_settingsPtr;
+        Server *_serverPtr;
     private:
-		Settings *_settings;
-        Request req;
-        Server _serv;
-        Response res;
         int _id;
         int _fd;
         sockaddr_in _addr;

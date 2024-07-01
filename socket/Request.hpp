@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/25 15:27:53 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:49:06 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,13 @@ enum Paramater
     OTHER,
 };
 
+class Client;
+
 class Request
 {
     public:
         Request();
+        ~Request();
         void add(std::string const &new_buff);
         void clear(void);
         std::string const &getConnection(void);
@@ -58,7 +61,6 @@ class Request
 		unsigned int const& getContentLength(void) const;
 		size_t getAcceptSize(void);
 		size_t getAcceptEncodingSize(void);
-
 
         int IsParsingOk(void);
     private:
@@ -81,9 +83,8 @@ class Request
 	  
        int parseHeader(void);
        int parseBody(void);
-       void accept(std::string const& line);
+       void setAccept(std::string const& line);
 	   void	acceptEncoding(std::string const& line);
-
 		template <class T>
 		static T convertType(std::string entry)
 		{
