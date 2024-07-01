@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:25:40 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:10:50 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class Response
     public:
         Response();
         Response(Response const &res);
-        Response &operator=(Response const &res);
+        // Response &operator=(Response const &res);
         ~Response();
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);

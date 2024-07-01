@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/01 15:49:58 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:17:26 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,13 @@ Response::Response(Response const &res)
     *this = res;
 }
 
-Response &Response::operator=(Response const &res)
-{
-    this->_buffer = res._buffer;
-    // this->_cgiEnv = res._cgiEnv;
-	this->_cgiStatus = res._cgiStatus;
-    return *this;
-}
+// Response &Response::operator=(Response const &res)
+// {
+//     this->_buffer = res._buffer;
+//     // this->_cgiEnv = res._cgiEnv;
+// 	this->_cgiStatus = res._cgiStatus;
+//     return *this;
+// }
 
 void Response::cut(int pos)
 {
