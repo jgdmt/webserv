@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 17:19:43 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:51:07 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,6 @@ void	CGI::body(int id)
 		if (_answer.find("Content-length") == std::string::npos)
 		{
 			size_t find = _answer.find("\r\n\r\n");
-			// std::cout << "ANS '" << _answer << "'\n";
-			// std::cout << "SUB '" << _answer.substr(find + 4) << "'\n";
 			size_t i = _answer.substr(find + 4).length();
 			if (find == std::string::npos)
 				i = _answer.length();
@@ -157,13 +155,10 @@ void	CGI::exec(char **script)
 void	CGI::handler(Route* route, std::string path)
 {
 	std::string s = route->getCgiPath();
+	std::cout << s << "\n";
 	char *script[3];
 
 	_answer.clear();
-	// if (path.substr(path.find_last_of('.')) == ".php")
-	// 	s = "/usr/bin/php";
-	// else if (!path.substr(path.find_last_of('.')).compare(".py"))
-	// 	s = "/usr/bin/python3";
 	script[0] = (char*) s.c_str();
 	script[1] = (char*) path.c_str();
 	script[2] = NULL;
