@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/06/28 20:01:32 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 12:03:52 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ CGI& CGI::operator=(CGI const& other)
 		this->_settings = other._settings;
 		this->_answer = other._answer;
 		this->_end = other._end;
+		this->_id = other._id;
 		return *this;
 }
 
@@ -75,34 +76,39 @@ char ** CGI::stringToChar(void)
 	return (cenv);
 }
 
-void	CGI::body(void)
+void	CGI::body(int id)
 {
 	char buff[READSIZE];
+	int rd = read(_end, buff, READSIZE);
 	
-	// switch (read(_end, buff, READSIZE))
-	// {
-	// 	case 0:
-	// 		if (_answer.find("Content-length") == std::string::npos)
-	// 		{
-	// 			size_t i = _answer.substr(_answer.find("\r\n\r\n") + 4).size();
-	// 			_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
-	// 		}
-	// 		return ;
-	// 	default:
-	// 		_answer.append(buff);
-	// }
-	int sum = read(_end, buff, READSIZE);
-		std::cout << buff << "\n";
-	while (sum != 0)
+	if (rd < 0)
+		Print::print(CRASH, "Cgi has crashed so we did it too");
+	else if (rd < READSIZE)
 	{
 		_answer.append(buff);
-		break ;
+		if (_answer.find("Content-length") == std::string::npos)
+		{
+			size_t i = _answer.substr(_answer.find("\r\n\r\n") + 4).size();
+			_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+		}
+		close(_end);
+		_settings->getFds()->erase(_settings->getFds()->begin() + id);
+		
 	}
-	if (_answer.find("Content-length") == std::string::npos)
-	{
-		size_t i = (_answer.substr(_answer.find("\r\n\r\n") + 4)).size();
-		_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
-	}
+	else
+		_answer.append(buff);
+	// int sum = read(_end, buff, READSIZE);
+	// 	std::cout << buff << "\n";
+	// while (sum != 0)
+	// {
+	// 	_answer.append(buff);
+	// 	break ;
+	// }
+	// if (_answer.find("Content-length") == std::string::npos)
+	// {
+	// 	size_t i = (_answer.substr(_answer.find("\r\n\r\n") + 4)).size();
+	// 	_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+	// }
 }
 
 void	CGI::exec(char **script)
@@ -123,6 +129,7 @@ void	CGI::exec(char **script)
 	{
 		std::cout << "fork error\n";
 		close(end[0]);
+		close(end[1]);
 		_settings->getFds()->pop_back();
 		return ;
 	}
@@ -140,7 +147,7 @@ void	CGI::exec(char **script)
 	}
 }
 
-std::string	CGI::handler(Route* route, std::string path)
+void	CGI::handler(Route* route, std::string path)
 {
 	std::string s;
 	char *script[3];
@@ -155,6 +162,4 @@ std::string	CGI::handler(Route* route, std::string path)
 	script[2] = NULL;
 	createEnv(route, path);
 	exec(script);
-	body();
-	return (_answer);
 }

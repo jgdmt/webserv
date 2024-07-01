@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 19:53:29 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 12:01:42 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,8 +144,8 @@ void Settings::run(void)
 				_clients[i - _servers.size()].readRequest();
 			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
 				_clients[i - _servers.size()].sendResponse();
-			// else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() < i)
-			// 	_cgis[i - _servers.size() - _clients.size()].body();
+			else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() < i)
+				_cgis[i - _servers.size() - _clients.size()].body(i);
 		}
 		checkTimeout();
 	}

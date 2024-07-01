@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/06/28 19:20:38 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 12:08:54 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 #include "Response.hpp"
 #include "CGI.hpp"
 #include "../parsing/Settings.hpp"
+#include "Client.hpp"
 
-Response::Response(Request *req, Server *serv, Settings *settings)
+Response::Response(Request *req, Server *serv, Settings *settings, Client *client)
 {
     _req = req;
     _serv = serv;
 	_settings = settings;
+	_client = client;
+	_cgiStatus = false;
 }
 
 Response::Response(Response const &res)
@@ -32,13 +35,19 @@ Response::Response(Response const &res)
 Response &Response::operator=(Response const &res)
 {
     this->_buffer = res._buffer;
-    this->_cgiEnv = res._cgiEnv;
+    // this->_cgiEnv = res._cgiEnv;
+	this->_cgiStatus = res._cgiStatus;
     return *this;
 }
 
 std::string *Response::getRes(void)
 {
     return &_buffer;
+}
+
+bool Response::getCgiStatus(void) const
+{
+	return _cgiStatus;
 }
 
 void Response::cut(int pos)
@@ -54,6 +63,7 @@ void Response::genHeader(std::string type)
     char buff[80];
 
     _buffer.clear();
+	_cgiStatus = false;
     _buffer = "HTTP/1.1 " + type + "\r\n";
     if (_req->getConnection() == "keep-alive\r")
     {
@@ -135,10 +145,9 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
-				CGI cgi(_req, _serv, _settings);
+				_settings->getCgi()->push_back(CGI(_req, _serv, _settings));
                 genHeader("200 OK");
-                _buffer.append(cgi.handler(route, path));
-				std::cout << _buffer << "\n";
+                _settings->getCgi()->back().handler(route, path);
                 return true;
             }
         }
@@ -156,7 +165,10 @@ void Response::genRes(std::string path, Route* route)
     else
     {
         if (checkCGI(path, route))
-            return;
+        {
+			_cgiStatus = true;
+			return ;
+		}
         unsigned int i = 0;
         std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
         while (i < _req->getAcceptSize())

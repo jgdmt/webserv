@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:58:37 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 12:08:23 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,29 +48,33 @@
     "application/octet-stream" )
 
 class Settings;
+class Client;
 
 class Response
 {
     public:
-        Response(Request* req, Server* serv, Settings *settings);
+        Response(Request* req, Server* serv, Settings *settings, Client *client);
         Response(Response const &res);
         Response &operator=(Response const &res);
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);
         void cut(int pos);
         std::string *getRes(void);
+		bool getCgiStatus(void) const;
     private:
         Request* _req;
         Server* _serv;
 		Settings* _settings;
+		Client* _client;
         std::string _buffer;
-		std::map<std::string, std::string> _cgiEnv;
+		// std::map<std::string, std::string> _cgiEnv;
+		bool _cgiStatus;
         
         bool checkCGI(std::string path, Route *route);
         void genHeader(std::string type);
         void genBody(std::string path);
         void genDirListing(std::string path);
         void genRes(std::string path, Route* route);
-        void createEnv(void);
+        // void createEnv(void);
         void check_path(std::string path, Route *route);
 };

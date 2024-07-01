@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/28 16:56:21 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 11:45:10 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,8 @@ void    Client::readRequest(void)
 			break;
 		case 1:
 			res.init();
-			_settings->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+			if (!res.getCgiStatus())
+				_settings->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
 			break;
 	}
 
@@ -142,7 +143,4 @@ void    Client::sendResponse(void)
 		res.cut(result);
 		_last_com = time(NULL);
 	}
-	
-
-
 }
