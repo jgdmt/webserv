@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/01 15:49:58 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 16:28:33 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void Response::setClient(Client* cli)
 }
 
 Response::~Response()
-{};
+{}
 
 Response::Response(Response const &res)
 {
@@ -41,6 +41,12 @@ Response &Response::operator=(Response const &res)
     // this->_cgiEnv = res._cgiEnv;
 	this->_cgiStatus = res._cgiStatus;
     return *this;
+}
+
+void Response::addBuffer(std::string& body)
+{
+	_buffer.append(body);
+	std::cout << _buffer << "\n";
 }
 
 void Response::cut(int pos)
@@ -138,7 +144,7 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
-				_client->_settingsPtr->getCgi()->push_back(CGI(_client, _client->_serverPtr, _client->_settingsPtr));
+				_client->_settingsPtr->getCgi()->push_back(CGI(_client));
                 genHeader("200 OK");
                 _client->_settingsPtr->getCgi()->back().handler(route, path);
                 return true;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:47:58 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:13:20 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,11 @@ Client &Client::operator=(Client const &client)
 int Client::getFd(void) const
 {
 	return _fd;
+}
+
+int Client::getId(void) const
+{
+	return _id;
 }
 
 time_t Client::getLastCom(void) const

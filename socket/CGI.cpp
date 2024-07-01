@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 14:22:39 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:19:43 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "../parsing/Settings.hpp"
 
-CGI::CGI(Client* cli, Server* serv, Settings* settings) :  _serv(serv), _settings(settings), _client(cli)
+CGI::CGI(Client* cli) : _client(cli)
 {
-	_id = _settings->getFds()->size() - 1;
+
 }
 
 CGI::CGI(CGI const& cpy)
@@ -27,11 +27,8 @@ CGI& CGI::operator=(CGI const& other)
 {
 		this->_env = other._env;
 		this->_client = other._client;
-		this->_serv = other._serv;
-		this->_settings = other._settings;
 		this->_answer = other._answer;
 		this->_end = other._end;
-		this->_id = other._id;
 		return *this;
 }
 
@@ -79,8 +76,11 @@ char ** CGI::stringToChar(void)
 void	CGI::body(int id)
 {
 	char buff[READSIZE];
+	for (int i = 0; i < READSIZE; i++)
+		buff[i] = 0;
 	int rd = read(_end, buff, READSIZE);
 	
+	std::cout << "body\n";
 	if (rd < 0)
 		Print::print(CRASH, "Cgi has crashed so we did it too");
 	else if (rd < READSIZE)
@@ -88,12 +88,19 @@ void	CGI::body(int id)
 		_answer.append(buff);
 		if (_answer.find("Content-length") == std::string::npos)
 		{
-			size_t i = _answer.substr(_answer.find("\r\n\r\n") + 4).size();
+			size_t find = _answer.find("\r\n\r\n");
+			// std::cout << "ANS '" << _answer << "'\n";
+			// std::cout << "SUB '" << _answer.substr(find + 4) << "'\n";
+			size_t i = _answer.substr(find + 4).length();
+			if (find == std::string::npos)
+				i = _answer.length();
 			_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
 		}
 		close(_end);
-		_settings->getFds()->erase(_settings->getFds()->begin() + id);
-		
+		_client->addBuffer(_answer);
+		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
+		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
+		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
 	}
 	else
 		_answer.append(buff);
@@ -123,14 +130,14 @@ void	CGI::exec(char **script)
 		return ;
 	}
 	_end = end[0];
-	_settings->getFds()->push_back((pollfd){_end, POLLIN, 0});
+	_client->_settingsPtr->getFds()->push_back((pollfd){_end, POLLIN, 0});
 	pid = fork();
 	if (pid < 0)
 	{
 		std::cout << "fork error\n";
 		close(end[0]);
 		close(end[1]);
-		_settings->getFds()->pop_back();
+		_client->_settingsPtr->getFds()->pop_back();
 		return ;
 	}
 	else if (!pid)
@@ -149,14 +156,14 @@ void	CGI::exec(char **script)
 
 void	CGI::handler(Route* route, std::string path)
 {
-	std::string s;
+	std::string s = route->getCgiPath();
 	char *script[3];
 
 	_answer.clear();
-	if (path.substr(path.find_last_of('.')) == ".php")
-		s = "/usr/bin/php";
-	else if (!path.substr(path.find_last_of('.')).compare(".py"))
-		s = "/usr/bin/python3";
+	// if (path.substr(path.find_last_of('.')) == ".php")
+	// 	s = "/usr/bin/php";
+	// else if (!path.substr(path.find_last_of('.')).compare(".py"))
+	// 	s = "/usr/bin/python3";
 	script[0] = (char*) s.c_str();
 	script[1] = (char*) path.c_str();
 	script[2] = NULL;

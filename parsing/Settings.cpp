@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 14:29:45 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:13:57 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@ typedef std::string::iterator it;
 std::vector<pollfd> *Settings::getFds()
 {
 	return &_fds;
+}
+
+std::vector<Client> *Settings::getClients(void)
+{
+	return &_clients;
 }
 
 std::vector<CGI> *Settings::getCgi()
@@ -144,7 +149,7 @@ void Settings::run(void)
 				_clients[i - _servers.size()].readRequest();
 			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
 				_clients[i - _servers.size()].sendResponse();
-			else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() < i)
+			else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() <= i)
 				_cgis[i - _servers.size() - _clients.size()].body(i);
 		}
 		checkTimeout();
@@ -188,7 +193,4 @@ void Settings::addClient(unsigned int i, Server &serv)
 	{
 		Print::print(ERROR, e.what());
 	}
-	
-	
-
 }

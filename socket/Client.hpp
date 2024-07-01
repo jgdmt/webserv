@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:47:36 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:12:59 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Client: public Request, public Response
         Client(Server *serv, int id, Settings* settings);
         ~Client(void);
         int getFd(void) const;
+		int getId(void) const;
         time_t getLastCom(void) const;
         void    setId(int id);
         void    readRequest(void);

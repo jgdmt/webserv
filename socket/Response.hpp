@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:25:40 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/01 16:23:57 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ class Response
         void init(void);
         void error(std::string httpErrorCode, std::string httpErrorMessage);
         void cut(int pos);
+		void addBuffer(std::string& body);
     protected:
         std::string _buffer;
 		bool _cgiStatus;
