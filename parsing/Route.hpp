@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 13:29:59 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 12:12:36 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class Route
 		std::vector<Route> _routes;
         std::string _redirection;
         std::string _path;
+		std::string _uploadDirectory;
         bool _directoryListing;
         std::string _defaultFileForDirectory;
 		std::string _cgiPath;
@@ -65,6 +66,7 @@ class Route
 		void	defaultfile(std::string const& content, std::string::iterator& start);
 		void	cgipath(std::string const& content, std::string::iterator& start);
 		void	cgiextension(std::string const& content, std::string::iterator& start);
+		void	upload(std::string const& content, std::string::iterator& start);
 		void	check_name(void);
 		void	check_duplicates(void);
 		void	check_defaultfile(void);

@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/27 15:12:00 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 15:05:59 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,8 +163,7 @@ void Route::path(std::string const& content, std::string::iterator& start)
 	if (len == -2)
 		Print::print(CRASH, "Parsing location " + _redirection + ": root does not take multiple values");
 	path = content.substr(start - content.begin(), len);
-	stat(path.c_str(), &path_stat);
-	if (!S_ISDIR(path_stat.st_mode))
+	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
 		Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " is not a directory");
 	this->_path = path;
 	start += len;
@@ -249,14 +248,13 @@ void Route::cgipath(std::string const& content, std::string::iterator& start)
 {
 	int len = Route::find_len(content, start, ';', false);
 	std::string path;
-	//check if executable
+
 	if (len == 0)
 		Print::print(CRASH, "Parsing location " + _redirection + ": cgi_path is missing a value");
 	if (len == -1)
 		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
 	if (len == -2)
 		Print::print(CRASH, "Parsing location " + _redirection + ": cgi_path does not take multiple values");
-	
 	path = content.substr(start - content.begin(), len);
 	if (access(path.c_str(), F_OK | X_OK))
 		Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " does not exist or is not executable");
@@ -287,6 +285,35 @@ void Route::cgiextension(std::string const& content, std::string::iterator& star
 		while (*start == ' ')
 			start++;
 	}
+}
+
+void Route::upload(std::string const& content, std::string::iterator& start)
+{
+	int len = Route::find_len(content, start, ';', false);
+	std::string path;
+	struct stat path_stat;
+
+	if (len == 0)
+		Print::print(CRASH, "Parsing location " + _redirection + ": upload is missing a value");
+	if (len == -1)
+		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+	if (len == -2)
+		Print::print(CRASH, "Parsing location " + _redirection + ": upload does not take multiple values");
+	path = content.substr(start - content.begin(), len);
+	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
+		Print::print(CRASH, "Parsing location (upload) " + _redirection + ": " + path + " is not a directory");
+	this->_uploadDirectory = path;
+	start += len;
+
+	// 	struct stat	path_stat;
+	// std::string path;
+
+	// path = content.substr(start - content.begin(), len);
+	// stat(path.c_str(), &path_stat);
+	// if (!S_ISDIR(path_stat.st_mode))
+	// 	Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " is not a directory");
+	// this->_path = path;
+	// start += len;
 }
 
 void Route::check_name(void)
@@ -365,6 +392,8 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 			cgipath(content, start);
 		else if (param == "cgi_extension")
 			cgiextension(content, start);
+		else if (param == "upload")
+			upload(content, start);
 		else
 			Print::print(CRASH, "Parsing location: " + param + " is unknown");
 		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)
