@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 16:22:11 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 19:34:45 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 #include "Request.hpp"
 #include "../parsing/Server.hpp"
 #include "../Print.hpp"
-
-#define READSIZE 50000
 
 class Settings;
 
@@ -36,6 +34,7 @@ class CGI {
 		Client* _client;
 		std::string _answer;
 		int	_end;
+		pid_t _pid;
 
 		char** stringToChar(void);
 		void createEnv(Route* route, std::string path);

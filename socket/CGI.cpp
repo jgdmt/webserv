@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 17:51:07 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 19:47:45 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ CGI& CGI::operator=(CGI const& other)
 
 void	CGI::createEnv(Route* route, std::string path)
 {
-	std::cout << _client << "\n";
 	_env["DOCUMENT_ROOT"] = route->getPath();
 	// _env["SERVER_SOFTWARE"] = "Webserv";
 	// _env["SERVER_NAME"] = "127.0.0.1";
@@ -49,7 +48,7 @@ void	CGI::createEnv(Route* route, std::string path)
 	_env["QUERY_STRING"] = _client->getQuery();
 	// _env["REMOTE_ADDR"] = _req.getHost();
 	// _env["AUTH_TYPE"] = "Basic";
-	// _env["CONTENT_TYPE"] = _req.getContentType();
+	_env["CONTENT_TYPE"] = _client->getContentType();
 	// _env["CONTENT_LENGTH"] = _req.getContentLength();
 	//_env["HTTP_COOKIE"] = ;
 
@@ -75,12 +74,13 @@ char ** CGI::stringToChar(void)
 
 void	CGI::body(int id)
 {
-	char buff[READSIZE];
-	for (int i = 0; i < READSIZE; i++)
+	int status;
+	char buff[READSIZE + 1];
+	// static int st = 0;
+	for (int i = 0; i <= READSIZE; i++)
 		buff[i] = 0;
 	int rd = read(_end, buff, READSIZE);
-	
-	std::cout << "body\n";
+
 	if (rd < 0)
 		Print::print(CRASH, "Cgi has crashed so we did it too");
 	else if (rd < READSIZE)
@@ -89,36 +89,37 @@ void	CGI::body(int id)
 		if (_answer.find("Content-length") == std::string::npos)
 		{
 			size_t find = _answer.find("\r\n\r\n");
-			size_t i = _answer.substr(find + 4).length();
+			size_t i = _answer.length();
+			if (find != std::string::npos)
+				i = _answer.substr(find + 4).length();
 			if (find == std::string::npos)
-				i = _answer.length();
-			_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n\r\n");
+			else
+				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
 		}
 		close(_end);
-		_client->addBuffer(_answer);
+		waitpid(_pid, &status, 0);
+		std::cout << WIFEXITED(status) << " | " << WEXITSTATUS(status) << "\n";
+		if (!WIFEXITED(status) || WEXITSTATUS(status))
+			_client->error("500", "Internal Server Error");
+		else
+			_client->addBuffer(_answer);
 		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
 		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
 		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
+	
 	}
 	else
+	{
+		// if (st == 0)
+		// 	std::cout << buff << "\n";
 		_answer.append(buff);
-	// int sum = read(_end, buff, READSIZE);
-	// 	std::cout << buff << "\n";
-	// while (sum != 0)
-	// {
-	// 	_answer.append(buff);
-	// 	break ;
-	// }
-	// if (_answer.find("Content-length") == std::string::npos)
-	// {
-	// 	size_t i = (_answer.substr(_answer.find("\r\n\r\n") + 4)).size();
-	// 	_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
-	// }
+		// st++;
+	}
 }
 
 void	CGI::exec(char **script)
 {
-	pid_t pid;
 	char **cenv = stringToChar();
 	int end[2];
 	
@@ -129,8 +130,8 @@ void	CGI::exec(char **script)
 	}
 	_end = end[0];
 	_client->_settingsPtr->getFds()->push_back((pollfd){_end, POLLIN, 0});
-	pid = fork();
-	if (pid < 0)
+	_pid = fork();
+	if (_pid < 0)
 	{
 		std::cout << "fork error\n";
 		close(end[0]);
@@ -138,13 +139,14 @@ void	CGI::exec(char **script)
 		_client->_settingsPtr->getFds()->pop_back();
 		return ;
 	}
-	else if (!pid)
+	else if (!_pid)
 	{
 		dup2(end[1], STDOUT_FILENO);
 		// // dup2(_end[0], STDIN_FILENO);
 		close(end[0]);
 		close(end[1]);
-		execve(script[0], script, cenv);
+		if (execve(script[0], script, cenv) == -1)
+			Print::print(ERROR, "Execve failed");
 	}
 	else
 	{
@@ -155,7 +157,6 @@ void	CGI::exec(char **script)
 void	CGI::handler(Route* route, std::string path)
 {
 	std::string s = route->getCgiPath();
-	std::cout << s << "\n";
 	char *script[3];
 
 	_answer.clear();
