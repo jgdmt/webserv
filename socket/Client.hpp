@@ -16,7 +16,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <exception>
-#include "parsing/Server.hpp"
+#include "../parsing/Server.hpp"
 #include "../Print.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
