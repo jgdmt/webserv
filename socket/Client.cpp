@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 17:13:20 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:21:48 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ Client &Client::operator=(Client const &client)
 	this->_serverPtr = client._serverPtr;
 	this->_last_com = client._last_com;
 	this->_settingsPtr = client._settingsPtr;
+	this->Response::_buffer = client.Response::_buffer;
+	this->_cgiStatus = client._cgiStatus;
 	return *this;
 }
 

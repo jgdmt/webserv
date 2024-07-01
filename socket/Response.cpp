@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/01 16:28:33 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:24:37 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,10 @@ Response::Response(Response const &res)
     *this = res;
 }
 
-Response &Response::operator=(Response const &res)
+void Response::addBuffer(std::string& body)
 {
-    this->_buffer = res._buffer;
-    // this->_cgiEnv = res._cgiEnv;
-	this->_cgiStatus = res._cgiStatus;
-    return *this;
+	_buffer.append(body);
+	std::cout << _buffer << "\n";
 }
 
 void Response::addBuffer(std::string& body)
