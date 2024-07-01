@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 12:01:42 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/01 14:29:45 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ void Settings::checkTimeout(void)
 	{
 		if((time(NULL) - _clients[i].getLastCom()) > TIMEOUT)
 		{
-			Print::print(DEBUG, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), _clients[i].getServer());
+			Print::print(DEBUG, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), *_clients[i]._serverPtr);
 			closeClient(i);
 			i--;
 		}
@@ -170,7 +170,7 @@ void Settings::closeClient(unsigned int i)
 			_clients[j].setId(j - 1);
 	close(_clients[i].getFd());
 	_fds.erase(_fds.begin() + _servers.size() + i);
-	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", _clients[i].getServer());
+	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", *_clients[i]._serverPtr);
 	_clients.erase(_clients.begin() + i);
 }
 
@@ -179,7 +179,7 @@ void Settings::addClient(unsigned int i, Server &serv)
 	(void)i;
 	try
 	{
-		Client test(serv,  _clients.size(), this);
+		Client test(&serv,  _clients.size(), this);
 		_clients.push_back(test);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
