@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 16:03:16 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 16:32:27 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Settings
     private:
         void checkTimeout(void);
 		void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);
-        void addClient(unsigned int i, Server &serv);
+        void addClient(Server &serv);
         std::vector<pollfd> _fds;
         std::vector<Server> _servers;
         std::vector<Client> _clients;
