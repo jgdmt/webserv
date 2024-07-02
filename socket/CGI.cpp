@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/01 19:47:45 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 12:07:36 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,17 @@ void	CGI::body(int id)
 	int rd = read(_end, buff, READSIZE);
 
 	if (rd < 0)
-		Print::print(CRASH, "Cgi has crashed so we did it too");
+	{
+		Print::print(ERROR, "CGI: pipe read failed");
+		_client->error("500", "Internal Server Error");
+		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
+		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
+		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
+	}
 	else if (rd < READSIZE)
 	{
 		_answer.append(buff);
+		std::cout << _answer << "\n";
 		if (_answer.find("Content-length") == std::string::npos)
 		{
 			size_t find = _answer.find("\r\n\r\n");
@@ -93,7 +100,10 @@ void	CGI::body(int id)
 			if (find != std::string::npos)
 				i = _answer.substr(find + 4).length();
 			if (find == std::string::npos)
+			{
+				std::cout << "HELLO\n";
 				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n\r\n");
+			}
 			else
 				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
 		}
