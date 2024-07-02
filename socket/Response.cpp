@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/01 18:28:26 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:22:09 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,12 +182,18 @@ void Response::check_path(std::string path, Route *route)
 {
     struct stat path_stat;
 
-    stat(path.c_str(), &path_stat);
+    std::cout << "Path: " << path << std::endl;
+    if(stat(path.c_str(), &path_stat) == -1)
+    {
+        error("500", "Internal Server Error");
+        return ;
+    }
     if (!S_ISDIR(path_stat.st_mode))
        genRes(path, route);
     else
     {
-        if (path[path.size() - 1] != '/')
+
+        if (path[path.size() - 1] != '/' && _client->getUri().size() != 1)
         {
             genHeader("301 Moved Permanently");
             _buffer.append("Location: " + _client->getUri() + "/\r\n\r\n");
@@ -240,7 +246,7 @@ void Response::check_path(std::string path, Route *route)
                 path.append("/");
             genRes(path + bestMatchValue, route);
         }
-        else if ((route && route->IsListing()))
+        else if ( route->IsListing())
         {
             genHeader("200 OK");
             genDirListing(path);
@@ -269,8 +275,21 @@ void Response::init(void)
             break;
         }
     }
+    if (route == NULL)
+    {
+        for (unsigned int i = 0; i < _client->_serverPtr->getRoutesNumber(); i++)
+        {
+            if (_client->_serverPtr->getRoute(i)->getRedirection() == "/")
+            {
+                route = _client->_serverPtr->getRoute(i);
+                pos = 0;
+                break;
+            }
+        }
+    }
     while (route != NULL)
     {
+        int oldPos = pos;
         pos = next;
         next = _client->getUri().find('/', pos + 1);
         if (next == std::string::npos)
@@ -288,21 +307,29 @@ void Response::init(void)
             i++;
         }
         if (i == nbRoute)
+        {
+            pos = oldPos;
             break;
+        }
     }
     std::string path;
     if (route != NULL)
     {
-        if (route && !route->isAutorizedMethod(_client->getMethod()))
+        if (!route->isAutorizedMethod(_client->getMethod()))
         {
             error("405", "Method Not Allowed");
             return;
         }
-        if (route->getPath()[route->getPath().size() - 1] == '/')
+        std::cout << "Route: " << route->getRedirection() << std::endl;
+        if (route->getPath()[route->getPath().size() - 1] == '/') //&& !(_client->getUri() == "/")
             route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
         path = route->getPath();
         if (pos < _client->getUri().size())
             path.append(_client->getUri().substr(pos, _client->getUri().size() - pos));
         check_path(path, route);
+    }
+    else
+    {
+       error("404", "Not Found");
     }
 }
