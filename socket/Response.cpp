@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/02 17:51:08 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:53:18 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Response::Response()
 {
 	_cgiStatus = false;
 }
-void Response::setClient(Client* cli)
+void Response::setClient(std::vector<Client>::iterator cli)
 {
     _client = cli;
 }

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:49:42 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/02 16:11:09 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ static int getParam(std::string const &param)
     for(int i = 0; params[i] != "end"; i++)
         if (params[i] == param)
             return (i);
-    if (param.size() == 0)
+    if (param.length() == 0)
         return (-1);
     else
         return (OTHER);
@@ -112,7 +112,7 @@ void Request::setAccept(std::string const& line)
 	{
 		j = line.find(",", i);
 		if (j == std::string::npos)
-			j = line.size() - 1;
+			j = line.length() - 1;
 		k = line.find(";q=", i);
 		if (k < j)
 		{
@@ -124,7 +124,7 @@ void Request::setAccept(std::string const& line)
 			_accept.push_back(line.substr(i, j - i));
 			sort.push_back(1);
 		}
-		if (j == line.size() - 1)
+		if (j == line.length() - 1)
 			break ;
 		i = j + 1;
 	}
@@ -152,7 +152,7 @@ void Request::acceptEncoding(std::string const& line)
 		j = line.find(", ", i);
 		if (j == std::string::npos)
 		{
-			j = line.size() - 1;
+			j = line.length() - 1;
 			_acceptEncoding.push_back(line.substr(i, j - i));
 			break;
 		}
@@ -234,16 +234,16 @@ int Request::parseBody(void)
         _state = END;
         return 0;
     }
-    if (tmp.size() + _body.size() >= _contentLength)
+    if (tmp.length() + _body.length() >= _contentLength)
     {
-        _body.append(tmp.substr(0, _contentLength - _body.size()));
+        _body.append(tmp.substr(0, _contentLength - _body.length()));
         _state = END;
         return (0);
     }
     else
     {
         _body.append(tmp);
-        _it += tmp.size(); 
+        _it += tmp.length(); 
     }
     return (1);
 }
@@ -317,7 +317,7 @@ int Request::IsParsingOk(void)
         return -1;
     else if (_state != END)
         return 0;
-    else if (!_method.size() || !_uri.size() || !_host.size())
+    else if (!_method.length() || !_uri.length() || !_host.length())
         return -1;
     else if ( _contentLength == 0 && (_method == "POST"))
         return -2;

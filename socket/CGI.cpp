@@ -6,14 +6,14 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/02 14:52:20 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:53:34 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "../parsing/Settings.hpp"
 
-CGI::CGI(Client* cli) : _client(cli)
+CGI::CGI(std::vector<Client>::iterator cli) : _client(cli)
 {
 
 }

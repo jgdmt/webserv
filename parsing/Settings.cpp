@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 17:13:57 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:10:52 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void Settings::run(void)
 				exit(1);
 			}
 			else if(_fds[i].revents & POLLIN && _servers.size() > i)
-				addClient(i, _servers[i]);
+				addClient(_servers[i]);
 			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
 				_clients[i - _servers.size()].readRequest();
 			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
@@ -179,13 +179,13 @@ void Settings::closeClient(unsigned int i)
 	_clients.erase(_clients.begin() + i);
 }
 
-void Settings::addClient(unsigned int i, Server &serv)
+void Settings::addClient(Server &serv)
 {
-	(void)i;
 	try
 	{
 		Client test(&serv,  _clients.size(), this);
 		_clients.push_back(test);
+		_clients.back().setClient(_clients.end() - 1);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
 	}

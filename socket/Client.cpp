@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 17:21:48 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:11:20 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 Client::Client(Server *serv, int id, Settings* settings): _settingsPtr(settings), _serverPtr(serv), _id(id)
 {
-	setClient(this);
     socklen_t addr_len = sizeof(_addr);
    _fd = accept(serv->getFdListen(), (sockaddr *)&_addr ,&addr_len);
 	if (_fd == -1)
@@ -35,11 +34,7 @@ Client::Client(Server *serv, int id, Settings* settings): _settingsPtr(settings)
 
 
 Client::~Client(void)
-{
-// close(_fd);
-// char buffer[INET_ADDRSTRLEN];
-// Print::print(INFO, "Connection closed on socket " + to_string(_fd) + " From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), _serv);
-}
+{}
 
 
 Client::Client(Client const &client): _serverPtr(client._serverPtr), _id(client._id)
@@ -49,13 +44,12 @@ Client::Client(Client const &client): _serverPtr(client._serverPtr), _id(client.
 
 Client &Client::operator=(Client const &client)
 {
-	setClient(this);
 	this->_addr = client._addr;
 	this->_id = client._id;
+	this->_settingsPtr = client._settingsPtr;
 	this->_fd = client._fd;
 	this->_serverPtr = client._serverPtr;
 	this->_last_com = client._last_com;
-	this->_settingsPtr = client._settingsPtr;
 	this->Response::_buffer = client.Response::_buffer;
 	this->_cgiStatus = client._cgiStatus;
 	return *this;
@@ -128,13 +122,13 @@ void    Client::sendResponse(void)
 	// Print::print(INFO, "ready", _serv);
 	int result;
 // // std::cout<< *(res.getRes()) << "\n";
-	if(Response::_buffer.size() >= WRITESIZE)
+	if(Response::_buffer.length() >= WRITESIZE)
 		result = send(_fd, Response::_buffer.c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
-		result = send(_fd, Response::_buffer.c_str(), Response::_buffer.size(), MSG_DONTWAIT);
+		result = send(_fd, Response::_buffer.c_str(), Response::_buffer.length(), MSG_DONTWAIT);
 	if(result < 0)
 			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
-	else if(result == 0 || (unsigned int)result == Response::_buffer.size())
+	else if(result == 0 || (unsigned int)result == Response::_buffer.length())
 	{
 			Print::print(DEBUG, "Response sent to Client " + to_string<int>(_id) + ".", *_serverPtr);
 			Request::clear();

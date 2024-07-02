@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 17:23:17 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:06:19 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,12 @@ class Response
         void error(std::string httpErrorCode, std::string httpErrorMessage);
         void cut(int pos);
 		void addBuffer(std::string& body);
+        void setClient(std::vector<Client>::iterator cli);
     protected:
         std::string _buffer;
 		bool _cgiStatus;
-        void setClient(Client* cli);
     private:
-        Client *_client;
+        std::vector<Client>::iterator _client;
         bool checkCGI(std::string path, Route *route);
         void genHeader(std::string type);
         void genBody(std::string path);
