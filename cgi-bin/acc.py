@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+
 from http import cookies
 import os
 import cgi
@@ -29,7 +29,7 @@ class UserDataBase:
 
 
 def printAccPage(session):
-    print("Content-type: text/html\r\n")
+    print("Content-type: text/html\r\n\r\n")
     print("<html>")
     print("<head>")
     print("<title>Account Page</title>")
@@ -42,7 +42,7 @@ def printAccPage(session):
     print("</html>")
 
 def printUserMsg(msg):
-    print("Content-type: text/html\r\n")
+    print("Content-type: text/html\r\n\r\n")
     print("<html>")
     print("<head>")
     print("<title>USER MSG</title>")
@@ -54,11 +54,10 @@ def printUserMsg(msg):
     print("</html>")
 
 def printLogin():
-    print("Content-Type: text/html\r\n")
+    print("Content-Type: text/html\r\n\r\n")
     print("<html> ")
     print("<head>")
     print("<meta charset=\"UTF-8\" name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-    print("<link rel=\"stylesheet\" href=\"/assets/css/accstyle.css\">")
     print("<title> Login Page </title>")
     print("</head>")
     print("<body>  ")

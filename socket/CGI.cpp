@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/02 12:07:36 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/02 14:52:20 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	CGI::createEnv(Route* route, std::string path)
 	// _env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	// _env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	// _env["SERVER_PORT"] = to_string(_serv.getPort());
-	// _env["REQUEST_METHOD"] = _req.getMethod();
+	_env["REQUEST_METHOD"] = _client->getMethod();
 	// _env["PATH_INFO"] = _path;
 	// _env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
 	// _env["SCRIPT_NAME"] = _path.substr(_path.find(_route.getPath()) + _route.getPath().size() + 1);

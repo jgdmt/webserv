@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/02 15:22:09 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:51:08 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,14 +282,14 @@ void Response::init(void)
             if (_client->_serverPtr->getRoute(i)->getRedirection() == "/")
             {
                 route = _client->_serverPtr->getRoute(i);
-                pos = 0;
+				next = route->getRedirection().length();
                 break;
             }
         }
     }
     while (route != NULL)
     {
-        int oldPos = pos;
+        // int oldPos = pos;
         pos = next;
         next = _client->getUri().find('/', pos + 1);
         if (next == std::string::npos)
@@ -308,7 +308,7 @@ void Response::init(void)
         }
         if (i == nbRoute)
         {
-            pos = oldPos;
+            // pos = oldPos;
             break;
         }
     }
@@ -321,7 +321,8 @@ void Response::init(void)
             return;
         }
         std::cout << "Route: " << route->getRedirection() << std::endl;
-        if (route->getPath()[route->getPath().size() - 1] == '/') //&& !(_client->getUri() == "/")
+		std::cout << "Route_path: " << route->getPath() << "\n";
+        if (route->getPath()[route->getPath().size() - 1] == '/' && _client->getUri()[0] == '/')
             route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
         path = route->getPath();
         if (pos < _client->getUri().size())
