@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/02 15:22:09 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:52:21 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Response::Response()
 {
 	_cgiStatus = false;
 }
-void Response::setClient(Client* cli)
+void Response::setClient(std::vector<Client>::iterator cli)
 {
     _client = cli;
 }
