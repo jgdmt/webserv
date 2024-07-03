@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/02 17:53:18 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 10:52:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,15 @@ Response::Response()
 {
 	_cgiStatus = false;
 }
+
 void Response::setClient(std::vector<Client>::iterator cli)
 {
     _client = cli;
+}
+
+std::vector<Client>::iterator Response::getClient(void) const
+{
+    return _client;
 }
 
 Response::~Response()

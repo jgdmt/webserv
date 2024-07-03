@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/02 17:06:19 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 10:51:59 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ class Response
 		void addBuffer(std::string& body);
         void setClient(std::vector<Client>::iterator cli);
     protected:
+        std::vector<Client>::iterator getClient(void) const;
         std::string _buffer;
 		bool _cgiStatus;
     private:

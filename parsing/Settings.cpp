@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/02 17:10:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 10:55:39 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,10 @@ void Settings::checkTimeout(void)
 void Settings::closeClient(unsigned int i)
 {
 	for(unsigned int j = i + 1; j < _clients.size(); j++)
+	{
 			_clients[j].setId(j - 1);
+			_clients[j].setClient(_clients.begin() + j);
+	}
 	close(_clients[i].getFd());
 	_fds.erase(_fds.begin() + _servers.size() + i);
 	Print::print(INFO, "Connection closed on socket " + to_string(_clients[i].getFd()) + ".", *_clients[i]._serverPtr);
@@ -185,6 +188,8 @@ void Settings::addClient(Server &serv)
 	{
 		Client test(&serv,  _clients.size(), this);
 		_clients.push_back(test);
+		for(std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
+			i->setClient(i);
 		_clients.back().setClient(_clients.end() - 1);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
