@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 16:34:28 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 17:57:52 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,10 +95,8 @@ void    Client::setId(int id)
 void    Client::readRequest(void)
 {
 	char buffer[READSIZE + 1];
-	buffer[READSIZE] = 0;
 	int i = _id + _settingsPtr->getServers()->size();
-	// bzero(buffer, READSIZE); // delete later
-	std::cout << buffer << '\n';
+	bzero(buffer, READSIZE + 1);
     switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
 	{
 	case 0:
@@ -108,20 +106,9 @@ void    Client::readRequest(void)
 		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + strerror(errno));
 		_settingsPtr->closeClient(_id);
 		return ;
-	case READSIZE:
-		_last_com = time(NULL);
-		std::cout << "A\n";
-		add(buffer);
-		std::cout << "B\n";
-		break;
 	default:
 		_last_com = time(NULL);
 		add(buffer);
-		if(IsParsingOk() == 0)
-		{
-			error("500", "Internal Server Error");
-			_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
-		}
 		break;
 	}
 	switch(IsParsingOk())
@@ -138,7 +125,7 @@ void    Client::readRequest(void)
 		case 0:
 			break;
 		case 1:
-			std::cout << "C\n";
+			// std::cout << "C\n";
 			init();
 			if (!_cgiStatus)
 				_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
