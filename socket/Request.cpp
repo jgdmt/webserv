@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/02 16:11:09 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:34:51 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Request::Request()
     _state = METHOD;
     _error = 0;
     _contentLength = 0;
+	bzero(&_headerStatus, sizeof(t_headerStatus));
 }
 
 Request::~Request()
@@ -177,19 +178,32 @@ int Request::parseHeader(void)
     _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
     while(t != EMPTY)
     {
+		std::cout << "Inside\n";
         switch (t)
         {
             case HOST:
                 _host = std::string(line.begin() + line.find(": ") + 2, line.end());
-                break;
+				if (_headerStatus.host == true)
+					_error = 1;
+                _headerStatus.host = true;
+				break;
             case CONNECTION:
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
-                break;
+                if (_headerStatus.connection == true)
+					_error = 1;
+				_headerStatus.connection = true;
+				break;
             case ACCEPT:
                 setAccept(line);
+				if (_headerStatus.accept == true)
+					_error = 1;
+				_headerStatus.accept = true;
                 break;
             case ACCEPT_ENCODING:
 				acceptEncoding(line);
+				if (_headerStatus.accept_encoding == true)
+					_error = 1;
+				_headerStatus.accept_encoding = true;
                 break;
             case CONTENT_TYPE:
                 if (line.find("; boundary=") != std::string::npos)
@@ -199,10 +213,16 @@ int Request::parseHeader(void)
                 }
                 else
                     _contentType = std::string(line.begin() + line.find(": ") + 2, line.end());
-                break; // add
+				if (_headerStatus.content_type == true)
+					_error = 1;
+                _headerStatus.content_type = true;
+				break; // add
             case CONTENT_LENGTH:
                 _contentLength = convertType<unsigned int>(std::string(line.begin() + line.find(": ") + 2, line.end()));
-            default:
+				if (_headerStatus.content_length == true)
+					_error = 1;
+				_headerStatus.content_length = true;
+			default:
                 break;
         }
         if (_buffer.find("\r\n", _it - _buffer.begin()) == (size_t)(_it - _buffer.begin()))
@@ -221,6 +241,7 @@ int Request::parseHeader(void)
         t = getParam(line.substr(0, line.find(": ")));
         _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
     }
+	std::cout << "end of while\n";
     _state = BODY;
     return (0);
 }
@@ -254,7 +275,7 @@ void Request::clear(void)
     _state = METHOD;
     _method.clear();
     _uri.clear();
-	 _query.clear();
+	_query.clear();
     _host.clear();
     _connection.clear();
     _contentType.clear();
@@ -307,7 +328,6 @@ void Request::add(std::string const &new_buff)
         case END:
             break;
     }
-    //else body
 }
 
 

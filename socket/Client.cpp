@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 10:45:13 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:34:28 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,23 @@ Client &Client::operator=(Client const &client)
 	this->_last_com = client._last_com;
 	this->Response::_buffer = client.Response::_buffer;
 	this->_cgiStatus = client._cgiStatus;
+	// request var
+	this->_it = client._it;
+    this->Request::_buffer = client.Request::_buffer;
+    this->_method = client._method;
+    this->_uri = client._uri;
+	this->_query = client._query;
+    this->_host = client._host;
+    this->_connection = client._connection;
+    this->_contentType = client._contentType;
+    this->_contentBoundary = client._contentBoundary;
+    this->_body = client._body;
+	this->_contentLength = client._contentLength;
+	this->_accept = client._accept;
+	this->_acceptEncoding = client._acceptEncoding;
+	this->_state = client._state;
+	this->_error = client._error;
+	this->_headerStatus = client._headerStatus;
 	return *this;
 }
 
@@ -77,10 +94,11 @@ void    Client::setId(int id)
 
 void    Client::readRequest(void)
 {
-	char buffer[READSIZE];
+	char buffer[READSIZE + 1];
+	buffer[READSIZE] = 0;
 	int i = _id + _settingsPtr->getServers()->size();
 	// bzero(buffer, READSIZE); // delete later
-	
+	std::cout << buffer << '\n';
     switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
 	{
 	case 0:
@@ -90,9 +108,20 @@ void    Client::readRequest(void)
 		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + strerror(errno));
 		_settingsPtr->closeClient(_id);
 		return ;
+	case READSIZE:
+		_last_com = time(NULL);
+		std::cout << "A\n";
+		add(buffer);
+		std::cout << "B\n";
+		break;
 	default:
 		_last_com = time(NULL);
 		add(buffer);
+		if(IsParsingOk() == 0)
+		{
+			error("500", "Internal Server Error");
+			_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+		}
 		break;
 	}
 	switch(IsParsingOk())
@@ -109,6 +138,7 @@ void    Client::readRequest(void)
 		case 0:
 			break;
 		case 1:
+			std::cout << "C\n";
 			init();
 			if (!_cgiStatus)
 				_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};

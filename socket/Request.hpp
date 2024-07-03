@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 15:49:06 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:32:32 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,16 @@ enum Paramater
     OTHER,
 };
 
+typedef struct s_headerStatus
+{
+	bool host;
+	bool connection;
+	bool accept;
+	bool accept_encoding;
+	bool content_type;
+	bool content_length;
+} t_headerStatus ;
+
 class Client;
 
 class Request
@@ -63,7 +73,8 @@ class Request
 		size_t getAcceptEncodingSize(void);
 
         int IsParsingOk(void);
-    private:
+
+	protected:
         std::string::iterator _it;
         std::string _buffer;
         std::string _method;
@@ -79,8 +90,9 @@ class Request
 		std::vector<std::string> _acceptEncoding;
         enum State _state;
         bool _error;
-      
-	  
+		t_headerStatus _headerStatus;
+
+    private:
        int parseHeader(void);
        int parseBody(void);
        void setAccept(std::string const& line);
