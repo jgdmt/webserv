@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/02 16:26:13 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 12:36:07 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,8 @@ void Route::path(std::string const& content, std::string::iterator& start)
 	if (len == -2)
 		Print::print(CRASH, "Parsing location " + _redirection + ": root does not take multiple values");
 	path = content.substr(start - content.begin(), len);
+	if (path[path.length() - 1] == '/')
+		path.pop_back();
 	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
 		Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " is not a directory");
 	this->_path = path;
@@ -304,16 +306,6 @@ void Route::upload(std::string const& content, std::string::iterator& start)
 		Print::print(CRASH, "Parsing location (upload) " + _redirection + ": " + path + " is not a directory");
 	this->_uploadDirectory = path;
 	start += len;
-
-	// 	struct stat	path_stat;
-	// std::string path;
-
-	// path = content.substr(start - content.begin(), len);
-	// stat(path.c_str(), &path_stat);
-	// if (!S_ISDIR(path_stat.st_mode))
-	// 	Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " is not a directory");
-	// this->_path = path;
-	// start += len;
 }
 
 void Route::check_name(void)
@@ -322,6 +314,8 @@ void Route::check_name(void)
 		Print::print(CRASH, "Parsing location " + _redirection + ": location can not have '\\' in the name");
 	if (_redirection.find('/') != _redirection.rfind('/'))
 		Print::print(CRASH, "Parsing location " + _redirection + ": location does not take multiple '/'");
+	if (_redirection[0] != '/')
+		Print::print(ERROR, "Warning: unreachable location: " + _redirection);
 }
 
 void Route::check_duplicates(void)
@@ -340,7 +334,6 @@ void Route::check_defaultfile(void)
 	if (def[def.size() - 1] != '/')
 		def.append("/");
 	def.append(_defaultFileForDirectory);
-	std::cout << def << "\n";
 	if (access(def.c_str(), F_OK | R_OK))
 	{
 		Print::print(ERROR, "Parsing location " + _redirection + ": " + def + " does not exist or is not executable");
@@ -407,6 +400,4 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 	if (_defaultFileForDirectory.size() > 0)
 		check_defaultfile();
 	check_duplicates();
-	for (size_t i = 0; i < _routes.size(); i++)
-		std::cout << "route " << _redirection << " (" << i << ") : " << _routes[i]._redirection << "\n";
 }

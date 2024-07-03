@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/03 10:52:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 14:30:52 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,15 +267,17 @@ void Response::check_path(std::string path, Route *route)
 
 void Response::init(void)
 {
+	std::cout << "Uri " << _client->getUri() << "\n";
     size_t pos = 0;
     Route *route = NULL;
     size_t next = _client->getUri().find('/', pos + 1);
     if (next == std::string::npos)
-        next = _client->getUri().size();
-    std::string chunkUri = _client->getUri().substr(pos, next - pos);
+        next = _client->getUri().length();
+	std::string chunkUri = _client->getUri().substr(pos, next - pos);
+	std::cout << "First chunk uri (pos, next) " << chunkUri << " (" << pos << ", " << next << ")\n";
     for (unsigned int i = 0; i < _client->_serverPtr->getRoutesNumber(); i++)
     {
-        if (_client->_serverPtr->getRoute(i)->getRedirection() == chunkUri)
+        if (_client->_serverPtr->getRoute(i)->getRedirection() == chunkUri && chunkUri != "/")
         {
             route = _client->_serverPtr->getRoute(i);
             break;
@@ -287,8 +289,9 @@ void Response::init(void)
         {
             if (_client->_serverPtr->getRoute(i)->getRedirection() == "/")
             {
+				std::cout << "/ route\n";
                 route = _client->_serverPtr->getRoute(i);
-				next = route->getRedirection().length();
+				next = 0;
                 break;
             }
         }
@@ -299,8 +302,9 @@ void Response::init(void)
         pos = next;
         next = _client->getUri().find('/', pos + 1);
         if (next == std::string::npos)
-            next = _client->getUri().size();
+            next = _client->getUri().length();
         chunkUri = _client->getUri().substr(pos, next - pos);
+		std::cout << "Next chunk uri (pos, next) " << chunkUri << " (" << pos << ", " << next << ")\n";
         unsigned int nbRoute = route->getRoutesNumber();
         unsigned int i = 0;
         while (i < nbRoute)
@@ -328,8 +332,8 @@ void Response::init(void)
         }
         std::cout << "Route: " << route->getRedirection() << std::endl;
 		std::cout << "Route_path: " << route->getPath() << "\n";
-        if (route->getPath()[route->getPath().size() - 1] == '/' && _client->getUri()[0] == '/')
-            route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
+        // if (route->getPath()[route->getPath().size() - 1] == '/' && _client->getUri()[0] == '/')
+        //     route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
         path = route->getPath();
         if (pos < _client->getUri().size())
             path.append(_client->getUri().substr(pos, _client->getUri().size() - pos));
