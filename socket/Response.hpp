@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 10:51:59 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/03 14:34:15 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@
 #include "Request.hpp"
 #include "../parsing/Server.hpp"
 #include "CGI.hpp"
-
-#define WRITESIZE 50000
 
 #define MIME_TYPE(extension) \
     (std::string(extension) == "html" ? "text/html" : \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 17:12:59 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 11:18:21 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 #include "Response.hpp"
 #include "CGI.hpp"
 
-#define READSIZE 50000
+#define READSIZE 500000
+#define WRITESIZE 50000
 
 class Settings;
 

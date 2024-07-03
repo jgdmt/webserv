@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 16:34:51 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:55:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -285,6 +285,7 @@ void Request::clear(void)
     _error = 0;
     _accept.clear();
 	_acceptEncoding.clear();
+    bzero(&_headerStatus, sizeof(t_headerStatus));
 }
 
 void Request::add(std::string const &new_buff)
