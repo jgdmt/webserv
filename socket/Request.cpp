@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 18:10:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 10:59:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,16 +166,16 @@ int Request::parseHeader(void)
 {
     std::string line;
 
-    if (_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
+    if (_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
         return (1);
-    line = std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()));
+    line = std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()));
     if (line.find(": ") == std::string::npos)
     {
          _error = 1;
         return (1);
     }
     int t = getParam(line.substr(0, line.find(':')));
-    _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
+    _it =  _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
     std::cout << "Raw: \"" << _buffer << "\"\n";
     while(t != EMPTY)
     {
@@ -238,16 +238,16 @@ int Request::parseHeader(void)
             _it += 2;
             break ;
         }
-        if (_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
+        if (_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
             return (1);
-        line = std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()));
+        line = std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()));
         if (line.find(": ") == std::string::npos)
         {
             _error = 1;
             return (1);
         }
         t = getParam(line.substr(0, line.find(": ")));
-        _it =  _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
+        _it =  _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
     }
 	std::cout << "end of while\n";
     _state = BODY;
@@ -322,11 +322,11 @@ void Request::add(std::string const &new_buff)
 			_it = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()) + 1;
             _state = PROTOCOL;
         case PROTOCOL:
-            if(_buffer.find('\n', _it - _buffer.begin()) == std::string::npos)
+            if(_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
                 break;
-            if ("HTTP/1.1" != std::string(_it, _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) - 1))
+            if ("HTTP/1.1" != std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin())))
                 _error = true;
-            _it = _buffer.begin() + _buffer.find('\n', _it - _buffer.begin()) + 1;
+            _it = _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
             _state = HEADER;
         case HEADER:
             if (parseHeader())
