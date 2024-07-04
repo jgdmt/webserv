@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:31:12 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 13:34:21 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Server::Server(int id) : _id(id)
     _error_pages["405"] = "default/http_error/405.html";
     _error_pages["406"] = "default/http_error/406.html";
     _error_pages["410"] = "default/http_error/410.html";
+	_error_pages["411"] = "default/http_error/411.html";
     _error_pages["413"] = "default/http_error/413.html";
     _error_pages["500"] = "default/http_error/500.html";
 
