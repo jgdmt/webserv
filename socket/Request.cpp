@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 10:59:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 13:42:34 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,14 +186,12 @@ int Request::parseHeader(void)
 				if (_headerStatus.host == true)
 					_error = 1;
                 _headerStatus.host = true;
-                std::cout << "ERROR H " << _error << "\n";
 				break;
             case CONNECTION:
                 _connection = std::string(line.begin() + line.find(": ") + 2, line.end());
                 if (_headerStatus.connection == true)
 					_error = 1;
 				_headerStatus.connection = true;
-                std::cout << "ERROR CON " << _error << "\n";
 
 				break;
             case ACCEPT:
@@ -201,14 +199,12 @@ int Request::parseHeader(void)
 				if (_headerStatus.accept == true)
 					_error = 1;
 				_headerStatus.accept = true;
-                std::cout << "ERROR  ACC " << _error << "\n";
                 break;
             case ACCEPT_ENCODING:
 				acceptEncoding(line);
 				if (_headerStatus.accept_encoding == true)
 					_error = 1;
 				_headerStatus.accept_encoding = true;
-                std::cout << "ERROR  AE " << _error << "\n";
                 break;
             case CONTENT_TYPE:
                 if (line.find("; boundary=") != std::string::npos)
@@ -221,16 +217,13 @@ int Request::parseHeader(void)
 				if (_headerStatus.content_type == true)
 					_error = 1;
                 _headerStatus.content_type = true;
-                std::cout << "ERROR  CT" << _error << "\n";
 				break; // add
             case CONTENT_LENGTH:
                 _contentLength = convertType<unsigned int>(std::string(line.begin() + line.find(": ") + 2, line.end()));
 				if (_headerStatus.content_length == true)
 					_error = 1;
 				_headerStatus.content_length = true;
-                std::cout << "ERROR CL " << _error << "\n";
 			default:
-                std::cout << "ATTENTION DEFAULT\n";
                 break;
         }
         if (_buffer.find("\r\n", _it - _buffer.begin()) == (size_t)(_it - _buffer.begin()))
@@ -344,18 +337,15 @@ int Request::IsParsingOk(void)
 {
     if (_error)
     {
-        std::cout << "b\n";
         return -1;
     }
     else if (_state != END)
         return 0;
     else if (!_method.length() || !_uri.length() || !_host.length())
     {
-        std::cout << "a\n";
-    std::cout << _method << " | " << _uri << " | " << _host << "\n";
         return -1;
     }
-    else if ( _contentLength == 0 && (_method == "POST"))
+    else if ( _contentLength == 0 && (_method == "POST") && _body.length() != 0)
         return -2;
 return 1;
 }
