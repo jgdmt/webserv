@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 14:42:17 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:02:33 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,18 +164,19 @@ int Request::parseHeader(void)
 {
     std::string line;
 
-    if (_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
+    if (_buffer.find("\r\n", _i) == std::string::npos)
         return (1);
-    line = std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()));
+    line = _buffer.substr(_i, _buffer.find("\r\n", _i) - _i);
     if (line.find(": ") == std::string::npos)
     {
          _error = 1;
         return (1);
     }
     int t = getParam(line.substr(0, line.find(':')));
-    _it =  _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
+    _i = _buffer.find("\r\n", _i) + 2;
     std::cout << "Raw: \"" << _buffer << "\"\n"; 
-	while(t != EMPTY)
+	
+    while(t != EMPTY)
     {
         switch (t)
         {
@@ -224,21 +225,21 @@ int Request::parseHeader(void)
 			default:
                 break;
         }
-        if (_buffer.find("\r\n", _it - _buffer.begin()) == (size_t)(_it - _buffer.begin()))
+        if (_buffer.find("\r\n", _i) == _i)
         {
-            _it += 2;
+            _i += 2;
             break ;
         }
-        if (_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
+        if (_buffer.find("\r\n", _i) == std::string::npos)
             return (1);
-        line = std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()));
+        line = _buffer.substr(_i, _buffer.find("\r\n", _i) - _i);
         if (line.find(": ") == std::string::npos)
         {
             _error = 1;
             return (1);
         }
         t = getParam(line.substr(0, line.find(": ")));
-        _it =  _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
+        _i = _buffer.find("\r\n", _i) + 2;
     }
 	std::cout << "end of while\n";
     _state = BODY;
@@ -247,7 +248,7 @@ int Request::parseHeader(void)
 
 int Request::parseBody(void)
 {
-    std::string tmp(_it, _buffer.end());
+    std::string tmp = _buffer.substr(_i);
 
     if(_contentLength == 0)
     {
@@ -263,7 +264,7 @@ int Request::parseBody(void)
     else
     {
         _body.append(tmp);
-        _it += tmp.length(); 
+        _i += tmp.length(); 
     }
     return (1);
 }
@@ -288,36 +289,37 @@ void Request::clear(void)
 }
 
 void Request::add(std::string const &new_buff)
-{
+{std::string t;
     _buffer.append(new_buff);
     switch (_state)
     {
         case METHOD:
-            _it = _buffer.begin();
+            _i = 0;
             if(_buffer.find(' ') == std::string::npos)
                 break;
-            _method = std::string(_it, _buffer.begin() + _buffer.find(' '));
-            _it = _buffer.begin() + _buffer.find(' ') + 1;
+            _method = _buffer.substr(_i, _buffer.find(' ') - _i);
+            _i = _buffer.find(' ') + 1;
             _state = URI;
         case URI:
-            if(_buffer.find(' ', _it - _buffer.begin()) == std::string::npos)
+            if(_buffer.find(' ', _i) == std::string::npos)
                 break;
-			if (_buffer.find('?', _it - _buffer.begin()) > _buffer.find(' ', _it - _buffer.begin()))
-	            _uri = std::string(_it, _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()));
+			if (_buffer.find('?', _i) > _buffer.find(' ', _i) - _i)
+	            _uri = _buffer.substr(_i, _buffer.find(' ', _i) - _i);
 			else
 			{
-				_uri = std::string(_it, _buffer.begin() + _buffer.find('?', _it - _buffer.begin()));
-				_it = _buffer.begin() + _buffer.find('?', _it - _buffer.begin()) + 1;
-				_query = std::string(_it, _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()));
+				_uri = _buffer.substr(_i, _buffer.find('?', _i) - _i);
+				_i =  _buffer.find('?', _i) + 1;
+				_query = _buffer.substr(_i, _buffer.find(' ', _i) - _i);
 			}
-			_it = _buffer.begin() + _buffer.find(' ', _it - _buffer.begin()) + 1;
+			_i = _buffer.find(' ', _i) + 1;
             _state = PROTOCOL;
         case PROTOCOL:
-            if(_buffer.find("\r\n", _it - _buffer.begin()) == std::string::npos)
+            if(_buffer.find("\r\n", _i) == std::string::npos)
                 break;
-            if ("HTTP/1.1" != std::string(_it, _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin())))
+            t =_buffer.substr(_i, _buffer.find("\r\n", _i) - _i);
+            if ("HTTP/1.1" != _buffer.substr(_i, _buffer.find("\r\n", _i) - _i))
                 _error = true;
-            _it = _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
+            _i = _buffer.find("\r\n", _i) + 2;
             _state = HEADER;
         case HEADER:
             if (parseHeader())
@@ -345,5 +347,7 @@ int Request::IsParsingOk(void)
     }
     else if ( _contentLength == 0 && (_method == "POST") && _body.length() != 0)
         return -2;
+    else if (_headerStatus.accept == false)
+        _accept.push_back("*/*");
 return 1;
 }

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 16:20:53 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/21 14:28:50 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 12:09:12 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void Print::print(std::string const &status, std::string const &str)
         std::cout << "\e[1;32m";
         output_time();
         std::cout << "              " << str << std::endl;
-        std::cout << "\e[97m";
+        std::cout << "\e[0m";
     }
     else if(status == CRASH || status == ERROR)
         error_print(status, str);
@@ -94,7 +94,7 @@ void Print::error_print(std::string const &status, std::string const &str)
     std::cerr << time->tm_min << ':';
     if (time->tm_sec < 10)
         std::cerr << '0';   
-    std::cerr << time->tm_sec << "]     [" << status << "]        " << str << "\e[97m\n";
+    std::cerr << time->tm_sec << "]     [" << status << "]        " << str << "\e[0m\n";
     if(status == CRASH)
         exit(EXIT_FAILURE);
 }

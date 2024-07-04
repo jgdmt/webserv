@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/03 17:29:11 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:49:59 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ Response::Response(Response const &res)
 void Response::addBuffer(std::string& body)
 {
 	_buffer.append(body);
-	std::cout << _buffer << "\n";
+	// std::cout << _buffer << "\n";
 }
 
 void Response::cut(int pos)
@@ -127,7 +127,8 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 {
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
     std::string path = _client->_serverPtr->getErrorPage(httpErrorCode);
-    genBody(path);
+    if(_client->getMethod() != "HEAD")
+        genBody(path);
     Print::print(DEBUG, "Error " + to_string(httpErrorCode) + " sent.", *_client->_serverPtr);
     return;
 }

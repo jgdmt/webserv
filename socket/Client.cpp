@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 17:57:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:16:32 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ Client &Client::operator=(Client const &client)
 	this->Response::_buffer = client.Response::_buffer;
 	this->_cgiStatus = client._cgiStatus;
 	// request var
-	this->_it = client._it;
+	this->_i = client._i;
     this->Request::_buffer = client.Request::_buffer;
     this->_method = client._method;
     this->_uri = client._uri;
