@@ -6,13 +6,11 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 13:42:34 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/04 14:42:17 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
-
-
 
 Request::Request()
 {
@@ -122,7 +120,7 @@ void Request::setAccept(std::string const& line)
 		}
 		else
 		{
-			_accept.push_back(line.substr(i, j - i));
+			_accept.push_back(line.substr(i, j + 1 - i));
 			sort.push_back(1);
 		}
 		if (j == line.length() - 1)
@@ -176,8 +174,8 @@ int Request::parseHeader(void)
     }
     int t = getParam(line.substr(0, line.find(':')));
     _it =  _buffer.begin() + _buffer.find("\r\n", _it - _buffer.begin()) + 2;
-    std::cout << "Raw: \"" << _buffer << "\"\n";
-    while(t != EMPTY)
+    std::cout << "Raw: \"" << _buffer << "\"\n"; 
+	while(t != EMPTY)
     {
         switch (t)
         {
@@ -291,7 +289,7 @@ void Request::clear(void)
 
 void Request::add(std::string const &new_buff)
 {
-    _buffer += new_buff;
+    _buffer.append(new_buff);
     switch (_state)
     {
         case METHOD:
