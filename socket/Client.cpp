@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/05 10:59:15 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/05 12:20:00 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ Client::Client(Server *serv, int id, Settings* settings): _settingsPtr(settings)
 	}
 	char buffer[INET_ADDRSTRLEN];
 	Print::print(INFO, "New Connection with id " + to_string(_id) + "(socket " + to_string(_fd) + ") From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), *_serverPtr);
-	if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
+	if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0 || fcntl(_fd, FD_CLOEXEC))
 	{
 		throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
 		close(_fd);
@@ -97,7 +97,7 @@ void    Client::readRequest(void)
 	char buffer[READSIZE + 1];
 	int i = _id + _settingsPtr->getServers()->size();
 	bzero(buffer, READSIZE + 1);
-    switch (recv(_fd, buffer, READSIZE, MSG_DONTWAIT))
+    switch (read(_fd, buffer, READSIZE))
 	{
 	case 0:
 		_settingsPtr->closeClient(_id);
@@ -137,9 +137,9 @@ void    Client::sendResponse(void)
 {
 	int result;
 	if(Response::_buffer.length() >= WRITESIZE)
-		result = send(_fd, Response::_buffer.c_str(), WRITESIZE, MSG_DONTWAIT);
+		result = write(_fd, Response::_buffer.c_str(), WRITESIZE);
 	else
-		result = send(_fd, Response::_buffer.c_str(), Response::_buffer.length(), MSG_DONTWAIT);
+		result = write(_fd, Response::_buffer.c_str(), Response::_buffer.length());
 	if(result < 0)
 			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
 	else if(result == 0 || (unsigned int)result == Response::_buffer.length())
