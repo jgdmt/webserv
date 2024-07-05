@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 15:16:32 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/05 10:59:15 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ Client::Client(Server *serv, int id, Settings* settings): _settingsPtr(settings)
 	}
 	char buffer[INET_ADDRSTRLEN];
 	Print::print(INFO, "New Connection with id " + to_string(_id) + "(socket " + to_string(_fd) + ") From " + (std::string)inet_ntop(AF_INET, &_addr, buffer, INET_ADDRSTRLEN), *_serverPtr);
-	// if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
-	// {
-	// 	throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
-	// 	close(_fd);
-	// }
+	if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		throw std::runtime_error("Socket " + to_string(_fd) + " fcntl: " + (std::string)strerror(errno));
+		close(_fd);
+	}
 	_last_com = time(NULL);
 }
 
@@ -103,7 +103,7 @@ void    Client::readRequest(void)
 		_settingsPtr->closeClient(_id);
 		return ;
 	case -1:
-		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + strerror(errno));
+		Print::print(ERROR, "Recv didn't work properly on client " + to_string<int>(_id) + " " + strerror(errno));
 		_settingsPtr->closeClient(_id);
 		return ;
 	default:
@@ -125,7 +125,6 @@ void    Client::readRequest(void)
 		case 0:
 			break;
 		case 1:
-			// std::cout << "C\n";
 			init();
 			if (!_cgiStatus)
 				_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
@@ -136,9 +135,7 @@ void    Client::readRequest(void)
 
 void    Client::sendResponse(void)
 {
-	// Print::print(INFO, "ready", _serv);
 	int result;
-// // std::cout<< *(res.getRes()) << "\n";
 	if(Response::_buffer.length() >= WRITESIZE)
 		result = send(_fd, Response::_buffer.c_str(), WRITESIZE, MSG_DONTWAIT);
 	else
@@ -152,6 +149,8 @@ void    Client::sendResponse(void)
 			Response::_buffer.clear();
 			_settingsPtr->getFds()->at(_id + _settingsPtr->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
 			_last_com = time(NULL);
+			if(getConnection() != "keep-alive")
+				_settingsPtr->closeClient(_id);
 	}
 	else
 	{

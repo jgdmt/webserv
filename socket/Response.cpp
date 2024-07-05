@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/04 15:49:59 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/04 17:28:42 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,8 +127,7 @@ void Response::error(std::string httpErrorCode, std::string httpErrorMessage)
 {
     genHeader(httpErrorCode + ' ' + httpErrorMessage);
     std::string path = _client->_serverPtr->getErrorPage(httpErrorCode);
-    if(_client->getMethod() != "HEAD")
-        genBody(path);
+    genBody(path);
     Print::print(DEBUG, "Error " + to_string(httpErrorCode) + " sent.", *_client->_serverPtr);
     return;
 }
@@ -326,7 +325,7 @@ void Response::init(void)
     std::string path;
     if (route != NULL)
     {
-        if (!route->isAutorizedMethod(_client->getMethod()))
+        if (!(route->isAutorizedMethod(_client->getMethod()) || (_client->getMethod() == "HEAD" && route->isAutorizedMethod("GET"))))
         {
             error("405", "Method Not Allowed");
             return;

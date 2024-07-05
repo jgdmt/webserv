@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 16:02:33 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/05 10:58:48 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ static int getParam(std::string const &param)
 
 void Request::setAccept(std::string const& line)
 {
-    size_t i = line.find(": ") + 2; //eventuellement verif si ':' existe
+    size_t i = line.find(": ") + 2;
 	size_t j;
 	size_t k;
 	std::vector<float> sort;
@@ -143,7 +143,7 @@ void Request::setAccept(std::string const& line)
 
 void Request::acceptEncoding(std::string const& line)
 {
-	size_t i = line.find(": ") + 2; // eventuellement verifier si ':' existe
+	size_t i = line.find(": ") + 2;
 	size_t j;
 
 	while (1)
@@ -167,15 +167,13 @@ int Request::parseHeader(void)
     if (_buffer.find("\r\n", _i) == std::string::npos)
         return (1);
     line = _buffer.substr(_i, _buffer.find("\r\n", _i) - _i);
-    if (line.find(": ") == std::string::npos)
+    if (line.length() && line.find(": ") == std::string::npos)
     {
          _error = 1;
         return (1);
     }
     int t = getParam(line.substr(0, line.find(':')));
-    _i = _buffer.find("\r\n", _i) + 2;
-    std::cout << "Raw: \"" << _buffer << "\"\n"; 
-	
+    _i = _buffer.find("\r\n", _i) + 2; 
     while(t != EMPTY)
     {
         switch (t)
@@ -216,7 +214,7 @@ int Request::parseHeader(void)
 				if (_headerStatus.content_type == true)
 					_error = 1;
                 _headerStatus.content_type = true;
-				break; // add
+				break;
             case CONTENT_LENGTH:
                 _contentLength = convertType<unsigned int>(std::string(line.begin() + line.find(": ") + 2, line.end()));
 				if (_headerStatus.content_length == true)
@@ -241,7 +239,6 @@ int Request::parseHeader(void)
         t = getParam(line.substr(0, line.find(": ")));
         _i = _buffer.find("\r\n", _i) + 2;
     }
-	std::cout << "end of while\n";
     _state = BODY;
     return (0);
 }
