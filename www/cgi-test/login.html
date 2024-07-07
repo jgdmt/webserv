@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Login</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+        <div id="content">
+			<form id="signupForm">
+				<label for="username">Username:</label><br>
+				<input type="text" id="username" name="username" required><br>
+				<label for="description">Description:</label><br>
+				<textarea id="description" name="description" required></textarea><br>
+				<label for="age">Age:</label><br>
+				<input type="number" id="age" name="age" required min="0"><br><br>
+				<input type="submit" value="Login">
+			  </form>
+		</div>
+    </body>
+	<script>
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const formData = new FormData(this);
+			const queryParams = new URLSearchParams(formData).toString();
+            const url = `login.py?${queryParams}`;
+			fetch(url, {
+                method: 'GET', // or 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display success message
+                document.getElementById('content').innerHTML = '<div id="successMessage">Successfully loged in</div><br/><a href="index.html">Go back</a>';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</html>

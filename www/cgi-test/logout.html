@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>CGI Tester</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="main.css" />
+		<script>
+			function logout() {
+			  // Create a new XMLHttpRequest
+			  var xhr = new XMLHttpRequest();
+			  // Configure it: GET-request for the URL /logout.py
+			  xhr.open('GET', 'logout.py', true);
+			  xhr.onreadystatechange = function() {
+				// In case of successful logout
+				if (xhr.readyState == 4 && xhr.status == 200) {
+				  // Handle successful logout here, e.g., redirect or inform the user
+				  alert('Logged out successfully');
+				  window.location.href = 'index.html';
+				}
+				else
+				{
+					alert('Failed to logout');
+				}
+			  };
+			  // Send the request
+			  xhr.send();
+			}
+			
+			// Call logout function without changing the page
+			logout();
+			</script>
+			</head>
+	<body class="is-preload">
+    </body>
+</html>
