@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/05 12:20:00 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 11:31:32 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,11 @@ time_t Client::getLastCom(void) const
 void    Client::setId(int id)
 {
 	_id = id;
+}
+
+sockaddr_in* Client::getAddr()
+{
+	return _addr;
 }
 
 void    Client::readRequest(void)

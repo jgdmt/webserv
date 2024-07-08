@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 11:18:21 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 11:30:50 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Client: public Request, public Response
         void    setId(int id);
         void    readRequest(void);
         void    sendResponse(void);
+        sockaddr_in* getAddr();
         Client(Client const &client);
         Client &operator=(Client const &client);
 		Settings *_settingsPtr;

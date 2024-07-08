@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/02 17:53:34 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/08 11:28:41 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "../parsing/Settings.hpp"
 
-CGI::CGI(std::vector<Client>::iterator cli) : _client(cli)
+CGI::CGI(std::vector<Client>::iterator cli, int id): _client(cli), _clientID(id) 
 {
 
 }
@@ -23,10 +23,25 @@ CGI::CGI(CGI const& cpy)
 	*this = cpy;
 }
 
+int	CGI::getID()
+{
+	return _clientID;
+}
+
+void CGI::setClient(std::vector<Client>::iterator cli)
+{
+	_client = cli;
+}
+void CGI::setID(int id)
+{
+	_clientID = id;
+}
+
 CGI& CGI::operator=(CGI const& other)
 {
 		this->_env = other._env;
 		this->_client = other._client;
+		this->_clientID = other._clientID;
 		this->_answer = other._answer;
 		this->_end = other._end;
 		return *this;
@@ -35,10 +50,10 @@ CGI& CGI::operator=(CGI const& other)
 void	CGI::createEnv(Route* route, std::string path)
 {
 	_env["DOCUMENT_ROOT"] = route->getPath();
-	// _env["SERVER_SOFTWARE"] = "Webserv";
-	// _env["SERVER_NAME"] = "127.0.0.1";
-	// _env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	// _env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	_env["SERVER_SOFTWARE"] = "Iswatchingyou";
+	_env["SERVER_NAME"] = _client->getHost();
+	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	// _env["SERVER_PORT"] = to_string(_serv.getPort());
 	_env["REQUEST_METHOD"] = _client->getMethod();
 	// _env["PATH_INFO"] = _path;
@@ -49,7 +64,7 @@ void	CGI::createEnv(Route* route, std::string path)
 	// _env["REMOTE_ADDR"] = _req.getHost();
 	// _env["AUTH_TYPE"] = "Basic";
 	_env["CONTENT_TYPE"] = _client->getContentType();
-	// _env["CONTENT_LENGTH"] = _req.getContentLength();
+	_env["CONTENT_LENGTH"] = _client->getContentLength();
 	//_env["HTTP_COOKIE"] = ;
 
 }

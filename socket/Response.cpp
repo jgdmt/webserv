@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/04 17:28:42 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 10:52:09 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ bool Response::checkCGI(std::string path, Route *route)
         {
             if (ext == route->getCgiExtension(i))
             {
-				_client->_settingsPtr->getCgi()->push_back(CGI(_client));
+				_client->_settingsPtr->getCgi()->push_back(CGI(_client, _client->getId()));
                 genHeader("200 OK");
                 _client->_settingsPtr->getCgi()->back().handler(route, path);
                 return true;

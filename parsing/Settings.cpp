@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 17:38:26 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 10:51:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,12 @@ void Settings::closeClient(unsigned int i)
 	_fds.erase(_fds.begin() + _servers.size() + i);
 	Print::print(INFO, "Client " + to_string(i) + " closed. Socket " + to_string(_clients[i].getFd()) + " freed.", *_clients[i]._serverPtr);
 	_clients.erase(_clients.begin() + i);
+	for(std::vector<CGI>::iterator j = _cgis.begin(); j != _cgis.end(); j++)
+	{
+		if(j->getID() > (int)i)
+			j->setID(j->getID() -1);
+		j->setClient(_clients.begin() + j->getID());
+	}
 }
 
 void Settings::addClient(Server &serv)
@@ -190,6 +196,8 @@ void Settings::addClient(Server &serv)
 		_clients.push_back(test);
 		for(std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
 			i->setClient(i);
+		for(std::vector<CGI>::iterator i = _cgis.begin(); i != _cgis.end(); i++)
+			i->setClient(_clients.begin() + i->getID());
 		_clients.back().setClient(_clients.end() - 1);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
 		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
@@ -199,3 +207,5 @@ void Settings::addClient(Server &serv)
 		Print::print(ERROR, e.what());
 	}
 }
+
+
