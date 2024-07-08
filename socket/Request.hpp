@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/04 15:05:17 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:34:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ enum Paramater
     ACCEPT_ENCODING,
     CONTENT_TYPE,
     CONTENT_LENGTH,
+    COOKIE,
     OTHER,
 };
 
@@ -69,6 +70,7 @@ class Request
 		std::string const &getAccept(int i) const;
 		std::string const &getAcceptEncoding(int i) const;
 		std::string const &getQuery(void) const;
+        std::string const &getCookies(void) const;
 		unsigned int const& getContentLength(void) const;
 		size_t getAcceptSize(void);
 		size_t getAcceptEncodingSize(void);
@@ -86,6 +88,7 @@ class Request
         std::string _contentType;
         std::string _contentBoundary;
         std::string _body;
+        std::string _cookies;
         unsigned int _contentLength;
         std::vector<std::string> _accept;
 		std::vector<std::string> _acceptEncoding;

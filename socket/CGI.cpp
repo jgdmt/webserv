@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/08 17:21:11 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:57:22 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,23 +49,22 @@ CGI& CGI::operator=(CGI const& other)
 
 void	CGI::createEnv(Route* route, std::string path)
 {
-	_env["DOCUMENT_ROOT"] = route->getPath();
-	_env["SERVER_SOFTWARE"] = "Iswatchingyou";
-	_env["SERVER_NAME"] = _client->getHost();
-	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	// _env["SERVER_PORT"] = to_string(_serv.getPort());
-	_env["REQUEST_METHOD"] = _client->getMethod();
-	// _env["PATH_INFO"] = _path;
-	// _env["PATH_TRANSLATED"] = _req.getUri() + _req.getQuery();
-	// _env["SCRIPT_NAME"] = _path.substr(_path.find(_route.getPath()) + _route.getPath().size() + 1);
-	_env["SCRIPT_FILENAME"] = path;
-	_env["QUERY_STRING"] = _client->getQuery();
-	// _env["REMOTE_ADDR"] = _req.getHost();
-	// _env["AUTH_TYPE"] = "Basic";
-	_env["CONTENT_TYPE"] = _client->getContentType();
+	char buffer[INET_ADDRSTRLEN];
+	_env["AUTH_TYPE"] = "";
 	_env["CONTENT_LENGTH"] = _client->getContentLength();
-	//_env["HTTP_COOKIE"] = ;
+	_env["CONTENT_TYPE"] = _client->getContentType();
+	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	_env["PATH_INFO"] = path;
+	_env["PATH_TRANSLATED"] = _client->getUri() + _client->getQuery();
+	_env["QUERY_STRING"] = _client->getQuery();
+	_env["REMOTE_ADDR"] = inet_ntop(AF_INET, _client->getAddr(), buffer, INET_ADDRSTRLEN);
+	_env["REQUEST_METHOD"] = _client->getMethod();
+	_env["SCRIPT_NAME"] = path.substr(path.find(route->getPath()) + route->getPath().size() + 1);
+	_env["SERVER_NAME"] = _client->getHost();
+	_env["SERVER_PORT"] = to_string(_client->_serverPtr->getPort());
+	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	_env["SERVER_SOFTWARE"] = "IsWatchingYou";
+	_env["HTTP_COOKIE"] = _client->getCookies();
 
 }
 

@@ -7,5 +7,5 @@ cookie['age'] = 0
 cookie['username']['Max-Age'] = '0'
 cookie['description']['Max-Age'] = '0'
 cookie['age']['Max-Age'] = '0'
-print(cookie +  "\r")
+print(cookie.output() +  "\r")
 print("\r")

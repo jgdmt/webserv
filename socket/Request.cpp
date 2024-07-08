@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/05 10:58:48 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:57:03 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,11 @@ std::string const &Request::getQuery(void) const
 	return _query;
 }
 
+std::string const &Request::getCookies(void) const
+{
+    return _cookies;
+}
+
 unsigned int const &Request::getContentLength(void) const
 {
 	return _contentLength;
@@ -90,7 +95,7 @@ size_t Request::getAcceptEncodingSize(void)
 
 static int getParam(std::string const &param)
 {
-    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "end"};
+    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "Cookie", "end"};
     for(int i = 0; params[i] != "end"; i++)
         if (params[i] == param)
             return (i);
@@ -98,6 +103,7 @@ static int getParam(std::string const &param)
         return (-1);
     else
         return (OTHER);
+
 }
 
 void Request::setAccept(std::string const& line)
@@ -220,6 +226,8 @@ int Request::parseHeader(void)
 				if (_headerStatus.content_length == true)
 					_error = 1;
 				_headerStatus.content_length = true;
+            case COOKIE:
+                _cookies = std::string(line.begin() + line.find(": ") + 2, line.end());
 			default:
                 break;
         }
@@ -286,7 +294,7 @@ void Request::clear(void)
 }
 
 void Request::add(std::string const &new_buff)
-{std::string t;
+{
     _buffer.append(new_buff);
     switch (_state)
     {
@@ -313,7 +321,6 @@ void Request::add(std::string const &new_buff)
         case PROTOCOL:
             if(_buffer.find("\r\n", _i) == std::string::npos)
                 break;
-            t =_buffer.substr(_i, _buffer.find("\r\n", _i) - _i);
             if ("HTTP/1.1" != _buffer.substr(_i, _buffer.find("\r\n", _i) - _i))
                 _error = true;
             _i = _buffer.find("\r\n", _i) + 2;
