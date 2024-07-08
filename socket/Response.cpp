@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/08 16:21:48 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:10:52 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,8 @@ bool Response::checkCGI(std::string path, Route *route)
 {
     if (!route->getCgiPath().empty() && route->getCgiLength() > 0 && (_client->getMethod() == "POST" || _client->getMethod() == "GET"))
     {
+		if (path.find_last_of('.') == std::string::npos)
+			return false;
         std::string ext = path.substr(path.find_last_of('.'));
 
         for (size_t i = 0; i < route->getCgiLength(); i++)
@@ -191,7 +193,7 @@ void Response::check_path(std::string path, Route *route)
     // std::cout << "Path: " << path << std::endl;
     if(stat(path.c_str(), &path_stat) == -1)
     {
-        error("500", "Internal Server Error");
+        error("404", "Not found");
         return ;
     }
     if (!S_ISDIR(path_stat.st_mode))
