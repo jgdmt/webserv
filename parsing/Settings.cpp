@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 10:51:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:14:34 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ void Settings::run(void)
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
 			{
 				Print::print(ERROR, "Poll: at client id " + to_string<int>(i - 1) + ": " +  (std::string)strerror(errno));
-				if(i >= _servers.size())
+				if(i >= _servers.size() && _clients.size() > i)
 					closeClient(i - _servers.size());
 				else
 				exit(1);
@@ -182,8 +182,15 @@ void Settings::closeClient(unsigned int i)
 	_clients.erase(_clients.begin() + i);
 	for(std::vector<CGI>::iterator j = _cgis.begin(); j != _cgis.end(); j++)
 	{
-		if(j->getID() > (int)i)
-			j->setID(j->getID() -1);
+		if(j->getID() == (int)i)
+			{
+				_fds.erase(_fds.begin() + _servers.size() + _clients.size() + (j - _cgis.begin()));
+				_cgis.erase(j);
+				j--;
+				continue;
+			}
+		else if(j->getID() > (int)i)
+			j->setID(j->getID() - 1);
 		j->setClient(_clients.begin() + j->getID());
 	}
 }

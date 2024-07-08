@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/08 10:45:20 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 16:36:06 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <ctime>
+#include <unistd.h>
 #include <sys/wait.h>
 #include "Request.hpp"
 #include "../parsing/Server.hpp"

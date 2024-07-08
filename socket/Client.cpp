@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 11:31:32 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 13:59:48 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void    Client::setId(int id)
 
 sockaddr_in* Client::getAddr()
 {
-	return _addr;
+	return &_addr;
 }
 
 void    Client::readRequest(void)

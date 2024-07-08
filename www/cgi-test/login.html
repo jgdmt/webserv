@@ -22,20 +22,21 @@
     </body>
 	<script>
         document.getElementById('signupForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting the traditional way
+            event.preventDefault(); 
 
             const formData = new FormData(this);
 			const queryParams = new URLSearchParams(formData).toString();
             const url = `login.py?${queryParams}`;
 			fetch(url, {
-                method: 'GET', // or 'POST'
+                method: 'GET',
             })
-            .then(response => response.text())
-            .then(data => {
-                // Display success message
-                document.getElementById('content').innerHTML = '<div id="successMessage">Successfully loged in</div><br/><a href="index.html">Go back</a>';
-            })
-            .catch(error => console.error('Error:', error));
-        });
+			.then(response => {
+    		if (response.status === 200) {
+				document.getElementById('content').innerHTML = '<div id="successMessage">Successfully logged in</div><br/><a href="index.html">Go back</a>';
+      		} else {
+				document.getElementById('content').innerHTML = '<div id="errorMessage">Error: Unable to log in. Please try again later.</div>';
+			}
+		});
+		});
     </script>
 </html>

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/08 11:28:41 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:21:11 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,30 +104,25 @@ void	CGI::body(int id)
 		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
 		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
 	}
-	else if (rd < READSIZE)
+	else if (rd == 0)
 	{
-		_answer.append(buff);
+		// _answer.append(buff);
 		std::cout << _answer << "\n";
 		if (_answer.find("Content-length") == std::string::npos)
 		{
 			size_t find = _answer.find("\r\n\r\n");
-			size_t i = _answer.length();
-			if (find != std::string::npos)
-				i = _answer.substr(find + 4).length();
 			if (find == std::string::npos)
 			{
-				std::cout << "HELLO\n";
-				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n\r\n");
+				_client->error("500", "Internal Server Error");
 			}
 			else
-				_answer.insert(0, "Content-length: " + to_string(i) + "\r\n");
+				_answer.insert(0, "Content-length: " + to_string(_answer.substr(find + 4).length()) + "\r\n");
 		}
 		close(_end);
 		waitpid(_pid, &status, 0);
-		std::cout << WIFEXITED(status) << " | " << WEXITSTATUS(status) << "\n";
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
 			_client->error("500", "Internal Server Error");
-		else
+		else if ( _answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
 		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
 		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
@@ -170,6 +165,9 @@ void	CGI::exec(char **script)
 		// // dup2(_end[0], STDIN_FILENO);
 		close(end[0]);
 		close(end[1]);
+		if(chdir(((std::string)script[1]).substr(0, ((std::string)script[1]).find_last_of("/")).c_str()) == -1)
+			exit(1);
+		script[1] = (char*)((std::string)script[1]).substr(((std::string)script[1]).find_last_of("/") + 1).c_str();
 		if (execve(script[0], script, cenv) == -1)
 			Print::print(ERROR, "Execve failed");
 	}
