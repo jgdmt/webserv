@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 10:17:23 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 11:09:33 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ void	CGI::createEnv(std::string path)
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_SOFTWARE"] = "IsWatchingYou";
 	_env["HTTP_COOKIE"] = _client->getCookies();
-
 }
 
 char ** CGI::stringToChar(void)
@@ -106,17 +105,21 @@ void	CGI::body(int id)
 	{
 		if (_answer.find("Content-length") == std::string::npos)
 		{
-			size_t find = _answer.find("\r\n\r\n");
+			size_t find;
+			if (_answer.find("\r\n") == 0)
+				find = 2;
+			else
+				find = _answer.find("\r\n\r\n") + 4;
 			if (find == std::string::npos)
 				_client->error("500", "Internal Server Error");
 			else
-				_answer.insert(0, "Content-length: " + to_string(_answer.substr(find + 4).length()) + "\r\n");
+				_answer.insert(0, "Content-length: " + to_string(_answer.length() - find) + "\r\n");
 		}
 		close(_end);
 		waitpid(_pid, &status, 0);
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
 			_client->error("500", "Internal Server Error");
-		else if ( _answer.find("\r\n\r\n") != std::string::npos)
+		else if (_answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
 		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
 		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
