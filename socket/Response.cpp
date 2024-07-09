@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/08 18:10:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 10:19:31 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,8 @@ void Response::genDirListing(std::string path)
 {
     _buffer.append("Content-Type: text/html\r\n");
     std::string body;
-    body.append("<html><head><title>Index of " + path + "</title></head>");
-    body.append("<body><h1>Index of " + path + "</h1><hr><pre>");
+    body.append("<html><head><title>Index of " + _client->getUri() + "</title></head>");
+    body.append("<body><h1>Index of " + _client->getUri() + "</h1><hr><pre>");
     DIR *dir = opendir(path.c_str());
     struct stat path_stat;
     std::string relativeUrl;
@@ -190,7 +190,12 @@ void Response::check_path(std::string path, Route *route)
 {
     struct stat path_stat;
 
-    // std::cout << "Path: " << path << std::endl;
+    if (route->getRedirection().length())
+    {
+        genHeader("301 Moved Permanently");
+        _buffer.append("Location: " + route->getRedirection() + _client->getUri().substr(_client->getUri().find(route->getLocation()) + route->getLocation().length())+ "\r\n\r\n");
+        return;
+    }
     if(stat(path.c_str(), &path_stat) == -1)
     {
         error("404", "Not found");
@@ -207,7 +212,7 @@ void Response::check_path(std::string path, Route *route)
             _buffer.append("Location: " + _client->getUri() + "/\r\n\r\n");
             return;
         }
-        if (route->getdefaultFileForDirectory().size() != 0 && route->getPath() + "/" == path)
+        if (route->getdefaultFileForDirectory().size() != 0 && route->getRoot() + "/" == path)
         {
             if (route->getdefaultFileForDirectory()[0] == '/')
                 route->setdefaultFileForDirectory(route->getdefaultFileForDirectory().substr(1));
@@ -269,17 +274,15 @@ void Response::check_path(std::string path, Route *route)
 
 void Response::init(void)
 {
-	// std::cout << "Uri " << _client->getUri() << "\n";
     size_t pos = 0;
     Route *route = NULL;
     size_t next = _client->getUri().find('/', pos + 1);
     if (next == std::string::npos)
         next = _client->getUri().length();
 	std::string chunkUri = _client->getUri().substr(pos, next - pos);
-	// std::cout << "First chunk uri (pos, next) " << chunkUri << " (" << pos << ", " << next << ")\n";
     for (unsigned int i = 0; i < _client->_serverPtr->getRoutesNumber(); i++)
     {
-        if (_client->_serverPtr->getRoute(i)->getRedirection() == chunkUri && chunkUri != "/")
+        if (_client->_serverPtr->getRoute(i)->getLocation() == chunkUri && chunkUri != "/")
         {
             route = _client->_serverPtr->getRoute(i);
             break;
@@ -289,9 +292,8 @@ void Response::init(void)
     {
         for (unsigned int i = 0; i < _client->_serverPtr->getRoutesNumber(); i++)
         {
-            if (_client->_serverPtr->getRoute(i)->getRedirection() == "/")
+            if (_client->_serverPtr->getRoute(i)->getLocation() == "/")
             {
-				// std::cout << "/ route\n";
                 route = _client->_serverPtr->getRoute(i);
 				next = 0;
                 break;
@@ -300,18 +302,16 @@ void Response::init(void)
     }
     while (route != NULL)
     {
-        // int oldPos = pos;
         pos = next;
         next = _client->getUri().find('/', pos + 1);
         if (next == std::string::npos)
             next = _client->getUri().length();
         chunkUri = _client->getUri().substr(pos, next - pos);
-		// std::cout << "Next chunk uri (pos, next) " << chunkUri << " (" << pos << ", " << next << ")\n";
         unsigned int nbRoute = route->getRoutesNumber();
         unsigned int i = 0;
         while (i < nbRoute)
         {
-            if (route->getRoute(i)->getRedirection() == chunkUri)
+            if (route->getRoute(i)->getLocation() == chunkUri)
             {
                 route = route->getRoute(i);
                 break;
@@ -319,10 +319,7 @@ void Response::init(void)
             i++;
         }
         if (i == nbRoute)
-        {
-            // pos = oldPos;
             break;
-        }
     }
     std::string path;
     if (route != NULL)
@@ -332,11 +329,7 @@ void Response::init(void)
             error("405", "Method Not Allowed");
             return;
         }
-        // std::cout << "Route: " << route->getRedirection() << std::endl;
-		// std::cout << "Route_path: " << route->getPath() << "\n";
-        // if (route->getPath()[route->getPath().size() - 1] == '/' && _client->getUri()[0] == '/')
-        //     route->setPath(route->getPath().substr(0, route->getPath().size() - 1));
-        path = route->getPath();
+        path = route->getRoot();
         if (pos < _client->getUri().size())
             path.append(_client->getUri().substr(pos, _client->getUri().size() - pos));
         check_path(path, route);

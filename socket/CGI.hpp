@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/08 16:36:06 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 09:50:11 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,6 @@ class CGI {
 		pid_t _pid;
 
 		char** stringToChar(void);
-		void createEnv(Route* route, std::string path);
+		void createEnv(std::string path);
 		void exec(char ** script);
 };

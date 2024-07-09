@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/01 12:12:36 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/09 09:44:50 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ class Route
         Route();
         bool isAutorizedMethod(std::string const &method);
         std::string const &getRedirection(void) const;
-        std::string const &getPath(void) const;
+        std::string const &getLocation(void) const;
+        std::string const &getRoot(void) const;
         bool IsListing(void);
         std::string getdefaultFileForDirectory(void) const;
 		std::string const &getCgiPath(void) const;
@@ -35,6 +36,7 @@ class Route
         Route *getRoute(unsigned int i);
         unsigned int getRoutesNumber(void) const;
         void setDefaultFileForDirectory(std::string const &str);
+        void setLocation(std::string const &str);
         void setRedirection(std::string const &str);
         void setPath(std::string const &str);
         void setDirectoryListing(bool directoryListing);
@@ -51,15 +53,16 @@ class Route
         // Route &operator= (Route const &cpy);
         std::vector<std::string> _autorizedMethods;
 		std::vector<Route> _routes;
-        std::string _redirection;
-        std::string _path;
+        std::string _location;
+        std::string _root;
 		std::string _uploadDirectory;
         bool _directoryListing;
         std::string _defaultFileForDirectory;
 		std::string _cgiPath;
+        std::string _redirection;
 		std::vector<std::string> _cgiExtensions;
         
-		void	path(std::string const& content, std::string::iterator& start);
+		void	root(std::string const& content, std::string::iterator& start);
 		void	route(std::string const& content, std::string::iterator& start, std::string::iterator& end);
 		void	allowmethods(std::string const& content, std::string::iterator& start);
 		void	directorylisting(std::string const& content, std::string::iterator& start);
@@ -67,6 +70,7 @@ class Route
 		void	cgipath(std::string const& content, std::string::iterator& start);
 		void	cgiextension(std::string const& content, std::string::iterator& start);
 		void	upload(std::string const& content, std::string::iterator& start);
+        void    redirect(std::string const& content, std::string::iterator&start);
 		void	check_name(void);
 		void	check_duplicates(void);
 		void	check_defaultfile(void);

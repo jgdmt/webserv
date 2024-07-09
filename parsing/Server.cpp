@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/05 12:25:51 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 09:43:39 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ void	Server::parseRoot(std::string const& content, std::string::iterator& start,
 	// std::string::iterator it = start;
 	// std::cout << "BEFORE " << content.substr((start + l + 2) - content.begin(), end_root - content.begin()) << "\n";
 	route.parse(content, start, end, l);
-	// std::cout << "parsing server " << route.getRedirection() << " end root: " << content.substr(it - content.begin(), end_root - content.begin()) << " and length: " << l << "\n"; 
+	// std::cout << "parsing server " << route.getLocation() << " end root: " << content.substr(it - content.begin(), end_root - content.begin()) << " and length: " << l << "\n"; 
 	this->_routes.push_back(route);
 }
 

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/08 18:57:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 10:17:23 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 CGI::CGI(std::vector<Client>::iterator cli, int id): _client(cli), _clientID(id) 
 {
-
 }
 
 CGI::CGI(CGI const& cpy)
@@ -47,7 +46,7 @@ CGI& CGI::operator=(CGI const& other)
 		return *this;
 }
 
-void	CGI::createEnv(Route* route, std::string path)
+void	CGI::createEnv(std::string path)
 {
 	char buffer[INET_ADDRSTRLEN];
 	_env["AUTH_TYPE"] = "";
@@ -59,7 +58,7 @@ void	CGI::createEnv(Route* route, std::string path)
 	_env["QUERY_STRING"] = _client->getQuery();
 	_env["REMOTE_ADDR"] = inet_ntop(AF_INET, _client->getAddr(), buffer, INET_ADDRSTRLEN);
 	_env["REQUEST_METHOD"] = _client->getMethod();
-	_env["SCRIPT_NAME"] = path.substr(path.find(route->getPath()) + route->getPath().size() + 1);
+	_env["SCRIPT_NAME"] = path.substr(path.find_last_of('/') + 1);
 	_env["SERVER_NAME"] = _client->getHost();
 	_env["SERVER_PORT"] = to_string(_client->_serverPtr->getPort());
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -90,7 +89,6 @@ void	CGI::body(int id)
 {
 	int status;
 	char buff[READSIZE + 1];
-	// static int st = 0;
 	for (int i = 0; i <= READSIZE; i++)
 		buff[i] = 0;
 	int rd = read(_end, buff, READSIZE);
@@ -99,21 +97,18 @@ void	CGI::body(int id)
 	{
 		Print::print(ERROR, "CGI: pipe read failed");
 		_client->error("500", "Internal Server Error");
+		close(_end);
 		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
 		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
 		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
 	}
 	else if (rd == 0)
 	{
-		// _answer.append(buff);
-		std::cout << _answer << "\n";
 		if (_answer.find("Content-length") == std::string::npos)
 		{
 			size_t find = _answer.find("\r\n\r\n");
 			if (find == std::string::npos)
-			{
 				_client->error("500", "Internal Server Error");
-			}
 			else
 				_answer.insert(0, "Content-length: " + to_string(_answer.substr(find + 4).length()) + "\r\n");
 		}
@@ -129,20 +124,15 @@ void	CGI::body(int id)
 	
 	}
 	else
-	{
-		// if (st == 0)
-		// 	std::cout << buff << "\n";
 		_answer.append(buff);
-		// st++;
-	}
 }
 
 void	CGI::exec(char **script)
 {
 	char **cenv = stringToChar();
 	int end[2];
-	
-	if (pipe(end) == -1)
+	int in[2];
+	if (pipe(end) == -1 || pipe(in) == -1)
 	{
 		std::cout << "Pipe error\n";
 		return ;
@@ -160,8 +150,10 @@ void	CGI::exec(char **script)
 	}
 	else if (!_pid)
 	{
+		dup2(in[0], STDIN_FILENO);
+		close(in[0]);
+		close(in[1]);
 		dup2(end[1], STDOUT_FILENO);
-		// // dup2(_end[0], STDIN_FILENO);
 		close(end[0]);
 		close(end[1]);
 		if(chdir(((std::string)script[1]).substr(0, ((std::string)script[1]).find_last_of("/")).c_str()) == -1)
@@ -172,6 +164,9 @@ void	CGI::exec(char **script)
 	}
 	else
 	{
+		write(in[1], _client->getBody().c_str(), _client->getBody().length());
+		close(in[0]);
+		close(in[1]);
 		close(end[1]);
 	}
 }
@@ -185,6 +180,6 @@ void	CGI::handler(Route* route, std::string path)
 	script[0] = (char*) s.c_str();
 	script[1] = (char*) path.c_str();
 	script[2] = NULL;
-	createEnv(route, path);
+	createEnv(path);
 	exec(script);
 }

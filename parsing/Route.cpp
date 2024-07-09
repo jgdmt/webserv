@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 12:36:07 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/09 09:46:52 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,19 @@ bool Route::isAutorizedMethod(std::string const &method)
         return false;
 }
 
+std::string const &Route::getLocation(void) const
+{
+    return _location;
+}
+
 std::string const &Route::getRedirection(void) const
 {
     return _redirection;
 }
 
-std::string const &Route::getPath(void) const
+std::string const &Route::getRoot(void) const
 {
-    return _path;
+    return _root;
 }
 
 std::string const &Route::getCgiPath(void) const
@@ -75,13 +80,17 @@ void Route::setDefaultFileForDirectory(std::string const &str)
     _defaultFileForDirectory = str;
 }
 
+void Route::setLocation(std::string const &str)
+{
+    _location = str;
+}
 void Route::setRedirection(std::string const &str)
 {
     _redirection = str;
 }
 void Route::setPath(std::string const &str)
 {
-    _path = str;
+    _root = str;
 }
 
 void Route::setDirectoryListing(bool directoryListing)
@@ -150,24 +159,24 @@ std::string::iterator	Route::find_end(std::string const& content, std::string::i
 	return (i);
 }
 
-void Route::path(std::string const& content, std::string::iterator& start)
+void Route::root(std::string const& content, std::string::iterator& start)
 {
 	int len = find_len(content, start, ';', false);
 	struct stat	path_stat;
 	std::string path;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": root is missing a value");
+		Print::print(CRASH, "Parsing location " + _location + ": root is missing a value");
 	if (len == -1)
 		Print::print(CRASH, "Parsing location: missing ';'");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location " + _redirection + ": root does not take multiple values");
+		Print::print(CRASH, "Parsing location " + _location + ": root does not take multiple values");
 	path = content.substr(start - content.begin(), len);
 	if (path[path.length() - 1] == '/')
 		path.pop_back();
 	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
-		Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " is not a directory");
-	this->_path = path;
+		Print::print(CRASH, "Parsing location " + _location + ": " + path + " is not a directory");
+	this->_root = path;
 	start += len;
 }
 
@@ -176,9 +185,9 @@ void Route::route(std::string const& content, std::string::iterator& start, std:
 	int len = find_len(content, start, '{', false);
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": location is missing values");
+		Print::print(CRASH, "Parsing location " + _location + ": location is missing values");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location  " + _redirection + ": location does not take multiple parameters");
+		Print::print(CRASH, "Parsing location  " + _location + ": location does not take multiple parameters");
 	Route route;
 	route.parse(content, start, end, len);
 	this->_routes.push_back(route);
@@ -192,9 +201,9 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 	std::string method;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": allow_methods is missing values");
+		Print::print(CRASH, "Parsing location " + _location + ": allow_methods is missing values");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
@@ -202,7 +211,7 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 		if (method == "PUT" || method == "POST" || method == "GET")
 			this->_autorizedMethods.push_back(method);
 		else
-			Print::print(CRASH, "Parsing location " + _redirection + ": " + method + " is not a valid method (valid methods: POST, GET, PUT)");
+			Print::print(CRASH, "Parsing location " + _location + ": " + method + " is not a valid method (valid methods: POST, GET, PUT)");
 		start = it;
 		while (*start == ' ')
 			start++;
@@ -215,18 +224,18 @@ void Route::directorylisting(std::string const& content, std::string::iterator& 
 	std::string tf;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": directory_listing is missing a value");
+		Print::print(CRASH, "Parsing location " + _location + ": directory_listing is missing a value");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location " + _redirection + ": directory_listing does not take multiple values");
+		Print::print(CRASH, "Parsing location " + _location + ": directory_listing does not take multiple values");
 	tf = content.substr(start - content.begin(), len);
 	if (tf == "true")
 		this->_directoryListing = true;
 	else if (tf == "false")
 		this->_directoryListing = false;
 	else
-		Print::print(CRASH, "Parsing location " + _redirection + ": " + tf + " is not a bool");
+		Print::print(CRASH, "Parsing location " + _location + ": " + tf + " is not a bool");
 	start += len;
 }
 
@@ -236,11 +245,11 @@ void Route::defaultfile(std::string const& content, std::string::iterator& start
 	std::string def;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": default_file is missing a value");
+		Print::print(CRASH, "Parsing location " + _location + ": default_file is missing a value");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location " + _redirection + ": default_file does not take multiple values");
+		Print::print(CRASH, "Parsing location " + _location + ": default_file does not take multiple values");
 	def = content.substr(start - content.begin(), len);
 	start += len;	
 	this->_defaultFileForDirectory = def;
@@ -252,14 +261,14 @@ void Route::cgipath(std::string const& content, std::string::iterator& start)
 	std::string path;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": cgi_path is missing a value");
+		Print::print(CRASH, "Parsing location " + _location + ": cgi_path is missing a value");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location " + _redirection + ": cgi_path does not take multiple values");
+		Print::print(CRASH, "Parsing location " + _location + ": cgi_path does not take multiple values");
 	path = content.substr(start - content.begin(), len);
 	if (access(path.c_str(), F_OK | X_OK))
-		Print::print(CRASH, "Parsing location " + _redirection + ": " + path + " does not exist or is not executable");
+		Print::print(CRASH, "Parsing location " + _location + ": " + path + " does not exist or is not executable");
 	_cgiPath = path;
 	start += len;
 }
@@ -273,15 +282,15 @@ void Route::cgiextension(std::string const& content, std::string::iterator& star
 	std::string extension;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": cgi_extension is missing values");
+		Print::print(CRASH, "Parsing location " + _location + ": cgi_extension is missing values");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';");
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
 		extension = content.substr(start - content.begin(), it - start);
 		if (extension.size() == 0 || extension[0] != '.')
-			Print::print(CRASH, "Parsing location " + _redirection + ": " + extension + " is not a valid extension");
+			Print::print(CRASH, "Parsing location " + _location + ": " + extension + " is not a valid extension");
 		_cgiExtensions.push_back(extension);
 		start = it;
 		while (*start == ' ')
@@ -296,26 +305,42 @@ void Route::upload(std::string const& content, std::string::iterator& start)
 	struct stat path_stat;
 
 	if (len == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": upload is missing a value");
+		Print::print(CRASH, "Parsing location " + _location + ": upload is missing a value");
 	if (len == -1)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing ';'");
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
 	if (len == -2)
-		Print::print(CRASH, "Parsing location " + _redirection + ": upload does not take multiple values");
+		Print::print(CRASH, "Parsing location " + _location + ": upload does not take multiple values");
 	path = content.substr(start - content.begin(), len);
 	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
-		Print::print(CRASH, "Parsing location (upload) " + _redirection + ": " + path + " is not a directory");
+		Print::print(CRASH, "Parsing location (upload) " + _location + ": " + path + " is not a directory");
 	this->_uploadDirectory = path;
+	start += len;
+}
+
+void Route::redirect(std::string const& content, std::string::iterator&start)
+{
+	int len = Route::find_len(content, start, ';', false);
+	std::string path;
+
+	if (len == 0)
+		Print::print(CRASH, "Parsing location " + _location + ": redirect is missing a value");
+	if (len == -1)
+		Print::print(CRASH, "Parsing location " + _location + ": missing ';'");
+	if (len == -2)
+		Print::print(CRASH, "Parsing location " + _location + ": redirect does not take multiple values");
+	path = content.substr(start - content.begin(), len);
+	_redirection = path;
 	start += len;
 }
 
 void Route::check_name(void)
 {
-	if (_redirection.find('\\') != std::string::npos)
-		Print::print(CRASH, "Parsing location " + _redirection + ": location can not have '\\' in the name");
-	if (_redirection.find('/') != _redirection.rfind('/'))
-		Print::print(CRASH, "Parsing location " + _redirection + ": location does not take multiple '/'");
-	if (_redirection[0] != '/')
-		Print::print(ERROR, "Warning: unreachable location: " + _redirection);
+	if (_location.find('\\') != std::string::npos)
+		Print::print(CRASH, "Parsing location " + _location + ": location can not have '\\' in the name");
+	if (_location.find('/') != _location.rfind('/'))
+		Print::print(CRASH, "Parsing location " + _location + ": location does not take multiple '/'");
+	if (_location[0] != '/')
+		Print::print(ERROR, "Warning: unreachable location: " + _location);
 }
 
 void Route::check_duplicates(void)
@@ -323,20 +348,20 @@ void Route::check_duplicates(void)
 	for (size_t i = 0; i < _routes.size(); i++)
 	{
 		for (size_t j = i + 1; j < _routes.size(); j++)
-			if (_routes[j]._redirection == _routes[i]._redirection)
-				Print::print(CRASH, "Parsing location " + _redirection + ": location can not have duplicate locations (" + _routes[j]._redirection + ")");
+			if (_routes[j]._location == _routes[i]._location)
+				Print::print(CRASH, "Parsing location " + _location + ": location can not have duplicate locations (" + _routes[j]._location + ")");
 	}
 }
 
 void Route::check_defaultfile(void)
 {
-	std::string def = _path;
+	std::string def = _root;
 	if (def[def.size() - 1] != '/')
 		def.append("/");
 	def.append(_defaultFileForDirectory);
 	if (access(def.c_str(), F_OK | R_OK))
 	{
-		Print::print(ERROR, "Parsing location " + _redirection + ": " + def + " does not exist or is not executable");
+		Print::print(ERROR, "Parsing location " + _location + ": " + def + " does not exist or is not executable");
 		_defaultFileForDirectory.clear();
 	}
 }
@@ -348,7 +373,7 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 	std::string param;
 	bool methods = false;
 
-	this->_redirection = content.substr(start - content.begin(), len);
+	this->_location = content.substr(start - content.begin(), len);
 	check_name();
 	start += len;
 	while (*(++start) == ' ')
@@ -369,7 +394,7 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 		while (*start == ' ')
 			start++;
 		if (param == "root")
-			path(content, start);
+			root(content, start);
 		else if (param == "location")
 			route(content, start, root_end);
 		else if (param == "allow_methods")
@@ -387,14 +412,16 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 			cgiextension(content, start);
 		else if (param == "upload")
 			upload(content, start);
+		else if (param == "redirect")
+			redirect(content, start);
 		else
 			Print::print(CRASH, "Parsing location: " + param + " is unknown");
 		while ((*start == ' ' || *start == ';' || *start == '}') && start != root_end)
 			start++;
 	}
 	start++;
-	if (_path.size() == 0)
-		Print::print(CRASH, "Parsing location " + _redirection + ": missing _path");
+	if (_root.size() == 0)
+		Print::print(CRASH, "Parsing location " + _location + ": missing _root");
 	if (!methods)
 		setDefaultAutorizedMethod();
 	if (_defaultFileForDirectory.size() > 0)
