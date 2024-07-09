@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/09 15:17:16 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 19:16:35 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,11 @@ bool Response::checkCGI(std::string path, Route *route)
 }
 void Response::genRes(std::string path, Route* route)
 {
+    if (_client->getMethod() == "DELETE")
+    {
+        deleteHandle(path);
+        return;
+    }
     if (access(path.c_str(), F_OK))
         error("404", "Not Found");
     else if (access(path.c_str(), R_OK))
@@ -183,7 +188,21 @@ void Response::genRes(std::string path, Route* route)
             genBody(path);
         }
     }
-} 
+}
+
+void Response::deleteHandle(std::string path)
+{
+    if (std::remove(path.c_str()) == -1)
+    {
+        Print::print(INFO, "Remove error " + std::string(strerror(errno)), *_client->_serverPtr);
+        error("500", "Internal Server Error");
+    }
+    else
+    {
+        genHeader("200 OK");
+        genBody("default/file_deleted.html");
+    }
+}
 
 void Response::check_path(std::string path, Route *route)
 {

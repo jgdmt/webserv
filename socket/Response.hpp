@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/03 14:34:15 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 18:55:02 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <ctime>
 #include <fstream>
 #include <map>
+#include <cstdio>
 #include <dirent.h>
 #include "../Print.hpp"
 #include "Request.hpp"
@@ -71,5 +72,6 @@ class Response
         void genBody(std::string path);
         void genDirListing(std::string path);
         void genRes(std::string path, Route* route);
+        void deleteHandle(std::string path);
         void check_path(std::string path, Route *route);
 };

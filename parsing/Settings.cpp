@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 16:29:40 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 17:04:22 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void Settings::run(void)
 {
 	while(1)
 	{
-		if(poll(_fds.data(), _fds.size(), -1) == -1)
+		if(poll(_fds.data(), _fds.size(), 30) == -1)
 			Print::print(CRASH, "Poll: " + (std::string)strerror(errno));
 		for(unsigned int i = 0; i < _fds.size(); i++)
 		{

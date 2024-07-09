@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 11:55:19 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 19:13:33 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,10 +208,10 @@ void Route::allowmethods(std::string const& content, std::string::iterator& star
 	{
 		it = std::find(start, tmp + len, ' ');
 		method = content.substr(start - content.begin(), it - start);
-		if (method == "PUT" || method == "POST" || method == "GET")
+		if (method == "PUT" || method == "POST" || method == "GET" || method == "DELETE")
 			this->_autorizedMethods.push_back(method);
 		else
-			Print::print(CRASH, "Parsing location " + _location + ": " + method + " is not a valid method (valid methods: POST, GET, PUT)");
+			Print::print(CRASH, "Parsing location " + _location + ": " + method + " is not a valid method (valid methods: POST, GET, PUT, DELETE)");
 		start = it;
 		while (*start == ' ')
 			start++;
