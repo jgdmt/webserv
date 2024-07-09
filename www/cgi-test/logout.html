@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>CGI Tester</title>
+		<title>CGI Tester | Logout</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="main.css" />
@@ -10,7 +10,7 @@
 			  // Create a new XMLHttpRequest
 			  var xhr = new XMLHttpRequest();
 			  // Configure it: GET-request for the URL /logout.py
-			  xhr.open('GET', 'logout.py', true);
+			  xhr.open('GET', 'python/logout.py', true);
 			  xhr.onreadystatechange = function() {
 				// In case of successful logout
 				if (xhr.readyState == 4 && xhr.status == 200) {
