@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 09:46:52 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 11:55:19 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,6 +330,8 @@ void Route::redirect(std::string const& content, std::string::iterator&start)
 		Print::print(CRASH, "Parsing location " + _location + ": redirect does not take multiple values");
 	path = content.substr(start - content.begin(), len);
 	_redirection = path;
+	if (_redirection[_redirection.length() - 1] != '/')
+		_redirection.append("/");
 	start += len;
 }
 
@@ -420,7 +422,7 @@ void Route::parse(std::string const& content, std::string::iterator& start, std:
 			start++;
 	}
 	start++;
-	if (_root.size() == 0)
+	if (_root.length() == 0 && _redirection.length() == 0)
 		Print::print(CRASH, "Parsing location " + _location + ": missing _root");
 	if (!methods)
 		setDefaultAutorizedMethod();

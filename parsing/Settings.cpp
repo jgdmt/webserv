@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 17:14:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 11:29:22 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,7 @@ void Settings::closeClient(unsigned int i)
 	}
 	close(_clients[i].getFd());
 	_fds.erase(_fds.begin() + _servers.size() + i);
-	Print::print(INFO, "Client " + to_string(i) + " closed. Socket " + to_string(_clients[i].getFd()) + " freed.", *_clients[i]._serverPtr);
+	Print::print(DEBUG, "Client " + to_string(i) + " closed. Socket " + to_string(_clients[i].getFd()) + " freed.", *_clients[i]._serverPtr);
 	_clients.erase(_clients.begin() + i);
 	for(std::vector<CGI>::iterator j = _cgis.begin(); j != _cgis.end(); j++)
 	{

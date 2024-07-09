@@ -2,7 +2,7 @@ import os
 import http.cookies
 print("Content-Type: text/html")
 print("\r\n\r");
-print("<!DOCTYPE HTML><html><head><title>CGI Tester</title><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\" /><link rel=\"stylesheet\" href=\"main.css\" /><noscript><link rel=\"stylesheet\" href=\"assets/css/noscript.css\" /></noscript></head><body class=\"is-preload\"><div id=\"content\">")
+print("<!DOCTYPE HTML><html><head><title>CGI Tester</title><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\" /><link rel=\"stylesheet\" href=\"../main.css\" /><noscript><link rel=\"stylesheet\" href=\"assets/css/noscript.css\" /></noscript></head><body class=\"is-preload\"><div id=\"content\">")
 cookie_string = os.environ.get('HTTP_COOKIE')
 
 if cookie_string:

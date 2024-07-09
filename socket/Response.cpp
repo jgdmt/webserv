@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/09 10:19:31 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 12:01:12 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ Response::Response(Response const &res)
 void Response::addBuffer(std::string& body)
 {
 	_buffer.append(body);
-	// std::cout << _buffer << "\n";
 }
 
 void Response::cut(int pos)
@@ -193,7 +192,7 @@ void Response::check_path(std::string path, Route *route)
     if (route->getRedirection().length())
     {
         genHeader("301 Moved Permanently");
-        _buffer.append("Location: " + route->getRedirection() + _client->getUri().substr(_client->getUri().find(route->getLocation()) + route->getLocation().length())+ "\r\n\r\n");
+        _buffer.append("Location: " + route->getRedirection() + _client->getUri().substr(_client->getUri().find(route->getLocation()) + route->getLocation().length()) + "\r\n\r\n");
         return;
     }
     if(stat(path.c_str(), &path_stat) == -1)
