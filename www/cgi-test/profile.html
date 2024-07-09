@@ -8,30 +8,23 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<script>
 			window.onload = function() {
-			  // Check if cookies are available
 			  if (document.cookie) {
-				// Split document.cookie on semicolons into an array of cookies
 				const cookiesArray = document.cookie.split('; ');
-				// Create a string to hold the HTML for displaying cookies
 				let cookiesHtml = '<ul>';
-				// Loop through cookies
 				cookiesArray.forEach(function(cookie) {
-				  // Split each cookie into name and value
 				  const [name, value] = cookie.split('=');
-				  // Append a list item for each cookie
 				  cookiesHtml += `<li>${name}: ${value}</li>`;
 				});
 				cookiesHtml += '</ul>';
-				// Display the cookies in the body of the page
-				document.body.innerHTML += `<div id="content"><h2>Cookies:</h2>${cookiesHtml}</div>`;
-			  } else {
-				// Display a message if no cookies are available
-				document.body.innerHTML += '<div id="content"><p>No cookies found.</p></div>';
-			  }
+				document.getElementById('content').innerHTML = `<h2>Cookies:</h2>${cookiesHtml}` + document.getElementById('content').innerHTML;
+			  } else
+				document.getElementById('content').innerHTML = '<p>No cookies found.</p>' + document.getElementById('content').innerHTML;
 			};
 			</script>
 	</head>
 	<body class="is-preload">
-   
+	<div id="content">
+		<br/><a href="index.html" id="back">Go back</a>
+	</div>
     </body>
 </html>

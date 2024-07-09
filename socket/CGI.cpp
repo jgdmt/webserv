@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 16:28:45 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/09 16:32:03 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,16 @@ void CGI::setClient(std::vector<Client>::iterator cli)
 void CGI::setID(int id)
 {
 	_clientID = id;
+}
+
+time_t const &CGI::getStartTime() const
+{
+	return _startTime;
+}
+
+std::vector<Client>::iterator CGI::getClient(void)
+{
+	return _client;
 }
 
 CGI& CGI::operator=(CGI const& other)
@@ -83,6 +93,15 @@ char ** CGI::stringToChar(void)
 	cenv[i] = NULL;
 	return (cenv);
 }
+void	CGI::closeCGI(int cgiId)
+{
+	close(_end);
+	kill(_pid, SIGKILL);
+	int fdId = cgiId + _client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size();
+	_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + fdId);
+	_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
+	_client->_settingsPtr->getCgi()->erase(_client->_settingsPtr->getCgi()->begin() + cgiId);
+}
 
 void	CGI::body(int id)
 {
@@ -96,10 +115,8 @@ void	CGI::body(int id)
 	{
 		Print::print(ERROR, "CGI: pipe read failed");
 		_client->error("500", "Internal Server Error");
-		close(_end);
-		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
-		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
-		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
+		std::cout << "yaaa\n";
+		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
 	}
 	else if (rd == 0)
 	{
@@ -115,16 +132,14 @@ void	CGI::body(int id)
 			else
 				_answer.insert(0, "Content-length: " + to_string(_answer.length() - find) + "\r\n");
 		}
-		close(_end);
+		kill(_pid, SIGKILL);
+		std::cout << "test\n";
 		waitpid(_pid, &status, 0);
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
 			_client->error("500", "Internal Server Error");
 		else if (_answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
-		_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + id);
-		_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
-		_client->_settingsPtr->getCgi()->erase((_client->_settingsPtr->getCgi()->begin() + id) - (_client->_settingsPtr->getServers()->size()) - (_client->_settingsPtr->getClients()->size()));
-	
+		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
 	}
 	else
 		_answer.append(buff);
@@ -176,6 +191,7 @@ void	CGI::exec(char **script)
 		close(in[0]);
 		close(in[1]);
 		close(end[1]);
+		_startTime = time(NULL);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 11:29:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 16:29:40 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,8 +140,10 @@ void Settings::run(void)
 				Print::print(ERROR, "Poll: at client id " + to_string<int>(i - 1) + ": " +  (std::string)strerror(errno));
 				if(i >= _servers.size() && _clients.size() > i)
 					closeClient(i - _servers.size());
+				else if (i > _servers.size() + _clients.size() && i < _cgis.size() > i)
+					_cgis[i - (_servers.size() + _clients.size())].closeCGI(i);
 				else
-				exit(1);
+					exit(1);
 			}
 			else if(_fds[i].revents & POLLIN && _servers.size() > i)
 				addClient(_servers[i]);
@@ -164,6 +166,16 @@ void Settings::checkTimeout(void)
 		{
 			Print::print(DEBUG, "TIMEOUT for client on socket " + to_string(_clients[i].getFd()), *_clients[i]._serverPtr);
 			closeClient(i);
+			i--;
+		}
+	}
+	for(int i = 0; i < (int)_cgis.size(); i++)
+	{
+		if((time(NULL) - _cgis[i].getStartTime()) > TIMEOUT / 2)
+		{
+			Print::print(DEBUG, "TIMEOUT for cgi", *_clients[i]._serverPtr);
+			_cgis[i].getClient()->error("504", "Gateway Timeout");
+			_cgis[i].closeCGI(i);
 			i--;
 		}
 	}
