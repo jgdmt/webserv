@@ -18,8 +18,4 @@ if cookie_string:
     print("</ul>")
 else:
     print(f"<p>No cookies found</p>")
-import time
-import sys
-sys.stdout.close()
-time.sleep(31);
-# print("<br/><a href=\"../\" id=\"back\">Go back</a></div></body></html>")
+print("<br/><a href=\"../\" id=\"back\">Go back</a></div></body></html>")

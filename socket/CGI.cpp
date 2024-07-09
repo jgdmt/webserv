@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 18:12:14 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/09 20:29:47 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,6 @@ void	CGI::body(int id)
 	{
 		Print::print(ERROR, "CGI: pipe read failed");
 		_client->error("500", "Internal Server Error");
-		std::cout << "yaaa\n";
 		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
 	}
 	else if (rd == 0)
@@ -133,8 +132,6 @@ void	CGI::body(int id)
 			else
 				_answer.insert(0, "Content-length: " + to_string(_answer.length() - find) + "\r\n");
 		}
-		kill(_pid, SIGKILL);
-		std::cout << "test\n";
 		waitpid(_pid, &status, 0);
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
 			_client->error("500", "Internal Server Error");
