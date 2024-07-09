@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 17:10:45 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 19:19:19 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,11 @@ void	CGI::createEnv(std::string path)
 
 char ** CGI::stringToChar(void)
 {
-	char** cenv = (char**)malloc(sizeof(char*) * (_env.size() + 1));
+	char** cenv = new char*[_env.size() + 1];
 	int i = 0;
 	std::string s;
 	if (cenv == NULL)
-		Print::print(ERROR, "Error malloc in cgi");
+		Print::print(ERROR, "Error in cgi");
 	for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
 	{
 		s = it->first;
@@ -144,12 +144,12 @@ void	CGI::body(int id)
 
 void	CGI::exec(char **script)
 {
-	char **cenv = stringToChar();
 	int end[2];
 	int in[2];
 	if (pipe(end) == -1 || pipe(in) == -1)
 	{
 		std::cout << "Pipe error\n";
+		_client->error("500", "Internal Server Error");
 		return ;
 	}
 	_end = end[0];
@@ -161,10 +161,12 @@ void	CGI::exec(char **script)
 		close(end[0]);
 		close(end[1]);
 		_client->_settingsPtr->getFds()->pop_back();
+		_client->error("500", "Internal Server Error");
 		return ;
 	}
 	else if (!_pid)
 	{
+		char **cenv = stringToChar();
 		dup2(in[0], STDIN_FILENO);
 		close(in[0]);
 		close(in[1]);
@@ -174,8 +176,11 @@ void	CGI::exec(char **script)
 		if(chdir(((std::string)script[1]).substr(0, ((std::string)script[1]).find_last_of("/")).c_str()) == -1)
 			exit(1);
 		script[1] = (char*)((std::string)script[1]).substr(((std::string)script[1]).find_last_of("/") + 1).c_str();
-		if (execve(script[0], script, cenv) == -1)
-			Print::print(ERROR, "Execve failed");
+		execve(script[0], script, cenv);
+		Print::print(ERROR, "Execve failed");
+		for (int i = 0; cenv[i]; i++)
+			free(cenv[i]);
+		delete cenv;
 	}
 	else
 	{
