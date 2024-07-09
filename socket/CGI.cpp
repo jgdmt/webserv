@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 16:32:03 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/09 18:12:14 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,8 @@ char ** CGI::stringToChar(void)
 void	CGI::closeCGI(int cgiId)
 {
 	close(_end);
-	kill(_pid, SIGKILL);
+	if (_pid > 0)
+		kill(_pid, SIGKILL);
 	int fdId = cgiId + _client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size();
 	_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + fdId);
 	_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
@@ -151,7 +152,11 @@ void	CGI::exec(char **script)
 	int in[2];
 	if (pipe(end) == -1 || pipe(in) == -1)
 	{
-		std::cout << "Pipe error\n";
+		close(end[0]);
+		close(end[1]);
+		close(in[0]);
+		close(in[1]);
+		Print::print(ERROR, "Pipe error");
 		_client->error("500", "Internal Server Error");
 		return ;
 	}
@@ -160,11 +165,12 @@ void	CGI::exec(char **script)
 	_pid = fork();
 	if (_pid < 0)
 	{
-		std::cout << "fork error\n";
+		Print::print(ERROR, "Fork error");
 		close(end[0]);
 		close(end[1]);
 		_client->_settingsPtr->getFds()->pop_back();
 		_client->error("500", "Internal Server Error");
+		closeCGI(_client->_settingsPtr->getCgi()->size() - 1);
 		return ;
 	}
 	else if (!_pid)
