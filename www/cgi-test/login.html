@@ -32,7 +32,7 @@
             })
 			.then(response => {
     		if (response.status === 200) {
-				document.getElementById('content').innerHTML = '<div id="successMessage">Successfully logged in</div><br/><a href="index.html">Go back</a>';
+				document.getElementById('content').innerHTML = '<div id="successMessage">Successfully logged in</div><br/><a href="index.html" id="back">Go back</a>';
       		} else {
 				document.getElementById('content').innerHTML = '<div id="errorMessage">Error: Unable to log in. Please try again later.</div>';
 			}

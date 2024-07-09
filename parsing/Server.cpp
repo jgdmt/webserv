@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 09:43:39 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/09 15:28:35 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ Server::Server(int id) : _id(id)
 	_error_pages["411"] = "default/http_error/411.html";
     _error_pages["413"] = "default/http_error/413.html";
     _error_pages["500"] = "default/http_error/500.html";
-
+    _error_pages["504"] = "default/http_error/504.html";
 }
 
 Server::~Server()

@@ -50,3 +50,7 @@ form {
 	background-color: rgba(0, 0, 0, 0.472);
 	border-radius: 10px;
 }
+
+#back {
+    font-size: xx-large;
+}
