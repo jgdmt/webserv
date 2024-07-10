@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/02 16:32:27 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:08:41 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Settings
         void setup(void);
         void run(void);
         void closeClient(unsigned int i);
+		Server* find_server_name(std::string host);
     private:
         void checkTimeout(void);
 		void parseServer(std::string const& content, std::string::iterator& name, std::string::iterator &start, std::string::iterator &end);

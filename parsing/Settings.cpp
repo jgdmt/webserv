@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 17:04:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:19:20 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,4 +227,20 @@ void Settings::addClient(Server &serv)
 	}
 }
 
+Server* Settings::find_server_name(std::string host)
+{
+	Server* server = NULL;
 
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		for (size_t j = 0; j < _servers[i].getNameNumber(); i++)
+		{
+			if (host == _servers[i].getName(j))
+			{
+				server = &_servers[i];
+				return server;
+			}
+		}
+	}
+	return server;
+}
