@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 13:59:48 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:22:29 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,11 @@ void    Client::readRequest(void)
 {
 	char buffer[READSIZE + 1];
 	int i = _id + _settingsPtr->getServers()->size();
-	bzero(buffer, READSIZE + 1);
-    switch (read(_fd, buffer, READSIZE))
+	int readSize;
+	readSize = read(_fd, buffer, READSIZE);
+	if(readSize > 0)
+		buffer[readSize] = 0; 
+    switch (readSize)
 	{
 	case 0:
 		_settingsPtr->closeClient(_id);
@@ -113,6 +116,7 @@ void    Client::readRequest(void)
 		return ;
 	default:
 		_last_com = time(NULL);
+		// std::cout << "here\n";
 		add(buffer);
 		break;
 	}
@@ -130,6 +134,7 @@ void    Client::readRequest(void)
 		case 0:
 			break;
 		case 1:
+			// std::cout << "parsing\n";
 			init();
 			if (!_cgiStatus)
 				_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};

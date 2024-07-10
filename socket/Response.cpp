@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/10 12:07:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 16:58:49 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,6 +307,8 @@ void Response::init(void)
 {
     size_t pos = 0;
     Route *route = NULL;
+    if(_client->getUri().find('%') != std::string::npos)
+        return error("501", "Not Implemented");
     size_t next = _client->getUri().find('/', pos + 1);
     if (next == std::string::npos)
         next = _client->getUri().length();

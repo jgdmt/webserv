@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:31:30 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 11:30:50 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:00:01 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include "Response.hpp"
 #include "CGI.hpp"
 
-#define READSIZE 500000
+#define READSIZE 50000
 #define WRITESIZE 50000
 
 class Settings;
