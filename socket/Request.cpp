@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 16:08:33 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:19:52 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ std::string const &Request::getCookies(void) const
     return _cookies;
 }
 
-unsigned int const &Request::getContentLength(void) const
+size_t const &Request::getContentLength(void) const
 {
 	return _contentLength;
 }
@@ -286,19 +286,47 @@ void Request::parseBody(void)
 
     if (_contentLength == 0 && !_chunked)
         _state = END;
-	// else if (_chunked)
-	// {
-		
-	// }
+	else if (_chunked)
+	{
+		while (1)
+		{
+			size_t i = tmp.find("\r\n", 0);
+			if (i == std::string::npos)
+				return ;
+			size_t chunk_size = convertType<size_t>(tmp.substr(0, i - _i));
+			std::cout << "chunk size " << chunk_size << "\n";
+			if (chunk_size > tmp.length() - i)
+				return ;
+			if (chunk_size == 0)
+			{
+				_state = END;
+				_buffer.clear();
+				return ;
+			}
+			i += 2;
+			_body.append(tmp.substr(i, chunk_size));
+			tmp = tmp.substr(chunk_size);
+			if (tmp.length() >= 2)
+				tmp = tmp.substr(2);
+			else
+			{
+				_buffer = _buffer.substr(_i + i);
+				_i = 0;
+				return ;
+			}
+		}
+	}
     else if (tmp.length() + _body.length() >= _contentLength)
     {
         _body.append(tmp.substr(0, _contentLength - _body.length()));
+		_buffer.clear();
         _state = END;
     }
     else
     {
         _body.append(tmp);
-        _i += tmp.length(); 
+		_buffer.clear();
+        _i = 0; 
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 16:07:05 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:20:04 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ class Request
 		std::string const &getAcceptEncoding(int i) const;
 		std::string const &getQuery(void) const;
         std::string const &getCookies(void) const;
-		unsigned int const& getContentLength(void) const;
+		size_t const& getContentLength(void) const;
 		size_t getAcceptSize(void);
 		size_t getAcceptEncodingSize(void);
 
@@ -106,15 +106,6 @@ class Request
        void setAccept(std::string const& line);
 	   void	acceptEncoding(std::string const& line);
 	   void transferEncoding(std::string const& line);
-		template <class T>
-		static T convertType(std::string entry)
-		{
-			T s = 0;
-			std::stringstream	ss(entry);
-
-			ss >> s;
-			return (s);
-		}
 
 		template <typename T>
 		static void swap(T& a, T& b)
