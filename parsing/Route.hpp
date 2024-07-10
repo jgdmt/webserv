@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 09:44:50 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 14:30:23 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Route
         std::string getdefaultFileForDirectory(void) const;
 		std::string const &getCgiPath(void) const;
 		std::string const &getCgiExtension(int i) const;
+		std::string const &getUploadDirectory(void) const;
 		size_t getCgiLength(void);
         Route *getRoute(unsigned int i);
         unsigned int getRoutesNumber(void) const;

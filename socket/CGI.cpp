@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/10 14:02:00 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 14:56:07 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ CGI& CGI::operator=(CGI const& other)
 		return *this;
 }
 
-void	CGI::createEnv(std::string path)
+void	CGI::createEnv(Route* route, std::string path)
 {
 	char buffer[INET_ADDRSTRLEN];
 	_env["AUTH_TYPE"] = "";
@@ -74,6 +74,7 @@ void	CGI::createEnv(std::string path)
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_SOFTWARE"] = "IsWatchingYou";
 	_env["HTTP_COOKIE"] = _client->getCookies();
+	_env["IWY_UPLOAD_DIR"] = route->getUploadDirectory();
 }
 
 char ** CGI::stringToChar(void)
@@ -208,6 +209,6 @@ void	CGI::handler(Route* route, std::string path)
 	script[0] = (char*) s.c_str();
 	script[1] = (char*) path.c_str();
 	script[2] = NULL;
-	createEnv(path);
+	createEnv(route, path);
 	exec(script);
 }

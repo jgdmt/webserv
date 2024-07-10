@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 15:58:08 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 14:28:36 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,6 @@ class CGI {
 		time_t _startTime;
 
 		char** stringToChar(void);
-		void createEnv(std::string path);
+		void createEnv(Route* route, std::string path);
 		void exec(char ** script);
 };
