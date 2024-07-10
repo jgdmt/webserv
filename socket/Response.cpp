@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/09 19:16:35 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 12:07:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,10 @@ void Response::genBody(std::string path)
 
 void Response::genDirListing(std::string path)
 {
+    if (_client->getMethod() == "POST" || _client->getMethod() == "PUT")
+    {
+        error("405", "Method Not Allowed");
+    }
     _buffer.append("Content-Type: text/html\r\n");
     std::string body;
     body.append("<html><head><title>Index of " + _client->getUri() + "</title></head>");
@@ -161,7 +165,7 @@ void Response::genRes(std::string path, Route* route)
         deleteHandle(path);
         return;
     }
-    if (access(path.c_str(), F_OK))
+    else if (access(path.c_str(), F_OK))
         error("404", "Not Found");
     else if (access(path.c_str(), R_OK))
         error("403", "Forbidden");
@@ -172,20 +176,25 @@ void Response::genRes(std::string path, Route* route)
 			_cgiStatus = true;
 			return ;
 		}
-        unsigned int i = 0;
-        std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
-        while (i < _client->getAcceptSize())
-        {
-            if (myme == _client->getAccept(i) || "*/*" == _client->getAccept(i))
-                break;
-            i++;
-        }
-        if (_client->getAcceptSize() != 0 && i == _client->getAcceptSize())
-            error("406", "Not Acceptable");
+        else if (_client->getMethod() == "POST" || _client->getMethod() == "PUT")
+            error("405", "Method Not Allowed");
         else
         {
-            genHeader("200 OK");
-            genBody(path);
+            unsigned int i = 0;
+            std::string myme = MIME_TYPE(path.substr(path.find_last_of('.') + 1));
+            while (i < _client->getAcceptSize())
+            {
+                if (myme == _client->getAccept(i) || "*/*" == _client->getAccept(i))
+                    break;
+                i++;
+            }
+            if (_client->getAcceptSize() != 0 && i == _client->getAcceptSize())
+                error("406", "Not Acceptable");
+            else
+            {
+                genHeader("200 OK");
+                genBody(path);
+            }
         }
     }
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/10 12:12:55 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 14:02:00 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	CGI::body(int id)
 			_client->error("500", "Internal Server Error");
 		else if (_answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
-		std::cout << "CGI RES: " << _answer << "\n";
+		// std::cout << "CGI RES: " << _answer << "\n";
 		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
 	}
 	else
@@ -161,6 +161,7 @@ void	CGI::exec(char **script)
 	_end = end[0];
 	_client->_settingsPtr->getFds()->push_back((pollfd){_end, POLLIN, 0});
 	_pid = fork();
+	write(in[1], _client->getBody().c_str(), _client->getBody().length());
 	if (_pid < 0)
 	{
 		Print::print(ERROR, "Fork error");
@@ -191,7 +192,6 @@ void	CGI::exec(char **script)
 	}
 	else
 	{
-		write(in[1], _client->getBody().c_str(), _client->getBody().length());
 		close(in[0]);
 		close(in[1]);
 		close(end[1]);
