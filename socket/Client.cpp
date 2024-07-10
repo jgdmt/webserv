@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 17:22:29 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:34:36 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,9 +100,9 @@ sockaddr_in* Client::getAddr()
 void    Client::readRequest(void)
 {
 	char buffer[READSIZE + 1];
-	int i = _id + _settingsPtr->getServers()->size();
+	int i = _id + _settingsPtr->getServerSize();
 	int readSize;
-	readSize = read(_fd, buffer, READSIZE);
+	readSize = recv(_fd, buffer, READSIZE, O_NONBLOCK);
 	if(readSize > 0)
 		buffer[readSize] = 0; 
     switch (readSize)
@@ -117,7 +117,7 @@ void    Client::readRequest(void)
 	default:
 		_last_com = time(NULL);
 		// std::cout << "here\n";
-		add(buffer);
+		add(std::string(buffer, readSize));
 		break;
 	}
 	switch(IsParsingOk())
@@ -157,7 +157,7 @@ void    Client::sendResponse(void)
 			Print::print(DEBUG, "Response sent to Client " + to_string<int>(_id) + ".", *_serverPtr);
 			Request::clear();
 			Response::_buffer.clear();
-			_settingsPtr->getFds()->at(_id + _settingsPtr->getServers()->size()) = (pollfd){_fd, POLLIN, 0};		
+			_settingsPtr->getFds()->at(_id + _settingsPtr->getServerSize()) = (pollfd){_fd, POLLIN, 0};		
 			_last_com = time(NULL);
 			if(getConnection() != "keep-alive")
 				_settingsPtr->closeClient(_id);

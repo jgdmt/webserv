@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Settings.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 11:51:08 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:08:41 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:31:48 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,13 @@
 class Settings
 {
     public:
+        Settings();
         void parse(std::string const &filePath);
         std::vector<Server> *getServers(void);
 		std::vector<Client> *getClients(void);
         std::vector<pollfd> *getFds();
 		std::vector<CGI> *getCgi();
+        size_t getServerSize();
         void setup(void);
         void run(void);
         void closeClient(unsigned int i);
@@ -41,4 +43,5 @@ class Settings
         std::vector<Server> _servers;
         std::vector<Client> _clients;
 		std::vector<CGI> _cgis;
+        size_t  _serverSize;
 }; 

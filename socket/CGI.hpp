@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:10 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/10 14:28:36 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 19:17:35 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <cstdio>
 #include "Request.hpp"
 #include "../parsing/Server.hpp"
 #include "../Print.hpp"
@@ -47,6 +48,7 @@ class CGI {
 		int	_end;
 		pid_t _pid;
 		time_t _startTime;
+		std::FILE* _file;
 
 		char** stringToChar(void);
 		void createEnv(Route* route, std::string path);

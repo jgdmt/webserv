@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 18:01:21 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:14:55 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,7 +314,7 @@ void Request::parseBody(void)
 			}
 			i += 2;
 			_body.append(tmp.substr(i, chunk_size));
-			tmp = tmp.substr(chunk_size);
+			tmp = tmp.substr(chunk_size + i);
 			if (tmp.length() >= 2)
 				tmp = tmp.substr(2);
 			else
@@ -353,8 +353,10 @@ void Request::clear(void)
     _body.clear();
     _contentLength = 0;
     _error = 0;
+	_chunked = 0;
     _accept.clear();
 	_acceptEncoding.clear();
+	_transferEncoding.clear();
     bzero(&_headerStatus, sizeof(t_headerStatus));
 }
 

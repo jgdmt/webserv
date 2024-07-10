@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:21:43 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:30:46 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,8 +158,8 @@ void	Server::servername(std::string const& content, std::string::iterator& start
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
-		if(function(content.substr(start - content.begin(), it - start)))
-			Print::print(CRASH, "Parsing server: Two servers with same server_name");
+		// if(function(content.substr(start - content.begin(), it - start)))
+		// 	Print::print(CRASH, "Parsing server: Two servers with same server_name");
 		this->_name.push_back(content.substr(start - content.begin(), it - start));
 		start = it;
 		while (*start == ' ')
@@ -184,7 +184,6 @@ void Server::maxbodysize(std::string const& content, std::string::iterator& star
 void	Server::parseRoot(std::string const& content, std::string::iterator& start, std::string::iterator& end)
 {
 	int l = Route::find_len(content, start, '{', false);
-	// std::string::iterator end_root = Route::find_end(content, start + l + 1);(void)end;
 
 	if (l == 0)
 		Print::print(CRASH, "Parsing server: location is missing a value");
@@ -192,10 +191,7 @@ void	Server::parseRoot(std::string const& content, std::string::iterator& start,
 		Print::print(CRASH, "Parsing server: location does not take multiple parameters");
 	Route route;
 
-	// std::string::iterator it = start;
-	// std::cout << "BEFORE " << content.substr((start + l + 2) - content.begin(), end_root - content.begin()) << "\n";
 	route.parse(content, start, end, l);
-	// std::cout << "parsing server " << route.getLocation() << " end root: " << content.substr(it - content.begin(), end_root - content.begin()) << " and length: " << l << "\n"; 
 	this->_routes.push_back(route);
 }
 

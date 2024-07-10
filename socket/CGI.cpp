@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/10 14:56:07 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:34:30 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 CGI::CGI(std::vector<Client>::iterator cli, int id): _client(cli), _clientID(id) 
 {
+	_pid = -1;
+	_file = NULL;
 }
 
 CGI::CGI(CGI const& cpy)
@@ -53,6 +55,9 @@ CGI& CGI::operator=(CGI const& other)
 		this->_clientID = other._clientID;
 		this->_answer = other._answer;
 		this->_end = other._end;
+		this->_pid = other._pid;
+		this->_startTime = other._startTime;
+		this->_file = other._file;
 		return *this;
 }
 
@@ -97,11 +102,12 @@ char ** CGI::stringToChar(void)
 void	CGI::closeCGI(int cgiId)
 {
 	close(_end);
+	fclose(_file);
 	if (_pid > 0)
 		kill(_pid, SIGKILL);
-	int fdId = cgiId + _client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size();
+	int fdId = cgiId + _client->_settingsPtr->getServerSize() + _client->_settingsPtr->getClients()->size();
 	_client->_settingsPtr->getFds()->erase(_client->_settingsPtr->getFds()->begin() + fdId);
-	_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServers()->size()) = (pollfd) {_client->getFd(), POLLOUT, 0};
+	_client->_settingsPtr->getFds()->at(_client->getId() + _client->_settingsPtr->getServerSize()) = (pollfd) {_client->getFd(), POLLOUT, 0};
 	_client->_settingsPtr->getCgi()->erase(_client->_settingsPtr->getCgi()->begin() + cgiId);
 }
 
@@ -117,7 +123,7 @@ void	CGI::body(int id)
 	{
 		Print::print(ERROR, "CGI: pipe read failed");
 		_client->error("500", "Internal Server Error");
-		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
+		closeCGI(id - (_client->_settingsPtr->getServerSize() + _client->_settingsPtr->getClients()->size()));
 	}
 	else if (rd == 0)
 	{
@@ -138,8 +144,7 @@ void	CGI::body(int id)
 			_client->error("500", "Internal Server Error");
 		else if (_answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
-		// std::cout << "CGI RES: " << _answer << "\n";
-		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
+		closeCGI(id - (_client->_settingsPtr->getServerSize() + _client->_settingsPtr->getClients()->size()));
 	}
 	else
 		_answer.append(buff);
@@ -148,27 +153,32 @@ void	CGI::body(int id)
 void	CGI::exec(char **script)
 {
 	int end[2];
-	int in[2];
-	if (pipe(end) == -1 || pipe(in) == -1)
+	if (pipe(end) == -1)
 	{
-		close(end[0]);
-		close(end[1]);
-		close(in[0]);
-		close(in[1]);
 		Print::print(ERROR, "Pipe error");
 		_client->error("500", "Internal Server Error");
 		return ;
 	}
 	_end = end[0];
 	_client->_settingsPtr->getFds()->push_back((pollfd){_end, POLLIN, 0});
+	_file = std::tmpfile();
+	int fd = fileno(_file);
+	if (write(fd, _client->getBody().c_str(), _client->getBody().length()) == -1)
+	{
+		Print::print(ERROR, "Write error");
+		close(fd);
+		close(end[1]);
+		_client->error("500", "Internal Server Error");
+		closeCGI(_client->_settingsPtr->getCgi()->size() - 1);
+		return;
+	}
+	lseek(fd, 0, SEEK_SET);
 	_pid = fork();
-	write(in[1], _client->getBody().c_str(), _client->getBody().length());
 	if (_pid < 0)
 	{
 		Print::print(ERROR, "Fork error");
-		close(end[0]);
+		close(fd);
 		close(end[1]);
-		_client->_settingsPtr->getFds()->pop_back();
 		_client->error("500", "Internal Server Error");
 		closeCGI(_client->_settingsPtr->getCgi()->size() - 1);
 		return ;
@@ -176,9 +186,7 @@ void	CGI::exec(char **script)
 	else if (!_pid)
 	{
 		char **cenv = stringToChar();
-		dup2(in[0], STDIN_FILENO);
-		close(in[0]);
-		close(in[1]);
+		dup2(fd, STDIN_FILENO);
 		dup2(end[1], STDOUT_FILENO);
 		close(end[0]);
 		close(end[1]);
@@ -193,8 +201,7 @@ void	CGI::exec(char **script)
 	}
 	else
 	{
-		close(in[0]);
-		close(in[1]);
+		close(fd);
 		close(end[1]);
 		_startTime = time(NULL);
 	}

@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:22:01 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:46:34 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 #include <iterator>
 
 typedef std::string::iterator it;
+
+Settings::Settings()
+{
+	_serverSize = 0;
+}
 
 std::vector<pollfd> *Settings::getFds()
 {
@@ -29,6 +34,11 @@ std::vector<Client> *Settings::getClients(void)
 std::vector<CGI> *Settings::getCgi()
 {
 	return &_cgis;
+}
+
+size_t Settings::getServerSize()
+{
+	return _serverSize;
 }
 
 static std::string createContent(std::string const& fileName)
@@ -76,7 +86,7 @@ void Settings::parseServer(std::string const& content, it& name, it& start, it& 
 	
 	if (name == start || content.substr(name - content.begin(), len) != "server")
 		Print::print(CRASH, content.substr(name - content.begin(), len) + " is an unknown key");
-	Server server(this->_servers.size() + 1);
+	Server server(this->_serverSize + 1);
 	server.parse(content, start, end);
 	this->_servers.push_back(server);
 }
@@ -128,6 +138,7 @@ void Settings::setup(void)
 		}
 		if(j == i)
 		{
+			_serverSize++;
 			_servers[i].setup();
 			pollfd tmp = {_servers[i].getFdListen(), POLLIN, 0};
 			_fds.push_back(tmp);
@@ -148,21 +159,21 @@ void Settings::run(void)
 			if (_fds[i].revents == POLLERR || _fds[i].revents == POLLHUP || _fds[i].revents == POLLNVAL)
 			{
 				Print::print(ERROR, "Poll: at client id " + to_string<int>(i - 1) + ": " +  (std::string)strerror(errno));
-				if(i >= _servers.size() && _clients.size() > i)
-					closeClient(i - _servers.size());
-				else if (i > _servers.size() + _clients.size() && i < _cgis.size() > i)
-					_cgis[i - (_servers.size() + _clients.size())].closeCGI(i);
+				if(i >= _serverSize && _clients.size() > i)
+					closeClient(i - _serverSize);
+				else if (i > _serverSize + _clients.size() && i < _cgis.size() > i)
+					_cgis[i - (_serverSize + _clients.size())].closeCGI(i);
 				else
 					exit(1);
 			}
-			else if(_fds[i].revents & POLLIN && _servers.size() > i)
+			else if(_fds[i].revents & POLLIN && _serverSize > i)
 				addClient(_servers[i]);
-			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
-				_clients[i - _servers.size()].readRequest();
-			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _servers.size())) // && _clients[i - _servers.size()].getFd() == _fds[i].fd
-				_clients[i - _servers.size()].sendResponse();
-			else if (_fds[i].revents & POLLIN && _clients.size() + _servers.size() <= i)
-				_cgis[i - _servers.size() - _clients.size()].body(i);
+			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _serverSize)) // && _clients[i - _serverSize].getFd() == _fds[i].fd
+				_clients[i - _serverSize].readRequest();
+			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _serverSize)) // && _clients[i - _serverSize].getFd() == _fds[i].fd
+				_clients[i - _serverSize].sendResponse();
+			else if (_fds[i].revents & POLLIN && _clients.size() + _serverSize <= i)
+				_cgis[i - _serverSize - _clients.size()].body(i);
 		}
 		checkTimeout();
 	}
@@ -199,14 +210,14 @@ void Settings::closeClient(unsigned int i)
 			_clients[j].setClient(_clients.begin() + j);
 	}
 	close(_clients[i].getFd());
-	_fds.erase(_fds.begin() + _servers.size() + i);
+	_fds.erase(_fds.begin() + _serverSize + i);
 	Print::print(DEBUG, "Client " + to_string(i) + " closed. Socket " + to_string(_clients[i].getFd()) + " freed.", *_clients[i]._serverPtr);
 	_clients.erase(_clients.begin() + i);
 	for(std::vector<CGI>::iterator j = _cgis.begin(); j != _cgis.end(); j++)
 	{
 		if(j->getID() == (int)i)
 			{
-				_fds.erase(_fds.begin() + _servers.size() + _clients.size() + (j - _cgis.begin()));
+				_fds.erase(_fds.begin() + _serverSize + _clients.size() + (j - _cgis.begin()));
 				_cgis.erase(j);
 				j--;
 				continue;
@@ -229,7 +240,7 @@ void Settings::addClient(Server &serv)
 			i->setClient(_clients.begin() + i->getID());
 		_clients.back().setClient(_clients.end() - 1);
 		pollfd tmp = {_clients.back().getFd(), POLLIN, 0};
-		_fds.insert(_fds.begin() + _servers.size() - 1 + _clients.size(), tmp);
+		_fds.insert(_fds.begin() + _serverSize - 1 + _clients.size(), tmp);
 	}
 	catch(const std::exception& e)
 	{
