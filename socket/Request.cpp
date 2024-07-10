@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 17:19:52 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 18:01:21 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ size_t Request::getAcceptEncodingSize(void)
 
 static int getParam(std::string const &param)
 {
-    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "Cookie", "end"};
+    std::string params[] = {"Host", "Connection", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "Transfer-Encoding", "Cookie", "end"};
     for(int i = 0; params[i] != "end"; i++)
         if (params[i] == param)
             return (i);
@@ -158,7 +158,7 @@ void Request::acceptEncoding(std::string const& line)
 		j = line.find(", ", i);
 		if (j == std::string::npos)
 		{
-			j = line.length() - 1;
+			j = line.length();
 			_acceptEncoding.push_back(line.substr(i, j - i));
 			break;
 		}
@@ -177,14 +177,14 @@ void Request::transferEncoding(std::string const& line)
 		j = line.find(", ", i);
 		if (j == std::string::npos)
 		{
-			j = line.length() - 1;
-			_acceptEncoding.push_back(line.substr(i, j - i));
-			if (_acceptEncoding.at(_acceptEncoding.size() - 1) == "chunked")
+			j = line.length();
+			_transferEncoding.push_back(line.substr(i, j - i));
+			if (_transferEncoding.at(_transferEncoding.size() - 1) == "chunked")
 				_chunked = true;
 			break;
 		}
-		_acceptEncoding.push_back(line.substr(i, j - i));
-		if (_accept.at(_acceptEncoding.size() - 1) == "chunked")
+		_transferEncoding.push_back(line.substr(i, j - i));
+		if (_transferEncoding.at(_transferEncoding.size() - 1) == "chunked")
 			_chunked = true;
 		i = j + 2;
 	}
@@ -280,6 +280,16 @@ int Request::parseHeader(void)
     return (0);
 }
 
+static size_t hex_to_size_t(std::string str)
+{
+	size_t x;
+	std::stringstream ss;
+
+	ss << std::hex << str;
+	ss >> x;
+	return x;
+}
+
 void Request::parseBody(void)
 {
     std::string tmp = _buffer.substr(_i);
@@ -293,8 +303,7 @@ void Request::parseBody(void)
 			size_t i = tmp.find("\r\n", 0);
 			if (i == std::string::npos)
 				return ;
-			size_t chunk_size = convertType<size_t>(tmp.substr(0, i - _i));
-			std::cout << "chunk size " << chunk_size << "\n";
+			size_t chunk_size = hex_to_size_t(tmp.substr(0, i - _i));
 			if (chunk_size > tmp.length() - i)
 				return ;
 			if (chunk_size == 0)
@@ -405,7 +414,7 @@ int Request::IsParsingOk(void)
     {
         return -1;
     }
-    else if ( _contentLength == 0 && (_method == "POST") && _body.length() != 0)
+    else if (!(_contentLength || _chunked) && (_method == "POST") && _body.length() != 0)
         return -2;
     else if (_headerStatus.accept == false)
         _accept.push_back("*/*");
