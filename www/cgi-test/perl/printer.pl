@@ -2,10 +2,8 @@ use strict;
 use warnings;
 use CGI;
 
-# Create a new CGI object
-my $cgi = CGI->new;
 
-# Read the body content
+my $cgi = CGI->new;
 my $body = '';
 if ($ENV{'CONTENT_LENGTH'}) {
     read(STDIN, $body, $ENV{'CONTENT_LENGTH'});

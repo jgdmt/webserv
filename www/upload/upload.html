@@ -1,12 +1,15 @@
 <html>
 <head>
     <title>File Upload</title>
+    <link rel="stylesheet" href="main.css" />
 </head>
-<body>
-    <h1>Upload a File</h1>
-    <form enctype="multipart/form-data" action="upload.pl" method="post">
-        <input type="file" name="file" />
-        <input type="submit" value="Upload" />
-    </form>
+<body class="is-preload">
+    <div id="content">
+        <h1>Upload a File</h1>
+        <form enctype="multipart/form-data" action="upload.pl" method="post">
+            <input type="file" name="file" multiple/>
+            <input type="submit" value="Upload" />
+        </form>
+    </div>
 </body>
 </html>
