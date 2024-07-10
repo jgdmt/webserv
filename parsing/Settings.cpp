@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 17:04:22 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:11:46 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,10 +119,20 @@ void Settings::setup(void)
 	char buffer[INET_ADDRSTRLEN];
 	for(int i = 0; i < (int)_servers.size(); i++)
 	{
-		_servers[i].setup();
-		pollfd tmp = {_servers[i].getFdListen(), POLLIN, 0};
-		_fds.push_back(tmp);
-		Print::print(INFO, "Server started! Listen at " + (std::string)inet_ntop(AF_INET, &_servers[i].getHost(), buffer, INET_ADDRSTRLEN) + ":" + to_string<uint16_t>(_servers[i].getPort()) + ".", _servers[i]);
+		int j = 0;
+		while(j < i)
+		{
+			if(_servers[j].getHost() == _servers[i].getHost())
+				break;
+			j++;
+		}
+		if(j == i)
+		{
+			_servers[i].setup();
+			pollfd tmp = {_servers[i].getFdListen(), POLLIN, 0};
+			_fds.push_back(tmp);
+			Print::print(INFO, "Server started! Listen at " + (std::string)inet_ntop(AF_INET, &_servers[i].getHost(), buffer, INET_ADDRSTRLEN) + ":" + to_string<uint16_t>(_servers[i].getPort()) + ".", _servers[i]);
+		}
 	}
 	Print::print(SUCCESS,"All servers succesfully started !");
 }
