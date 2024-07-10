@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 11:48:31 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 16:08:33 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ Request::Request()
 {
     _state = METHOD;
     _error = 0;
+	_chunked = false;
     _contentLength = 0;
 	bzero(&_headerStatus, sizeof(t_headerStatus));
 }
@@ -166,6 +167,29 @@ void Request::acceptEncoding(std::string const& line)
 	}
 }
 
+void Request::transferEncoding(std::string const& line)
+{
+	size_t i = line.find(": ") + 2;
+	size_t j;
+
+	while (1)
+	{
+		j = line.find(", ", i);
+		if (j == std::string::npos)
+		{
+			j = line.length() - 1;
+			_acceptEncoding.push_back(line.substr(i, j - i));
+			if (_acceptEncoding.at(_acceptEncoding.size() - 1) == "chunked")
+				_chunked = true;
+			break;
+		}
+		_acceptEncoding.push_back(line.substr(i, j - i));
+		if (_accept.at(_acceptEncoding.size() - 1) == "chunked")
+			_chunked = true;
+		i = j + 2;
+	}
+}
+
 int Request::parseHeader(void)
 {
     std::string line;
@@ -222,10 +246,15 @@ int Request::parseHeader(void)
                 _headerStatus.content_type = true;
 				break;
             case CONTENT_LENGTH:
-                _contentLength = convertType<unsigned int>(std::string(line.begin() + line.find(": ") + 2, line.end()));
+                _contentLength = convertType<size_t>(std::string(line.begin() + line.find(": ") + 2, line.end()));
 				if (_headerStatus.content_length == true)
 					_error = 1;
 				_headerStatus.content_length = true;
+			case TRANSFER_ENCODING:
+				transferEncoding(line);
+				if (_headerStatus.transfer_encoding == true)
+					_error = 1;
+				_headerStatus.transfer_encoding = true;
             case COOKIE:
                 _cookies = std::string(line.begin() + line.find(": ") + 2, line.end());
 			default:
@@ -251,27 +280,26 @@ int Request::parseHeader(void)
     return (0);
 }
 
-int Request::parseBody(void)
+void Request::parseBody(void)
 {
     std::string tmp = _buffer.substr(_i);
 
-    if(_contentLength == 0)
-    {
+    if (_contentLength == 0 && !_chunked)
         _state = END;
-        return 0;
-    }
-    if (tmp.length() + _body.length() >= _contentLength)
+	// else if (_chunked)
+	// {
+		
+	// }
+    else if (tmp.length() + _body.length() >= _contentLength)
     {
         _body.append(tmp.substr(0, _contentLength - _body.length()));
         _state = END;
-        return (0);
     }
     else
     {
         _body.append(tmp);
         _i += tmp.length(); 
     }
-    return (1);
 }
 
 void Request::clear(void)
@@ -329,8 +357,8 @@ void Request::add(std::string const &new_buff)
             if (parseHeader())
                 break;
         case BODY:
-            if (parseBody())
-           		break;
+            parseBody();
+           	break;
         case END:
             break;
     }

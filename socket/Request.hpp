@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/08 18:34:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 16:07:05 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ enum Paramater
     ACCEPT_ENCODING,
     CONTENT_TYPE,
     CONTENT_LENGTH,
+	TRANSFER_ENCODING,
     COOKIE,
     OTHER,
 };
@@ -49,6 +50,7 @@ typedef struct s_headerStatus
 	bool accept_encoding;
 	bool content_type;
 	bool content_length;
+	bool transfer_encoding;
 } t_headerStatus ;
 
 class Client;
@@ -89,18 +91,21 @@ class Request
         std::string _contentBoundary;
         std::string _body;
         std::string _cookies;
-        unsigned int _contentLength;
+        size_t _contentLength;
         std::vector<std::string> _accept;
 		std::vector<std::string> _acceptEncoding;
+		std::vector<std::string> _transferEncoding;
         enum State _state;
         bool _error;
+		bool _chunked;
 		t_headerStatus _headerStatus;
 
     private:
        int parseHeader(void);
-       int parseBody(void);
+       void parseBody(void);
        void setAccept(std::string const& line);
 	   void	acceptEncoding(std::string const& line);
+	   void transferEncoding(std::string const& line);
 		template <class T>
 		static T convertType(std::string entry)
 		{
