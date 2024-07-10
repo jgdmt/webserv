@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:21:10 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:21:43 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,11 @@ std::string Server::getLogLevel(void) const
 	return _log_level;
 }
 
+std::string const& Server::getName(int i) const
+{
+	return _name[i];
+}
+
 int Server::getFdListen(void) const
 {
 	return _fd_listen;
@@ -98,6 +103,11 @@ Route* Server::getRoute(unsigned int i)
 unsigned int Server::getRoutesNumber(void) const
 {
 	return _routes.size();
+}
+
+size_t Server::getNameNumber(void) const
+{
+	return _name.size();
 }
 
 void Server::listen2(std::string const& content, std::string::iterator& start)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.s19.be>         +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 14:35:46 by vilibert          #+#    #+#             */
-/*   Updated: 2024/06/24 14:31:12 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:15:40 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,9 @@ class Server
         uint64_t getMaxBodySize(void) const;
 		int	getID(void) const;
         std::string const &getErrorPage(std::string const &error);
+		size_t getNameNumber(void) const;
         std::string getLogLevel(void) const;
+		std::string const &getName(int i) const;
         int getFdListen(void) const;
         Route* getRoute(unsigned int i);
         unsigned int getRoutesNumber(void) const;

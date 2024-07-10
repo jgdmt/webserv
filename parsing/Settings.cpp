@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:11:46 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 20:22:01 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,4 +237,20 @@ void Settings::addClient(Server &serv)
 	}
 }
 
+Server* Settings::find_server_name(std::string host)
+{
+	Server* server = NULL;
 
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		for (size_t j = 0; j < _servers[i].getNameNumber(); i++)
+		{
+			if (host == _servers[i].getName(j))
+			{
+				server = &_servers[i];
+				return server;
+			}
+		}
+	}
+	return server;
+}
