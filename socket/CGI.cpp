@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/09 20:29:47 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 12:12:55 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	CGI::createEnv(std::string path)
 {
 	char buffer[INET_ADDRSTRLEN];
 	_env["AUTH_TYPE"] = "";
-	_env["CONTENT_LENGTH"] = _client->getContentLength();
+	_env["CONTENT_LENGTH"] = to_string(_client->getContentLength());
 	_env["CONTENT_TYPE"] = _client->getContentType();
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["PATH_INFO"] = path;
@@ -137,6 +137,7 @@ void	CGI::body(int id)
 			_client->error("500", "Internal Server Error");
 		else if (_answer.find("\r\n\r\n") != std::string::npos)
 			_client->addBuffer(_answer);
+		std::cout << "CGI RES: " << _answer << "\n";
 		closeCGI(id - (_client->_settingsPtr->getServers()->size() + _client->_settingsPtr->getClients()->size()));
 	}
 	else

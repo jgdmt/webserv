@@ -9,9 +9,20 @@ UPLOAD_DIR = '/Users/jgoudema/Documents/webserv/www/upload'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def main():
-    form = cgi.FieldStorage(fp=sys.stdin, environ=os.environ, keep_blank_values=True)
+    print("Environment Variables:\n")
+    for key, value in os.environ.items():
+        print(f"{key}: {value}")
     
-    # Check if the file was uploaded
+    print("\n\n")
+
+    # Read and print raw input data
+    try:
+        input_data = sys.stdin.read(int(os.environ.get('CONTENT_LENGTH', 0)))
+        print("Raw Input Data:\n")
+        print(input_data)
+    except Exception as e:
+        print(f"Error reading input data: {e}")
+    form = cgi.FieldStorage(fp=sys.stdin, environ=os.environ, keep_blank_values=True)
     if 'file' not in form:
         print("Content-Type: text/html\r\n\r")
         print("<html><body><h1>No file uploaded</h1></body></html>")
