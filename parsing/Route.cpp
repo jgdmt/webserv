@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/09 19:13:33 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 14:41:45 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,11 @@ std::string const &Route::getCgiPath(void) const
 std::string const &Route::getCgiExtension(int i) const
 {
 	return _cgiExtensions[i];
+}
+
+std::string const& Route::getUploadDirectory(void) const
+{
+	return _uploadDirectory;
 }
 
 size_t Route::getCgiLength(void)
@@ -313,6 +318,8 @@ void Route::upload(std::string const& content, std::string::iterator& start)
 	path = content.substr(start - content.begin(), len);
 	if (stat(path.c_str(), &path_stat) == -1 || !S_ISDIR(path_stat.st_mode))
 		Print::print(CRASH, "Parsing location (upload) " + _location + ": " + path + " is not a directory");
+	if (path[0] != '/')
+		Print::print(CRASH, "Parsing location " + _location + ": upload takes only absolute paths");
 	this->_uploadDirectory = path;
 	start += len;
 }
