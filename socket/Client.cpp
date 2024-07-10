@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:34:36 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:51:54 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ void    Client::readRequest(void)
 	char buffer[READSIZE + 1];
 	int i = _id + _settingsPtr->getServerSize();
 	int readSize;
+	Request::setClient(this);
 	readSize = recv(_fd, buffer, READSIZE, O_NONBLOCK);
 	if(readSize > 0)
 		buffer[readSize] = 0; 
@@ -122,10 +123,13 @@ void    Client::readRequest(void)
 	}
 	switch(IsParsingOk())
 	{
+		case -3:
+			error("413", "Content Too Large");
+			_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
+			break;
 		case -2:
 			error("411", "Length Required");
 			_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};
-
 			break;
 		case -1:
 			error("400", "Bad Request");
@@ -134,7 +138,6 @@ void    Client::readRequest(void)
 		case 0:
 			break;
 		case 1:
-			// std::cout << "parsing\n";
 			init();
 			if (!_cgiStatus)
 				_settingsPtr->getFds()->at(i) = (pollfd){_fd, POLLOUT, 0};

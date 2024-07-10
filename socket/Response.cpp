@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/07/10 20:23:17 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:47:30 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,15 +302,10 @@ void Response::check_path(std::string path, Route *route)
         
     }
 }
-void Response::HandleServerName(void)
-{
-    if(_client->_settingsPtr->find_server_name(_client->getHost()))
-        _client->_serverPtr = _client->_settingsPtr->find_server_name(_client->getHost());
-}
+
 
 void Response::init(void)
 {
-    HandleServerName();
     size_t pos = 0;
     Route *route = NULL;
     if(_client->getUri().find('%') != std::string::npos)

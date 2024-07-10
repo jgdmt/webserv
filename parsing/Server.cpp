@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:30:46 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:05:25 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,8 +158,6 @@ void	Server::servername(std::string const& content, std::string::iterator& start
 	while (start != tmp + len)
 	{
 		it = std::find(start, tmp + len, ' ');
-		// if(function(content.substr(start - content.begin(), it - start)))
-		// 	Print::print(CRASH, "Parsing server: Two servers with same server_name");
 		this->_name.push_back(content.substr(start - content.begin(), it - start));
 		start = it;
 		while (*start == ' ')

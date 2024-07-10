@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:44 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 18:31:39 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:53:36 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,9 @@ class Request
         int IsParsingOk(void);
 
 	protected:
+		void setClient(Client* cli);
+		
+		Client* _client;
         size_t _i;
         std::string _buffer;
         std::string _method;
@@ -95,7 +98,7 @@ class Request
 		std::vector<std::string> _acceptEncoding;
 		std::vector<std::string> _transferEncoding;
         enum State _state;
-        bool _error;
+        int _error;
 		bool _chunked;
 		t_headerStatus _headerStatus;
 

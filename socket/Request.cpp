@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:58:32 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:14:55 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:50:49 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
-
+#include "Client.hpp"
+#include "../parsing/Settings.hpp"
 Request::Request()
 {
     _state = METHOD;
@@ -105,6 +106,11 @@ static int getParam(std::string const &param)
     else
         return (OTHER);
 
+}
+
+void Request::setClient(Client* cli)
+{
+	_client = cli;
 }
 
 void Request::setAccept(std::string const& line)
@@ -212,6 +218,8 @@ int Request::parseHeader(void)
                 _host = std::string(line.begin() + line.find(": ") + 2, line.end());
 				if (_headerStatus.host == true)
 					_error = 1;
+				 if(_client->_settingsPtr->find_server_name(_client->getHost()))
+        			_client->_serverPtr = _client->_settingsPtr->find_server_name(_client->getHost());
                 _headerStatus.host = true;
 				break;
             case CONNECTION:
@@ -294,7 +302,9 @@ void Request::parseBody(void)
 {
     std::string tmp = _buffer.substr(_i);
 
-    if (_contentLength == 0 && !_chunked)
+	if (tmp.length() > _client->_serverPtr->getMaxBodySize())
+		_error = 10;
+    else if (_contentLength == 0 && !_chunked)
         _state = END;
 	else if (_chunked)
 	{
@@ -408,6 +418,8 @@ int Request::IsParsingOk(void)
 {
     if (_error)
     {
+		if (_error == 10)
+			return -3;
         return -1;
     }
     else if (_state != END)
