@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 12:00:33 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:46:34 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:31:36 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,9 @@ void Settings::run(void)
 			}
 			else if(_fds[i].revents & POLLIN && _serverSize > i)
 				addClient(_servers[i]);
-			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _serverSize)) // && _clients[i - _serverSize].getFd() == _fds[i].fd
+			else if (_fds[i].revents & POLLIN && _clients.size() > (i - _serverSize)) 
 				_clients[i - _serverSize].readRequest();
-			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _serverSize)) // && _clients[i - _serverSize].getFd() == _fds[i].fd
+			else if (_fds[i].revents & POLLOUT && _clients.size() > (i - _serverSize))
 				_clients[i - _serverSize].sendResponse();
 			else if (_fds[i].revents & POLLIN && _clients.size() + _serverSize <= i)
 				_cgis[i - _serverSize - _clients.size()].body(i);
@@ -254,7 +254,7 @@ Server* Settings::find_server_name(std::string host)
 
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
-		for (size_t j = 0; j < _servers[i].getNameNumber(); i++)
+		for (size_t j = 0; j < _servers[i].getNameNumber(); j++)
 		{
 			if (host == _servers[i].getName(j))
 			{
