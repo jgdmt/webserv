@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 21:05:25 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:57:53 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,6 +277,15 @@ void	Server::parse(std::string const& content, std::string::iterator& start, std
 			Print::print(CRASH, "Parsing server: " + param + " is unknown");
 		while (*start == ' ' || *start == ';')
 			start++;
+	}
+	if (_port != 80 && _port != 443)
+	{
+		for(size_t i = 0; i < _name.size(); i++)
+		{
+			std::cout << _name[i] << "\n";
+			_name[i].append(":" + to_string<uint16_t>(_port));
+			std::cout << "after " << _name[i] << "\n";
+		}
 	}
 }
 
