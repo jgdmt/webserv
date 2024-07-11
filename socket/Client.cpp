@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/11 09:47:53 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/11 11:53:58 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,6 @@ void    Client::readRequest(void)
 		return ;
 	default:
 		_last_com = time(NULL);
-		// std::cout << "here\n";
 		add(std::string(buffer, readSize));
 		break;
 	}

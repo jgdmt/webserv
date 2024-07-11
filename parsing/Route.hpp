@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:13:40 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:13:26 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/11 11:53:37 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ class Route
 		static std::string::iterator	find_end(std::string const& content, std::string::iterator i);
 
 	private:
-        // Route(Route const &cpy);
-        // Route &operator= (Route const &cpy);
         std::vector<std::string> _autorizedMethods;
 		std::vector<Route> _routes;
         std::string _location;

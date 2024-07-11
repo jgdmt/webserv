@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:00:05 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/11 11:19:14 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/11 11:53:45 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Server::Server(int id) : _id(id)
 
 Server::~Server()
 {
-	// close(this->_fd_listen);
+
 }
 
 Server::Server(Server const &cpy)

@@ -6,7 +6,7 @@
 /*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 15:32:07 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 20:13:21 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/11 11:53:24 by jgoudema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,6 @@ void Route::cgipath(std::string const& content, std::string::iterator& start)
 
 void Route::cgiextension(std::string const& content, std::string::iterator& start)
 {
-	//.php
 	int len = Route::find_len(content, start, ';', true);
 	std::string::iterator tmp = start;
 	std::string::iterator it;
