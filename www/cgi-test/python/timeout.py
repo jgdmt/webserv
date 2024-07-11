@@ -1,2 +1,2 @@
 import time
-time.sleep(35);
+time.sleep(35)
