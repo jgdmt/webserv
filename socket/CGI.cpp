@@ -6,7 +6,7 @@
 /*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:00:16 by jgoudema          #+#    #+#             */
-/*   Updated: 2024/07/10 20:34:30 by vilibert         ###   ########.fr       */
+/*   Updated: 2024/07/11 09:52:41 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ char ** CGI::stringToChar(void)
 	cenv[i] = NULL;
 	return (cenv);
 }
+
 void	CGI::closeCGI(int cgiId)
 {
 	close(_end);

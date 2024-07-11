@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgoudema <jgoudema@student.s19.be>         +#+  +:+       +#+        */
+/*   By: vilibert <vilibert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:34:54 by vilibert          #+#    #+#             */
-/*   Updated: 2024/07/10 21:51:54 by jgoudema         ###   ########.fr       */
+/*   Updated: 2024/07/11 09:47:53 by vilibert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,10 @@ void    Client::sendResponse(void)
 	else
 		result = write(_fd, Response::_buffer.c_str(), Response::_buffer.length());
 	if(result < 0)
+	{
 			Print::print(ERROR, "Send failed for Client " + to_string<int>(_id));
+			_settingsPtr->closeClient(_id);
+	}
 	else if(result == 0 || (unsigned int)result == Response::_buffer.length())
 	{
 			Print::print(DEBUG, "Response sent to Client " + to_string<int>(_id) + ".", *_serverPtr);
